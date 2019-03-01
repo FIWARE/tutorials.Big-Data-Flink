@@ -1,0 +1,21 @@
+curl -iX POST \
+  'http://localhost:1026/v2/subscriptions' \
+  -H 'Content-Type: application/json' \
+  -H 'fiware-service: openiot' \
+  -H 'fiware-servicepath: /' \
+  -d '{
+  "description": "Notify Flink of all context changes",
+  "subject": {
+    "entities": [
+      {
+        "idPattern": ".*"
+      }
+    ]
+  },
+  "notification": {
+    "http": {
+      "url": "http://172.17.0.1:9000/v2/notify"
+    }
+  },
+  "throttling": 5
+}'
