@@ -37,9 +37,9 @@ This tutorial is an introduction to the [FIWARE Cosmos Orion Flink Connector](ht
 
 # Real-time Processing of Historic Context Information using Apache Flink
 
-> "Those who cannot remember the past are condemned to repeat it."
+> "Who controls the past controls the future: who controls the present controls the past."
 >
-> — George Santayana. (The Life of Reason: The Phases of Human Progress, 1905-1906)
+> — George Orwell. "1984" (1949)
 
 
 [FIWARE Cosmos](https://fiware-draco.readthedocs.io/en/latest/) is a Generic Enabler that allows for an easier Big Data analysis over context integrated with some of the most popular Big Data platforms, such as [Apache Flink](https://flink.apache.org/) and [Apache Spark](https://spark.apache.org/).
