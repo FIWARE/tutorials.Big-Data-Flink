@@ -145,33 +145,136 @@ the repository:
 Where `<command>` will vary depending upon the databases we wish to activate. This command will also import seed data
 from the previous tutorials and provision the dummy IoT sensors on startup.
 
+To start the system, run the following command:
+
+```console
+./services start
+```
+
 > :information_source: **Note:** If you want to clean up and start over again you can do so with the following command:
 >
 > ```console
 > ./services stop
 > ```
 
-# MongoDB - Persisting Context Data into a Database
-
-Persisting historic context data using MongoDB technology is relatively simple to configure since we are already using a MongoDB instance to hold data related to the Orion Context Broker and the IoT Agent. The MongoDB instance is listening on the standard `27017` port and the overall architecture can be seen below:
-
-![](https://fiware.github.io/tutorials.Historic-Context-NIFI/img/mongo-draco-tutorial.png)
-
-```yaml
-mongo-db:
-    image: mongo:3.6
-    hostname: mongo-db
-    container_name: db-mongo
-    ports:
-        - "27017:27017"
-    networks:
-        - default
-    command: --bind_ip_all --smallfiles
-```
 
 
-To start the system with a **MongoDB** database only, run the following command:
+
+### Generating Context Data
+
+For the purpose of this tutorial, we must be monitoring a system where the context is periodically being updated. The
+dummy IoT Sensors can be used to do this. Open the device monitor page at `http://localhost:3000/device/monitor` and
+unlock a **Smart Door** and switch on a **Smart Lamp**. This can be done by selecting an appropriate the command from
+the drop down list and pressing the `send` button. The stream of measurements coming from the devices can then be seen
+on the same page:
+
+![](https://fiware.github.io/tutorials.Historic-Context-NIFI/img/door-open.gif)
+
+### Subscribing to context changes
+
+Once a dynamic context system is up and running, we need to inform **Draco** of changes in context.
+
+This is done by making a POST request to the `/v2/subscription` endpoint of the Orion Context Broker.
+
+-   The `fiware-service` and `fiware-servicepath` headers are used to filter the subscription to only listen to
+    measurements from the attached IoT Sensors, since they had been provisioned using these settings
+-   The `idPattern` in the request body ensures that Draco will be informed of all context data changes.
+-   The notification `url` must match the configured `Base Path and Listening port` of the Draco Listen HTTP Processor
+-   The `throttling` value defines the rate that changes are sampled.
+
+Do not forget to change $MY_IP to your machine's IP Address (must be accesible from the docker container):
+
+#### :one: Request:
 
 ```console
-./services mongodb
+curl -iX POST \
+  'http://localhost:1026/v2/subscriptions' \
+  -H 'Content-Type: application/json' \
+  -H 'fiware-service: openiot' \
+  -H 'fiware-servicepath: /' \
+  -d '{
+  "description": "Notify Flink of all context changes",
+  "subject": {
+    "entities": [
+      {
+        "idPattern": ".*"
+      }
+    ]
+  },
+  "notification": {
+    "http": {
+      "url": "http://$MY_IP:9001/v2/notify"
+    }
+  },
+  "throttling": 5
+}'
 ```
+
+As you can see, the database used to persist context data has no impact on the details of the subscription. It is the
+same for each database. The response will be **201 - Created**
+
+If a subscription has been created, you can check to see if it is firing by making a GET request to the
+`/v2/subscriptions` endpoint.
+
+#### :two: Request:
+
+```console
+curl -X GET \
+  'http://localhost:1026/v2/subscriptions/' \
+  -H 'fiware-service: openiot' \
+  -H 'fiware-servicepath: /'
+```
+
+#### Response:
+
+```json
+[
+  {
+    "id": "5d76059d14eda92b0686f255",
+    "description": "Notify Flink of all context changes",
+    "status": "active",
+    "subject": {
+      "entities": [
+        {
+          "idPattern": ".*"
+        }
+      ],
+      "condition": {
+        "attrs": []
+      }
+    },
+    "notification": {
+      "timesSent": 362,
+      "lastNotification": "2019-09-09T09:36:33.00Z",
+      "attrs": [],
+      "attrsFormat": "normalized",
+      "http": {
+        "url": "http://$MY_IP:9001/v2/notify"
+      },
+      "lastSuccess": "2019-09-09T09:36:33.00Z",
+      "lastSuccessCode": 200
+    },
+    "throttling": 5
+  }
+]
+
+```
+
+Within the `notification` section of the response, you can see several additional `attributes` which describe the health
+of the subscription
+
+If the criteria of the subscription have been met, `timesSent` should be greater than `0`. A zero value would indicate
+that the `subject` of the subscription is incorrect or the subscription has created with the wrong `fiware-service-path`
+or `fiware-service` header
+
+The `lastNotification` should be a recent timestamp - if this is not the case, then the devices are not regularly
+sending data. Remember to unlock the **Smart Door** and switch on the **Smart Lamp**
+
+The `lastSuccess` should match the `lastNotification` date - if this is not the case then **Cosmos** is not receiving the
+subscription properly. Check that the hostname and port are correct.
+
+Finally, check that the `status` of the subscription is `active` - an expired subscription will not fire.
+
+# Example 1: Receiving data and performing operations
+
+The first example makes use of the OrionSource in order to receive notifications from the Orion Context Broker. Specifically, the example receives a notification every time that a IoT device changes his status, and calculates the sum of each type of device.
