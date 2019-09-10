@@ -1,4 +1,4 @@
-package org.fiware.cosmos.orion.flink.connector.examples.example1
+package org.fiware.cosmos.orion.flink.connector.tutorial.example1
 
 
 import org.apache.flink.streaming.api.scala.{StreamExecutionEnvironment, _}
@@ -7,7 +7,7 @@ import org.fiware.cosmos.orion.flink.connector.{OrionSource}
 
 /**
   * Example1 Orion Connector
-  * @author @sonsoleslp
+  * @author @Javierlj
   */
 object Example1{
 
@@ -19,18 +19,15 @@ object Example1{
     // Process event stream
     val processedDataStream = eventStream
       .flatMap(event => event.entities)
-      .map(entity => {
-        val temp = entity.attrs("temperature").value.asInstanceOf[Number].floatValue()
-        new Temp_Node( entity.id, temp)
-      })
-      .keyBy("id")
-      .timeWindow(Time.seconds(5), Time.seconds(2))
-      .min("temperature")
+      .map(entity => new Sensor(entity.`type`,1))
+      .keyBy("device")
+      .timeWindow(Time.seconds(60))
+      .sum(1)
 
     // print the results with a single thread, rather than in parallel
     processedDataStream.print().setParallelism(1)
     env.execute("Socket Window NgsiEvent")
   }
 
-  case class Temp_Node(id: String, temperature: Float)
+  case class Sensor(device: String, sum: Int)
 }
