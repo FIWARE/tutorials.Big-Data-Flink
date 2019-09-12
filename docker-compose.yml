@@ -1,18 +1,9 @@
+
 version: "3.1"
 services:
-  mongo-db:
-    image: mongo:3.6
-    hostname: mongo-db
-    container_name: db-mongo
-    ports:
-      - "27017:27017"
-    networks:
-      - default
-    command: --bind_ip_all --smallfiles
-    volumes:
-      - mongo-db:/data
+  # Orion is the context broker
   orion:
-    image: fiware/orion:2.1.0
+    image: fiware/orion:2.2.0
     hostname: orion
     container_name: fiware-orion
     depends_on:
@@ -27,19 +18,66 @@ services:
     healthcheck:
       test: curl --fail -s http://localhost:1026/version || exit 1
 
-  # draco:
-  #   image: ging/fiware-draco:1.1.0
-  #   container_name: draco
-  #   depends_on:
-  #     - mysql-db
-  #   environment:
-  #     - NIFI_WEB_HTTP_PORT=9090
-  #   ports:
-  #     - "9090:9090"
-  #     - "5050:5050"
-  #   healthcheck:
-  #     test: curl --fail -s http://localhost:9090/nifi-api/system-diagnostics || exit 1
+  # IoT-Agent is configured for the UltraLight Protocol
+  iot-agent:
+    image: fiware/iotagent-ul:1.9.0
+    hostname: iot-agent
+    container_name: fiware-iot-agent
+    depends_on:
+      - mongo-db
+    networks:
+      - default
+    ports:
+      - "4041:4041"
+      - "7896:7896"
+    environment:
+      - IOTA_CB_HOST=orion # name of the context broker to update context
+      - IOTA_CB_PORT=1026 # port the context broker listens on to update context
+      - IOTA_NORTH_PORT=4041
+      - IOTA_REGISTRY_TYPE=mongodb #Whether to hold IoT device info in memory or in a database
+      - IOTA_LOG_LEVEL=DEBUG # The log level of the IoT Agent
+      - IOTA_TIMESTAMP=true # Supply timestamp information with each measurement
+      - IOTA_CB_NGSI_VERSION=v2 # use NGSIv2 when sending updates for active attributes
+      - IOTA_AUTOCAST=true # Ensure Ultralight number values are read as numbers not strings
+      - IOTA_MONGO_HOST=mongo-db # The host name of MongoDB
+      - IOTA_MONGO_PORT=27017 # The port mongoDB is listening on
+      - IOTA_MONGO_DB=iotagentul # The name of the database used in mongoDB
+      - IOTA_HTTP_PORT=7896 # The port used for device traffic over HTTP
+      - IOTA_PROVIDER_URL=http://iot-agent:4041
+    healthcheck:
+      test: curl --fail -s http://iot-agent:4041/iot/about || exit 1
 
+  # Tutorial acts as a series of dummy IoT Sensors over HTTP
+  tutorial:
+    image: fiware/tutorials.context-provider
+    hostname: tutorial
+    container_name: fiware-tutorial
+    networks:
+      default:
+        aliases:
+          - iot-sensors
+          - context-provider
+    expose:
+      - "3000"
+      - "3001"
+    ports:
+      - "3000:3000"
+      - "3001:3001"
+    environment:
+      - "DEBUG=tutorial:*"
+      - "WEB_APP_PORT=3000" # Port used by the content provider proxy and web-app for viewing data
+      - "IOTA_HTTP_HOST=iot-agent"
+      - "IOTA_HTTP_PORT=7896"
+      - "DUMMY_DEVICES_PORT=3001" # Port used by the dummy IOT devices to receive commands
+      - "DUMMY_DEVICES_TRANSPORT=HTTP" # Default transport used by dummy IoT devices
+      - "DUMMY_DEVICES_API_KEY=4jggokgpepnvsb2uv4s40d59ov"
+      - "CONTEXT_BROKER=http://orion:1026/v2" # URL of the context broker to update context
+      - "NGSI_LD_PREFIX="
+      - "OPENWEATHERMAP_KEY_ID=<ADD_YOUR_KEY_ID>"
+      - "TWITTER_CONSUMER_KEY=<ADD_YOUR_CONSUMER_KEY>"
+      - "TWITTER_CONSUMER_SECRET=<ADD_YOUR_CONSUMER_SECRET>"
+    healthcheck:
+      test: curl --fail -s http://tutorial:3000/version || exit 1
   jobmanager:
     image: flink:1.5.3-hadoop24-scala_2.11
     hostname: jobmanager
@@ -66,31 +104,54 @@ services:
       - "jobmanager:jobmanager"
     environment:
       - JOB_MANAGER_RPC_ADDRESS=jobmanager
-  iot-agent:
-    image: fiware/iotagent-ul:1.8.0
-    hostname: iot-agent
-    container_name: fiware-iot-agent
-    depends_on:
-      - mongo-db
+  # Database
+  mongo-db:
+    image: mongo:3.6
+    hostname: mongo-db
+    container_name: db-mongo
+    expose:
+      - "27017"
+    ports:
+      - "27017:27017"
     networks:
       - default
-    ports:
-      - "4041:4041"
-      - "7896:7896"
-    environment:
-      - "IOTA_CB_HOST=orion" # name of the context broker to update context
-      - "IOTA_CB_PORT=1026" # port the context broker listens on to update context
-      - "IOTA_NORTH_PORT=4041"
-      - "IOTA_REGISTRY_TYPE=mongodb" #Whether to hold IoT device info in memory or in a database
-      - "IOTA_LOG_LEVEL=DEBUG" #The log level of the IoT Agent
-      - "IOTA_TIMESTAMP=true"
-      - "IOTA_MONGO_HOST=mongo-db" # The host name of ongoDB
-      - "IOTA_MONGO_PORT=27017" # The port mongoDB is listening on
-      - "IOTA_MONGO_DB=iotagentul" # The name of the database used in mongoDB
-      - "IOTA_HTTP_PORT=7896" # The port used for device traffic over HTTP
-      - "IOTA_PROVIDER_URL=http://iot-agent:4041"
-    healthcheck:
-      test: curl --fail -s http://localhost:4041/iot/about || exit 1
+    command: --bind_ip_all --smallfiles
+    volumes:
+      - mongo-db:/data
+
+networks:
+  default:
+    ipam:
+      config:
+        - subnet: 172.18.100.0/24
+
+volumes:
+  mongo-db: ~
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   tutorial:
     image: fiware/tutorials.context-provider

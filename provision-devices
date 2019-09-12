@@ -8,7 +8,7 @@ set -e
 
 
 curl () {
-  docker run --network flinktutorial_default --rm appropriate/curl -s \
+  docker run --network fiware_default --rm appropriate/curl -s \
     "$@"
 }
 
