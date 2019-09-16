@@ -25,23 +25,14 @@ The tutorial uses [cUrl](https://ec.haxx.se/) commands throughout, but is also a
 <summary><strong>Details</strong></summary>
 
   
--  [Real-time Processing of Historic Context Information](#real-time-processing-of-historic-context-information-using-apache-flink)
+-  [Real-time Processing of Historic Context Information using Apache Flink](#real-time-processing-of-historic-context-information-using-apache-flink)
 -  [Architecture](#architecture)
 -  [Prerequisites](#prerequisites)
 -  [Docker and Docker Compose](#docker-and-docker-compose)
 -  [Cygwin for Windows](#cygwin-for-windows)
 -  [Start Up](#start-up)
--  [MongoDB - Persisting Context Data into a Database](#mongodb---persisting-context-data-into-a-database)
--  [MongoDB - Database Server Configuration](#mongodb---database-server-configuration)
--  [MongoDB - Draco Configuration](#mongodb---draco-configuration)
--  [MongoDB - Start up](#mongodb---start-up)
--  [Checking the Draco Service Health](#checking-the-draco-service-health)
--  [Generating Context Data](#generating-context-data)
--  [Subscribing to Context Changes](#subscribing-to-context-changes)
--  [MongoDB - Reading Data from a database](#mongodb----reading-data-from-a-database)
--  [Show Available Databases on the MongoDB server](#show-available-databases-on-the-mongodb-server)
--  [Read Historical Context from the server](#read-historical-context-from-the-server)
--  [Next Steps](#next-steps)
+-  [Example 1: Receiving data and preforming operations](#example-1-receiving-data-and-performing-operations)
+-  [Example 2: Receiving data, performing operations and writing back to the Context Broker](#example-2--receiving-data-performing-operations-and-writing-back-to-the-context-broker)
 
 </details>
 
@@ -121,7 +112,7 @@ to follow the instructions found [here](https://docs.docker.com/compose/install/
 
 You can check your current **Docker** and **Docker Compose** versions using the following commands:
 
-```console
+```bash
 docker-compose -v
 docker version
 ```
@@ -141,7 +132,7 @@ to provide a command-line functionality similar to a Linux distribution on Windo
 Before you start you should ensure that you have obtained or built the necessary Docker images locally. Please clone the repository and create the necessary images by running the commands as shown:
 
   
-```console
+```bash
 
 git clone https://github.com/sonsoleslp/fiware-cosmos-orion-flink-connector-tutorial.git
 
@@ -155,7 +146,7 @@ This command will also import seed data from the previous tutorials and provisio
 
 To start the system, run the following command:
  
-```console
+```bash
 
 ./services start
 
@@ -163,7 +154,7 @@ To start the system, run the following command:
 
 > :information_source: **Note:** If you want to clean up and start over again you can do so with the following command:
 >
-> ```console
+> ```bash
 > ./services stop
 > ```
   
@@ -375,7 +366,7 @@ If a subscription has been created, you can check to see if it is firing by maki
 
 #### :two: Request:
 
-```console
+```bash
 curl -X GET \
 'http://localhost:1026/v2/subscriptions/' \
 -H 'fiware-service: openiot' \
@@ -436,17 +427,17 @@ The second example switch on a lamp when his motion sensor detects movement.
 ## Setting up the scenario
 First we need to delete the subscription we create before:
 
-```console
+```bash
 curl -X DELETE   'http://localhost:1026/v2/subscriptions/$subscriptionId'   -H 'fiware-service: openiot'   -H 'fiware-servicepath: /'
 ```
 You can obtain the id of your subscription by making a GET request to the `/v2/subscriptions` endpoint.
 
-```console
+```bash
 curl -X GET   'http://localhost:1026/v2/subscriptions/'   -H 'fiware-service: openiot'   -H 'fiware-servicepath: /'
 ```
 
 Now we create other subscription that only notify when motion sensor detects movement:
-```console
+```bash
 curl -iX POST \
   'http://localhost:1026/v2/subscriptions' \
   -H 'Content-Type: application/json' \
@@ -516,7 +507,7 @@ As you can see, it is similar to the previous example. The main difference is th
 val sinkStream = processedDataStream.map(node =>  {  new OrionSinkObject("urn:ngsi-ld:Lamp"+ node.id.takeRight(3)+  "@on","http://localhost:3001/iot/lamp"+ node.id.takeRight(3),CONTENT_TYPE,METHOD)  }) OrionSink.addSink(sinkStream)
 ```
 The arguments of the **`OrionSinkObject`** are:
--   **Message**: ```"urn:ngsi-ld:Lamp"+ node.id.takeRight(3)+ "@on"``` (with takeRight(3) we get the number of the room, for example '001')
+-   **Message**: ```"urn:ngsi-ld:Lamp"+ node.id.takeRight(3)+ "@on"``` (takeRight(3) gets the number of the room, for example '001')
 -   **URL**: ```http://localhost:3001/iot/lamp"+ node.id.takeRight(3)```
 -   **Content Type**: `ContentType.Plain`.
 -   **HTTP Method**: `HTTPMethod.POST`.
