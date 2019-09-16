@@ -25,6 +25,7 @@ object Example2 {
       .filter(entity => (entity.attrs("count").value == "1"))
       .map(entity => new Sensor(entity.id))
       .keyBy("id")
+
       .timeWindow(Time.seconds(5), Time.seconds(2))
       .min("id")
 
