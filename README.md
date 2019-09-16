@@ -145,6 +145,8 @@ Before you start you should ensure that you have obtained or built the necessary
 
 git clone https://github.com/sonsoleslp/fiware-cosmos-orion-flink-connector-tutorial.git
 
+cd fiware-cosmos-orion-flink-connector-tutorial
+
 ./services create
 
 ```
@@ -163,13 +165,13 @@ To start the system, run the following command:
 >
 > ```console
 > ./services stop
-> ``
+> ```
   
 
 Next, install the connector JAR:
 
 ```
-cd fiware-cosmos-orion-flink-connector-tutorial/job
+cd job
 
 mvn install:install-file -Dfile=./orion.flink.connector-1.1.0.jar -DgroupId=org.fiware.cosmos -DartifactId=orion.flink.connector -Dversion=1.1.0 -Dpackaging=jar
 
