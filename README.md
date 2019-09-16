@@ -25,23 +25,14 @@ The tutorial uses [cUrl](https://ec.haxx.se/) commands throughout, but is also a
 <summary><strong>Details</strong></summary>
 
   
--  [Real-time Processing of Historic Context Information](#real-time-processing-of-historic-context-information-using-apache-flink)
+-  [Real-time Processing of Historic Context Information using Apache Flink](#real-time-processing-of-historic-context-information-using-apache-flink)
 -  [Architecture](#architecture)
 -  [Prerequisites](#prerequisites)
 -  [Docker and Docker Compose](#docker-and-docker-compose)
 -  [Cygwin for Windows](#cygwin-for-windows)
 -  [Start Up](#start-up)
--  [MongoDB - Persisting Context Data into a Database](#mongodb---persisting-context-data-into-a-database)
--  [MongoDB - Database Server Configuration](#mongodb---database-server-configuration)
--  [MongoDB - Draco Configuration](#mongodb---draco-configuration)
--  [MongoDB - Start up](#mongodb---start-up)
--  [Checking the Draco Service Health](#checking-the-draco-service-health)
--  [Generating Context Data](#generating-context-data)
--  [Subscribing to Context Changes](#subscribing-to-context-changes)
--  [MongoDB - Reading Data from a database](#mongodb----reading-data-from-a-database)
--  [Show Available Databases on the MongoDB server](#show-available-databases-on-the-mongodb-server)
--  [Read Historical Context from the server](#read-historical-context-from-the-server)
--  [Next Steps](#next-steps)
+-  [Example 1: Receiving data and preforming operations](#example-1-receiving-data-and-performing-operations)
+-  [Example 2: Receiving data, performing operations and writing back to the Context Broker](#example-2--receiving-data-performing-operations-and-writing-back-to-the-context-broker)
 
 </details>
 
