@@ -24,42 +24,23 @@ The tutorial uses [cUrl](https://ec.haxx.se/) commands throughout, but is also a
 <summary><strong>Details</strong></summary>
 
   
-
 -  [Real-time Processing of Historic Context Information](#real-time-processing-of-historic-context-information-using-apache-flink)
-
 -  [Architecture](#architecture)
-
 -  [Prerequisites](#prerequisites)
-
 -  [Docker and Docker Compose](#docker-and-docker-compose)
-
 -  [Cygwin for Windows](#cygwin-for-windows)
-
 -  [Start Up](#start-up)
-
 -  [MongoDB - Persisting Context Data into a Database](#mongodb---persisting-context-data-into-a-database)
-
 -  [MongoDB - Database Server Configuration](#mongodb---database-server-configuration)
-
 -  [MongoDB - Draco Configuration](#mongodb---draco-configuration)
-
 -  [MongoDB - Start up](#mongodb---start-up)
-
 -  [Checking the Draco Service Health](#checking-the-draco-service-health)
-
 -  [Generating Context Data](#generating-context-data)
-
 -  [Subscribing to Context Changes](#subscribing-to-context-changes)
-
 -  [MongoDB - Reading Data from a database](#mongodb----reading-data-from-a-database)
-
 -  [Show Available Databases on the MongoDB server](#show-available-databases-on-the-mongodb-server)
-
 -  [Read Historical Context from the server](#read-historical-context-from-the-server)
-
 -  [Next Steps](#next-steps)
-
-  
 
 </details>
 
@@ -67,40 +48,25 @@ The tutorial uses [cUrl](https://ec.haxx.se/) commands throughout, but is also a
 
 # Real-time Processing of Historic Context Information using Apache Flink
 
-  
 
 > "Who controls the past controls the future: who controls the present controls the past."
-
 >
-
 > — George Orwell. "1984" (1949)
-
-  
-  
 
 [FIWARE Cosmos](https://fiware-draco.readthedocs.io/en/latest/) is a Generic Enabler that allows for an easier Big Data analysis over context integrated with some of the most popular Big Data platforms, such as [Apache Flink](https://flink.apache.org/) and [Apache Spark](https://spark.apache.org/).
 
-  
-
 The [FIWARE Cosmos Orion Flink Connector](http://fiware-cosmos-flink.rtfd.io) is a software tool that enables a direct ingestion of the context data coming from the notifications sent by **Orion Context Broker** to the Apache Flink processing engine. This allows to aggregate data in a time window in order to extract value from them in real-time.
-
-  
 
 #### Device Monitor
 
-  
 
 For the purpose of this tutorial, a series of dummy IoT devices have been created, which will be attached to the context broker. Details of the architecture and protocol used can be found in the [IoT Sensors tutorial](https://github.com/FIWARE/tutorials.IoT-Sensors). The state of each device can be seen on the UltraLight device monitor web page found at: `http://localhost:3000/device/monitor`
 
-  
 
 ![FIWARE Monitor](https://fiware.github.io/tutorials.Historic-Context-NIFI/img/device-monitor.png)
-
-  
-
+ 
 # Architecture
 
-  
 
 This application builds on the components and dummy IoT devices created in [previous tutorials](https://github.com/FIWARE/tutorials.IoT-Agent/). It will make use of three FIWARE components - the [Orion Context Broker](https://fiware-orion.readthedocs.io/en/latest/), the [IoT Agent for Ultralight 2.0](https://fiware-iotagent-ul.readthedocs.io/en/latest/), and the [Cosmos Orion Flink Connector](https://fiware-cosmos-flink.readthedocs.io/en/latest/) for connecting Orion to an Apache Flink cluster. Additional databases are now involved - both the Orion Context Broker and the IoT Agent rely on [MongoDB](https://www.mongodb.com/) technology to keep persistence of the information they hold
 
