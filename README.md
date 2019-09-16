@@ -338,7 +338,7 @@ Do not forget to change $MY_IP to your machine's IP Address (must be accesible f
 
   
 
-```shell
+```bash
 curl -iX POST \
   'http://localhost:1026/v2/subscriptions' \
   -H 'Content-Type: application/json' \
