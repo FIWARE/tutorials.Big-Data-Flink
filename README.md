@@ -493,7 +493,7 @@ object Example2{
   processedDataStream.print().setParallelism(1)  
   
     val sinkStream = processedDataStream.map(node => {  
-      new OrionSinkObject("urn:ngsi-ld:Lamp"+ node.id.takeRight(3)+ "@on","http://localhost:3001/iot/lamp"+ node.id.takeRight(3),CONTENT_TYPE,METHOD)  
+      new OrionSinkObject("urn:ngsi-ld:Lamp"+ node.id.takeRight(3)+ "@on","http://${IP}:3001/iot/lamp"+ node.id.takeRight(3),CONTENT_TYPE,METHOD)  
     })   
     OrionSink.addSink(sinkStream)  
     env.execute("Socket Window NgsiEvent")  
@@ -504,12 +504,65 @@ object Example2{
 ```
 As you can see, it is similar to the previous example. The main difference is that it writes the processed data back in the Context Broker through the  **`OrionSink`**. 
 ```scala
-val sinkStream = processedDataStream.map(node =>  {  new OrionSinkObject("urn:ngsi-ld:Lamp"+ node.id.takeRight(3)+  "@on","http://localhost:3001/iot/lamp"+ node.id.takeRight(3),CONTENT_TYPE,METHOD)  }) OrionSink.addSink(sinkStream)
+val sinkStream = processedDataStream.map(node =>  {  new OrionSinkObject("urn:ngsi-ld:Lamp"+ node.id.takeRight(3)+  "@on","http://${IP}:3001/iot/lamp"+ node.id.takeRight(3),CONTENT_TYPE,METHOD)  }) OrionSink.addSink(sinkStream)
 ```
 The arguments of the **`OrionSinkObject`** are:
 -   **Message**: ```"urn:ngsi-ld:Lamp"+ node.id.takeRight(3)+ "@on"``` (takeRight(3) gets the number of the room, for example '001')
--   **URL**: ```http://localhost:3001/iot/lamp"+ node.id.takeRight(3)```
+-   **URL**: ```http://${IP}:3001/iot/lamp"+ node.id.takeRight(3)```
 -   **Content Type**: `ContentType.Plain`.
 -   **HTTP Method**: `HTTPMethod.POST`.
 
 You can open a door and the lamp will switch on.
+
+### Example 3: Packaging the code and submitting it to the Flink Job Manager
+In the previous examples, we've seen how to get the connector up and running from an IDE like IntelliJ. In a real case scenario, we might want to package our code and submit it to a Flink cluster in order to run our operations in parallel.
+
+
+### Subscribing to notifications
+First, we need to change the notification URL of our subscription to point to our Flink node like so:
+
+```bash
+curl -iX POST \
+  'http://localhost:1026/v2/subscriptions' \
+  -H 'Content-Type: application/json' \
+  -H 'fiware-service: openiot' \
+  -H 'fiware-servicepath: /' \
+  -d '{
+  "description": "Notify Flink of all context changes",
+  "subject": {
+    "entities": [
+      {
+        "idPattern": "Motion.*"
+      }
+    ]
+  },
+  "notification": {
+    "http": {
+      "url": "http://taskmanager:9001/notify"
+    }
+  },
+  "throttling": 5
+}'
+```
+
+
+### Packaging the code
+
+Let's build a JAR package of the example. In it, we need to include all the dependencies we have used, such as the connector, but exclude some of the dependencies provided by the environment (Flink, Scala...).
+This can be done through the `maven package` command without the `add-dependencies-for-IDEA` profile checked.
+This will build a JAR file under `target/orion.flink.connector.tutorial-1.0-SNAPSHOT.jar`.
+
+### Submitting the job
+
+
+Let's submit the Example 3 code to the Flink cluster we have deployed. In order to do this, open the Flink GUI on the browser ([http://localhost:8081](http://localhost:8081)) and select the **Submit new Job** section on the left menu.
+Click the **Add New** button and upload the JAR. Once uploaded, select it from the **Uploaded JARs** list and specify the class to execute:
+```scala
+org.fiware.cosmos.orion.flink.connector.tutorial.example2.Example2
+```
+
+![Screenshot](https://raw.githubusercontent.com/ging/fiware-cosmos-orion-flink-connector-examples/master/files/img/submit_job.png)
+
+
+Once filled in this field, you can click the **Submit** button and you will see that your job is running.
+Now you can open a door and see the lamp turning on.
