@@ -519,7 +519,7 @@ In the previous examples, we've seen how to get the connector up and running fro
 
 
 ### Subscribing to notifications
-First, we need to change the notification URL of our subscription to point to our Flink node like so (`files/example3/curl_SubscribeToEntityNotifications.sh`):
+First, we need to change the notification URL of our subscription to point to our Flink node like so:
 
 ```bash
 curl -iX POST \
