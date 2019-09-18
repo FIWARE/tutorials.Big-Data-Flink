@@ -8,13 +8,13 @@ curl -iX POST \
   "subject": {
     "entities": [
       {
-        "idPattern": ".*"
+        "idPattern": "Motion.*"
       }
     ]
   },
   "notification": {
     "http": {
-      "url": "http://172.17.0.1:9001/v2/notify"
+      "url": "http://taskmanager:9001/notify"
     }
   },
   "throttling": 5

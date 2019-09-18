@@ -22,10 +22,9 @@ object Example2 {
     // Process event stream
     val processedDataStream = eventStream
       .flatMap(event => event.entities)
-      .filter(entity => (entity.attrs("count").value == "1"))
+      .filter(entity => (entity.`type`== "Motion" && entity.attrs("count").value == "1"))
       .map(entity => new Sensor(entity.id))
       .keyBy("id")
-
       .timeWindow(Time.seconds(5), Time.seconds(2))
       .min("id")
 
@@ -33,7 +32,7 @@ object Example2 {
     processedDataStream.print().setParallelism(1)
 
     val sinkStream = processedDataStream.map(node => {
-      new OrionSinkObject("urn:ngsi-ld:Lamp" + node.id.takeRight(3) + "@on", "http://localhost:3001/iot/lamp" + node.id.takeRight(3), CONTENT_TYPE, METHOD)
+      new OrionSinkObject("urn:ngsi-ld:Lamp" + node.id.takeRight(3) + "@on", s"http://${IP}:3001/iot/lamp" + node.id.takeRight(3), CONTENT_TYPE, METHOD)
     })
     OrionSink.addSink(sinkStream)
     env.execute("Socket Window NgsiEvent")
