@@ -454,7 +454,7 @@ curl -iX POST \
   },
   "notification": {
     "http": {
-      "url": "http://172.17.0.1:9001/v2/notify"
+      "url": "http://${MY_IP}:9001/v2/notify"
     }
   },
   "throttling": 5
