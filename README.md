@@ -15,7 +15,7 @@ This tutorial is an introduction to the [FIWARE Cosmos Orion Flink Connector](ht
 The tutorial uses [cUrl](https://ec.haxx.se/) commands throughout, but is also available as [Postman documentation](https://fiware.github.io/tutorials.Historic-Context-NIFI/)
 
   
-[![Run in Postman](https://run.pstmn.io/button.svg)](https://app.getpostman.com/run-collection/64eda5ebb4b337c8784f)
+[![Run in Postman](https://run.pstmn.io/button.svg)](https://www.getpostman.com/collections/64eda5ebb4b337c8784f)
 
   
 ## Contents
