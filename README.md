@@ -69,12 +69,11 @@ Therefore the overall architecture will consist of the following elements:
 - Three **FIWARE Generic Enablers**:
     - The FIWARE [Orion Context Broker](https://fiware-orion.readthedocs.io/en/latest/) which will receive requests using [NGSI](https://fiware.github.io/specifications/OpenAPI/ngsiv2)
     - The FIWARE [IoT Agent for Ultralight 2.0](https://fiware-iotagent-ul.readthedocs.io/en/latest/) which will receive northbound measurements from the dummy IoT devices in [Ultralight 2.0](https://fiware-iotagent-ul.readthedocs.io/en/latest/usermanual/index.html#user-programmers-manual) format and convert them to [NGSI](https://fiware.github.io/specifications/OpenAPI/ngsiv2) requests for the context broker to alter the state of the context entities
-    - FIWARE [Cosmos Orion Flink Connector](https://fiware-cosmos-flink.readthedocs.io/en/latest/) which will subscribe to context changes and make operations on them in real-time
+    - The FIWARE [Cosmos Orion Flink Connector](https://fiware-cosmos-flink.readthedocs.io/en/latest/) which will subscribe to context changes and make operations on them in real-time
 - One **Database**:
     - The underlying [MongoDB](https://www.mongodb.com/) database :
         - Used by the **Orion Context Broker** to hold context data information such as data entities, subscriptions and registrations
         - Used by the **IoT Agent** to hold device information such as device URLs and Keys
-        - Potentially used as a data sink to hold the processed context data.
 - Three **Context Providers**:
   - The **Stock Management Frontend** is not used in this tutorial. It does the following:
 
@@ -105,7 +104,7 @@ technology which allows to different components isolated into their respective e
 -   To install Docker on Linux follow the instructions [here](https://docs.docker.com/install/)
 
 **Docker Compose** is a tool for defining and running multi-container Docker applications. A series of
-[YAML files](https://github.com/FIWARE/tutorials.Historic-Context-NIFI/tree/master/docker-compose) are used configure
+[YAML files](https://github.com/FIWARE/tutorials.Historic-Context-NIFI/tree/master/docker-compose) are used to configure
 the required services for the application. This means all container services can be brought up in a single command.
 Docker Compose is installed by default as part of Docker for Windows and Docker for Mac, however Linux users will need
 to follow the instructions found [here](https://docs.docker.com/compose/install/)
@@ -129,15 +128,13 @@ to provide a command-line functionality similar to a Linux distribution on Windo
 
   
 
-Before you start you should ensure that you have obtained or built the necessary Docker images locally. Please clone the repository and create the necessary images by running the commands as shown:
+Before you start you should ensure that you have obtained or built the necessary Docker images locally. Please clone the repository and create the necessary images by running the commands as shown. Note that you might need to run some of the commands as a privileged user:
 
   
 ```bash
 
 git clone https://github.com/sonsoleslp/fiware-cosmos-orion-flink-connector-tutorial.git
-
 cd fiware-cosmos-orion-flink-connector-tutorial
-
 ./services create
 
 ```
@@ -147,9 +144,7 @@ This command will also import seed data from the previous tutorials and provisio
 To start the system, run the following command:
  
 ```bash
-
 ./services start
-
 ```
 
 > :information_source: **Note:** If you want to clean up and start over again you can do so with the following command:
@@ -159,11 +154,10 @@ To start the system, run the following command:
 > ```
   
 
-Next, install the connector JAR:
+Next, in order to use the Orion Flink Connector we need to install the JAR using Maven:
 
 ```
 cd job
-
 mvn install:install-file -Dfile=./orion.flink.connector-1.1.0.jar -DgroupId=org.fiware.cosmos -DartifactId=orion.flink.connector -Dversion=1.1.0 -Dpackaging=jar
 
 ```
@@ -183,7 +177,7 @@ on the same page:
 # Example 1: Receiving data and performing operations
 
 
-The first example makes use of the OrionSource in order to receive notifications from the Orion Context Broker. Specifically, the example calculates the sum of notifications  that each type of device sends in one minute.
+The first example makes use of the OrionSource in order to receive notifications from the Orion Context Broker. Specifically, the example counts the number notifications that each type of device sends in one minute. You can find the code of Example 1 in `job/src/main/scala/org/fiware/cosmos/orion/flink/connector/tutorial/example1/Example1.scala`:
 
 ```scala 
 
@@ -220,8 +214,7 @@ object Example1{
 }
 
 ```
-
-After importing the necessary dependencies, the first step is creating the source and adding it to the environment.
+The first lines of the program are aimed at importing the necessary dependencies, including the connector. After that, the first step is to create an instance of the Orion Source using the class provided by the connector and to add it to the environment provided by Flink.
 
 
 ```scala
@@ -230,12 +223,12 @@ val eventStream = env.addSource(new OrionSource(9001))
 
 ```
 
-The `OrionSource` accepts a port number as a parameter. The data received from this source is a `DataStream` of `NgsiEvent` objects.
+The `OrionSource` accepts a port number as a parameter. The connector will be listening through this port to data coming from Orion. These data will be in the form of a `DataStream` of `NgsiEvent` objects.
 
 You can check the details of this object in the [connector docs](https://github.com/ging/fiware-cosmos-orion-flink-connector/blob/master/README.md#orionsource).
 
   
-In the example, the first step of the processing is flat-mapping the entities. This operation is performed in order to put together the entity objects of severall NGSI Events.
+In the example, the first step of the processing is flat-mapping the entities. This operation is performed in order to put together the entity objects of all the NGSI Events received in a period of time.
 
 ```scala
 
@@ -245,7 +238,7 @@ val processedDataStream = eventStream
 
 ```
 
-Once you have all the entities, you can iterate over them (with `map`) and extract the desired attributes; in this case, it is the sensor type(Door,Motion,Bell or Lamp).
+Once you have all the entities together, you can iterate over them (with `map`) and extract the desired attributes. In this case, you are interested in the sensor type (Door, Motion, Bell or Lamp).
 
 ```scala
 
@@ -255,7 +248,7 @@ Once you have all the entities, you can iterate over them (with `map`) and extra
 
 ```
 
-In each iteration you create a custom object with the properties you need: the sensor type and the increment of each notification. For this purpose, you can define a case class like so:
+In each iteration, you create a custom object with the properties you need: the sensor type and the increment of each notification. For this purpose, you can define a case class like so:
 
 ```scala
 
@@ -313,13 +306,12 @@ Sensor(Motion,6)
 
 ### Subscribing to context changes
 
-Once a dynamic context system is up and running(execute Example1), we need to inform **Flink** of changes in context.
+Once a dynamic context system is up and running (execute Example1), we need to inform **Flink** of changes in context.
 
 This is done by making a POST request to the `/v2/subscription` endpoint of the Orion Context Broker.
 
 - The `fiware-service` and `fiware-servicepath` headers are used to filter the subscription to only listen to measurements from the attached IoT Sensors, since they had been provisioned using these settings
 
-- The `idPattern` in the request body ensures that Draco will be informed of all context data changes.
 
 - The notification `url` must match the configured `Base Path and Listening port` of the Draco Listen HTTP Processor
 
@@ -357,9 +349,7 @@ curl -iX POST \
 
   
 
-As you can see, the database used to persist context data has no impact on the details of the subscription. It is the
-
-same for each database. The response will be **201 - Created**
+The response will be `**201 - Created**`
 
 If a subscription has been created, you can check to see if it is firing by making a GET request to the `/v2/subscriptions` endpoint.
 
@@ -425,7 +415,7 @@ Finally, check that the `status` of the subscription is `active` - an expired su
 The second example switch on a lamp when his motion sensor detects movement.
 
 ## Setting up the scenario
-First we need to delete the subscription we create before:
+First we need to delete the subscription we created before:
 
 ```bash
 curl -X DELETE   'http://localhost:1026/v2/subscriptions/$subscriptionId'   -H 'fiware-service: openiot'   -H 'fiware-servicepath: /'
