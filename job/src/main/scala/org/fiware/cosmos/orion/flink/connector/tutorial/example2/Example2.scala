@@ -32,7 +32,7 @@ object Example2 {
     processedDataStream.print().setParallelism(1)
 
     val sinkStream = processedDataStream.map(node => {
-      new OrionSinkObject("urn:ngsi-ld:Lamp" + node.id.takeRight(3) + "@on", s"http://${IP}:3001/iot/lamp" + node.id.takeRight(3), CONTENT_TYPE, METHOD)
+      new OrionSinkObject("urn:ngsi-ld:Lamp" + node.id.takeRight(3) + "@on", "http://localhost:3001/iot/lamp" + node.id.takeRight(3), CONTENT_TYPE, METHOD)
     })
     OrionSink.addSink(sinkStream)
     env.execute("Socket Window NgsiEvent")
