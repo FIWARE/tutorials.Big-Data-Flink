@@ -154,7 +154,7 @@ To start the system, run the following command:
 > ```
   
 
-Next, in order to use the Orion Flink Connector we need to install the JAR using Maven:
+Next, in order to use the Orion Flink Connector we need to install the JAR using Maven(install Maven if you don't have it):
 
 ```
 cd job
@@ -172,7 +172,11 @@ on the same page:
 
 ![](https://fiware.github.io/tutorials.Historic-Context-NIFI/img/door-open.gif)
   
+### Running examples locally
 
+For running locally we should download [IntelliJ](https://www.jetbrains.com/idea/download) and open the project using [Maven](https://www.jetbrains.com/help/idea/maven-support.html#maven_import_project_start). 
+
+Open IntelliJ and go to `job` directory to start with examples:
 
 # Example 1: Receiving data and performing operations
 
@@ -426,7 +430,7 @@ You can obtain the id of your subscription by making a GET request to the `/v2/s
 curl -X GET   'http://localhost:1026/v2/subscriptions/'   -H 'fiware-service: openiot'   -H 'fiware-servicepath: /'
 ```
 
-Now we create other subscription that only notify when motion sensor detects movement:
+Now we create other subscription that only notify when motion sensor detects movement.Do not forget to change $MY_IP to your machine's IP Address (must be accesible from the docker container):
 ```bash
 curl -iX POST \
   'http://localhost:1026/v2/subscriptions' \
@@ -502,6 +506,43 @@ The arguments of the **`OrionSinkObject`** are:
 -   **Content Type**: `ContentType.Plain`.
 -   **HTTP Method**: `HTTPMethod.POST`.
 
+## Setting up the scenario
+First we need to delete the subscription we created before:
+
+```bash
+curl -X DELETE   'http://localhost:1026/v2/subscriptions/$subscriptionId'   -H 'fiware-service: openiot'   -H 'fiware-servicepath: /'
+```
+You can obtain the id of your subscription by making a GET request to the `/v2/subscriptions` endpoint.
+
+```bash
+curl -X GET   'http://localhost:1026/v2/subscriptions/'   -H 'fiware-service: openiot'   -H 'fiware-servicepath: /'
+```
+
+Now we create other subscription that only notify when motion sensor detects movement:
+```bash
+curl -iX POST \
+  'http://localhost:1026/v2/subscriptions' \
+  -H 'Content-Type: application/json' \
+  -H 'fiware-service: openiot' \
+  -H 'fiware-servicepath: /' \
+  -d '{
+  "description": "Notify Flink of all context changes",
+  "subject": {
+    "entities": [
+      {
+        "idPattern": "Motion.*"
+      }
+    ]
+  },
+  "notification": {
+    "http": {
+      "url": "http://${MY_IP}:9001/v2/notify"
+    }
+  },
+  "throttling": 5
+}'
+```
+
 You can open a door and the lamp will switch on.
 
 ### Example 3: Packaging the code and submitting it to the Flink Job Manager
@@ -535,6 +576,16 @@ curl -iX POST \
 }'
 ```
 
+### Change code
+
+You should change localhost in example 2 for your IP(must be accesible from the docker container)
+```scala
+new OrionSinkObject("urn:ngsi-ld:Lamp" + node.id.takeRight(3) + "@on", s"http://${IP}:3001/iot/lamp" + node.id.takeRight(3), CONTENT_TYPE, METHOD)
+```
+
+```scala
+new OrionSinkObject("urn:ngsi-ld:Lamp" + node.id.takeRight(3) + "@on", "http://${IP}:3001/iot/lamp" + node.id.takeRight(3), CONTENT_TYPE, METHOD)
+```
 
 ### Packaging the code
 
