@@ -418,42 +418,6 @@ Finally, check that the `status` of the subscription is `active` - an expired su
 # Example 2:  Receiving data, performing operations and writing back to the Context Broker
 The second example switch on a lamp when his motion sensor detects movement.
 
-## Setting up the scenario
-First we need to delete the subscription we created before:
-
-```bash
-curl -X DELETE   'http://localhost:1026/v2/subscriptions/$subscriptionId'   -H 'fiware-service: openiot'   -H 'fiware-servicepath: /'
-```
-You can obtain the id of your subscription by making a GET request to the `/v2/subscriptions` endpoint.
-
-```bash
-curl -X GET   'http://localhost:1026/v2/subscriptions/'   -H 'fiware-service: openiot'   -H 'fiware-servicepath: /'
-```
-
-Now we create other subscription that only notify when motion sensor detects movement.Do not forget to change $MY_IP to your machine's IP Address (must be accesible from the docker container):
-```bash
-curl -iX POST \
-  'http://localhost:1026/v2/subscriptions' \
-  -H 'Content-Type: application/json' \
-  -H 'fiware-service: openiot' \
-  -H 'fiware-servicepath: /' \
-  -d '{
-  "description": "Notify Flink of all context changes",
-  "subject": {
-    "entities": [
-      {
-        "idPattern": "Motion.*"
-      }
-    ]
-  },
-  "notification": {
-    "http": {
-      "url": "http://${MY_IP}:9001/v2/notify"
-    }
-  },
-  "throttling": 5
-}'
-```
 
 ## Switching on a lamp
 Let's take a look at the Example2 code now:
@@ -518,7 +482,7 @@ You can obtain the id of your subscription by making a GET request to the `/v2/s
 curl -X GET   'http://localhost:1026/v2/subscriptions/'   -H 'fiware-service: openiot'   -H 'fiware-servicepath: /'
 ```
 
-Now we create other subscription that only notify when motion sensor detects movement:
+Now we create other subscription that only notify when motion sensor detects movement. Do not forget to change $MY_IP to your machine's IP Address (must be accesible from the docker container):
 ```bash
 curl -iX POST \
   'http://localhost:1026/v2/subscriptions' \
