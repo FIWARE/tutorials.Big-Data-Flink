@@ -79,7 +79,7 @@ services:
     healthcheck:
       test: curl --fail -s http://tutorial:3000/version || exit 1
   jobmanager:
-    image: flink:1.5.3-hadoop24-scala_2.11
+    image: flink:1.9.0-scala_2.11
     hostname: jobmanager
     container_name: jobmanager
     expose:
@@ -91,7 +91,7 @@ services:
       - JOB_MANAGER_RPC_ADDRESS=jobmanager
 
   taskmanager:
-    image: flink:1.5.3-hadoop24-scala_2.11
+    image: flink:1.9.0-scala_2.11
     hostname: taskmanager
     container_name: taskmanager
     expose:
