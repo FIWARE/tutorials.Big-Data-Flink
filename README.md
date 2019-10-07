@@ -565,7 +565,7 @@ Click the **Add New** button and upload the JAR. Once uploaded, select it from t
 org.fiware.cosmos.orion.flink.connector.tutorial.example2.Example2
 ```
 
-![Screenshot](https://raw.githubusercontent.com/ging/fiware-cosmos-orion-flink-connector-examples/master/files/img/submit_job.png)
+![Screenshot](https://raw.githubusercontent.com/sonsoleslp/fiware-cosmos-orion-flink-connector-tutorial/master/img/submit-flink.png)
 
 
 Once filled in this field, you can click the **Submit** button and you will see that your job is running.
