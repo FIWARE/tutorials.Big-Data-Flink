@@ -510,6 +510,9 @@ You can open a door and the lamp will switch on.
 
 ### Example 3: Packaging the code and submitting it to the Flink Job Manager
 In the previous examples, we've seen how to get the connector up and running from an IDE like IntelliJ. In a real case scenario, we might want to package our code and submit it to a Flink cluster in order to run our operations in parallel.
+The Flink Dashoard is listening on port 8081:
+
+![Screenshot](https://raw.githubusercontent.com/sonsoleslp/fiware-cosmos-orion-flink-connector-tutorial/master/img/Tutorial FIWARE Flink.png)
 
 
 ### Subscribing to notifications
