@@ -309,9 +309,9 @@ This is done by making a POST request to the `/v2/subscription` endpoint of the 
 - The `fiware-service` and `fiware-servicepath` headers are used to filter the subscription to only listen to measurements from the attached IoT Sensors, since they had been provisioned using these settings
 
 - The notification `url` must match the one our Flink program is listening to. Substiture ${MY_IP} for your machine's IP address in the docker0 network (must be accesible from the docker container). You can get this IP like so:
-  ```
+```bash
 docker network inspect bridge --format='{{(index .IPAM.Config 0).Gateway}}'
-  ```
+```
 
 - The `throttling` value defines the rate that changes are sampled.
 
