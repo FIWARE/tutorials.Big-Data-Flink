@@ -178,7 +178,7 @@ on the same page:
   
 ### Running examples locally
 
-For running locally we should download [IntelliJ](https://www.jetbrains.com/idea/download) and open the `job` directory of the project using [Maven](https://www.jetbrains.com/help/idea/maven-support.html#maven_import_project_start). 
+For running locally we should download [IntelliJ](https://www.jetbrains.com/idea/download) and open the `job` directory of the project using [Maven](https://www.jetbrains.com/help/idea/maven-support.html#maven_import_project_start). Use JDK 1.8 
 
 #### Example 1: Receiving data and performing operations
 
