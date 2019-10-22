@@ -163,7 +163,7 @@ Next, in order to use the Orion Flink Connector we need to install the JAR using
 
 ```
 cd job
-mvn install:install-file -Dfile=./orion.flink.connector-1.1.0.jar -DgroupId=org.fiware.cosmos -DartifactId=orion.flink.connector -Dversion=1.1.0 -Dpackaging=jar
+mvn install:install-file -Dfile=./orion.flink.connector-1.2.0.jar -DgroupId=org.fiware.cosmos -DartifactId=orion.flink.connector -Dversion=1.2.0 -Dpackaging=jar
 ```
 
 ### Generating Context Data
@@ -178,7 +178,7 @@ on the same page:
   
 ### Running examples locally
 
-For running locally we should download [IntelliJ](https://www.jetbrains.com/idea/download) and open the `job` directory of the project using [Maven](https://www.jetbrains.com/help/idea/maven-support.html#maven_import_project_start). 
+For running locally we should download [IntelliJ](https://www.jetbrains.com/idea/download) and open the `job` directory of the project using [Maven](https://www.jetbrains.com/help/idea/maven-support.html#maven_import_project_start). Use JDK 1.8 
 
 #### Example 1: Receiving data and performing operations
 
@@ -308,10 +308,10 @@ This is done by making a POST request to the `/v2/subscription` endpoint of the 
 
 - The `fiware-service` and `fiware-servicepath` headers are used to filter the subscription to only listen to measurements from the attached IoT Sensors, since they had been provisioned using these settings
 
-- The notification `url` must match the one our Flink program is listening to. Substiture ${MY_IP} for your machine's IP address in the docker0 network (must be accesible from the docker container). You can get this IP like so:
-  ```
+- The notification `url` must match the one our Flink program is listening to. Substiture ${MY_IP} for your machine's IP address in the docker0 network (must be accesible from the docker container). You can get this IP like so (maybe yo need to use sudo):
+```bash
 docker network inspect bridge --format='{{(index .IPAM.Config 0).Gateway}}'
-  ```
+```
 
 - The `throttling` value defines the rate that changes are sampled.
 
