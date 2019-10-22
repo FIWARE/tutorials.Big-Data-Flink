@@ -163,7 +163,7 @@ Next, in order to use the Orion Flink Connector we need to install the JAR using
 
 ```
 cd job
-mvn install:install-file -Dfile=./orion.flink.connector-1.2.0.jar -DgroupId=org.fiware.cosmos -DartifactId=orion.flink.connector -Dversion=1.2.0 -Dpackaging=jar
+mvn install:install-file -Dfile=./orion.flink.connector-1.2.1.jar -DgroupId=org.fiware.cosmos -DartifactId=orion.flink.connector -Dversion=1.2.1 -Dpackaging=jar
 ```
 
 ### Generating Context Data
