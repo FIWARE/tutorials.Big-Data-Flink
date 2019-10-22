@@ -11,8 +11,10 @@ import org.fiware.cosmos.orion.flink.connector._
   * @author @Javierlj
   */
 object Example2 {
-  final val CONTENT_TYPE = ContentType.Plain
-  final val METHOD = HTTPMethod.POST
+  final val CONTENT_TYPE = ContentType.JSON
+  final val METHOD = HTTPMethod.PATCH
+  final val CONTENT = "{\n  \"on\": {\n      \"type\" : \"command\",\n      \"value\" : \"\"\n  }\n}"
+  final val HEADERS = Map("fiware-service" -> "openiot","fiware-servicepath" -> "/","Accept" -> "*/*")
 
   def main(args: Array[String]): Unit = {
     val env = StreamExecutionEnvironment.getExecutionEnvironment
@@ -32,7 +34,7 @@ object Example2 {
     processedDataStream.print().setParallelism(1)
 
     val sinkStream = processedDataStream.map(node => {
-      new OrionSinkObject("urn:ngsi-ld:Lamp" + node.id.takeRight(3) + "@on", "http://localhost:3001/iot/lamp" + node.id.takeRight(3), CONTENT_TYPE, METHOD)
+      new OrionSinkObject(CONTENT, "http://localhost:1026/v2/entities/Lamp:"+node.id.takeRight(3)+"/attrs", CONTENT_TYPE, METHOD, HEADERS)
     })
     OrionSink.addSink(sinkStream)
     env.execute("Socket Window NgsiEvent")
