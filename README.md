@@ -432,6 +432,9 @@ import org.fiware.cosmos.orion.flink.connector._
 object Example2{  
   final val CONTENT_TYPE = ContentType.Plain  
   final val METHOD = HTTPMethod.POST  
+  final val CONTENT = "{\n  \"on\": {\n      \"type\" : \"command\",\n      \"value\" : \"\"\n  }\n}"
+  final val HEADERS = Map("fiware-service" -> "openiot","fiware-servicepath" -> "/","Accept" -> "*/*")
+  
   def main(args: Array[String]): Unit = {  
     val env = StreamExecutionEnvironment.getExecutionEnvironment  
   // Create Orion Source. Receive notifications on port 9001  
@@ -461,15 +464,18 @@ object Example2{
 ```
 As you can see, it is similar to the previous example. The main difference is that it writes the processed data back in the Context Broker through the  **`OrionSink`**. 
 ```scala
-val sinkStream = processedDataStream.map(node =>  {  new OrionSinkObject("urn:ngsi-ld:Lamp"+ node.id.takeRight(3)+  "@on","http://${MY_IP}:3001/iot/lamp"+ node.id.takeRight(3),CONTENT_TYPE,METHOD)  }) 
+val sinkStream = processedDataStream.map(node => {
+      new OrionSinkObject(CONTENT, "http://localhost:1026/v2/entities/Lamp:"+node.id.takeRight(3)+"/attrs", CONTENT_TYPE,         METHOD, HEADERS)
+    })
 
 OrionSink.addSink(sinkStream)
 ```
 The arguments of the **`OrionSinkObject`** are:
--   **Message**: ```"urn:ngsi-ld:Lamp"+ node.id.takeRight(3)+ "@on"``` (takeRight(3) gets the number of the room, for example '001')
--   **URL**: ```http://${IP}:3001/iot/lamp"+ node.id.takeRight(3)```
+-   **Message**: ```"{\n  \"on\": {\n      \"type\" : \"command\",\n      \"value\" : \"\"\n  }\n}"``` We send 'on' command 
+-   **URL**: ```"http://localhost:1026/v2/entities/Lamp:"+node.id.takeRight(3)+"/attrs"``` takeRight(3) gets the number of the room, for example '001')
 -   **Content Type**: `ContentType.Plain`.
 -   **HTTP Method**: `HTTPMethod.POST`.
+-   **Headers**: `Map("fiware-service" -> "openiot","fiware-servicepath" -> "/","Accept" -> "*/*")`. Optional parameter. We add the headers we need in the HTTP Request.
 
 ##### Setting up the scenario
 First we need to delete the subscription we created before:
@@ -551,11 +557,13 @@ We should change localhost in example 2 for the orion container hostname:
 
 * Example 2
 ```scala
-new OrionSinkObject("urn:ngsi-ld:Lamp" + node.id.takeRight(3) + "@on", s"http://localhost:3001/iot/lamp" + node.id.takeRight(3), CONTENT_TYPE, METHOD)
+      new OrionSinkObject(CONTENT, "http://localhost:1026/v2/entities/Lamp:"+node.id.takeRight(3)+"/attrs", CONTENT_TYPE, METHOD, HEADERS)
+
 ```
 * Example 3
 ```scala
-new OrionSinkObject("urn:ngsi-ld:Lamp" + node.id.takeRight(3) + "@on", "http://orion:1026/iot/lamp" + node.id.takeRight(3), CONTENT_TYPE, METHOD)
+      new OrionSinkObject(CONTENT, "http://orion:1026/v2/entities/Lamp:"+node.id.takeRight(3)+"/attrs", CONTENT_TYPE, METHOD, HEADERS)
+
 ```
 
 ##### Packaging the code
