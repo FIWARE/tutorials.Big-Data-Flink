@@ -1,30 +1,30 @@
 
-[![FIWARE Banner](https://fiware.github.io/tutorials.Historic-Context-NIFI/img/fiware.png)](https://www.fiware.org/developers)
+[![FIWARE Banner](https://fiware.github.io/tutorials.Big-Data-Analysis/img/fiware.png)](https://www.fiware.org/developers)
 
 [![FIWARE Context processing, analysis and visualisation](https://nexus.lab.fiware.org/static/badges/chapters/processing.svg)](https://github.com/FIWARE/catalogue/blob/master/processing/README.md)
-[![License: MIT](https://img.shields.io/github/license/fiware/tutorials.Historic-Context-NIFI.svg)](https://opensource.org/licenses/MIT)
+[![License: MIT](https://img.shields.io/github/license/fiware/tutorials.Big-Data-Analysis.svg)](https://opensource.org/licenses/MIT)
 [![NGSI v2](https://img.shields.io/badge/NGSI-v2-blue.svg)](https://fiware-ges.github.io/orion/api/v2/stable/)
 [![Support badge](https://nexus.lab.fiware.org/repository/raw/public/badges/stackoverflow/fiware.svg)](https://stackoverflow.com/questions/tagged/fiware)
 <br/>  [![Documentation](https://img.shields.io/readthedocs/fiware-tutorials.svg)](https://fiware-tutorials.rtfd.io)
 
-  
+
 
 This tutorial is an introduction to the [FIWARE Cosmos Orion Flink Connector](http://fiware-cosmos-flink.rtfd.io), which enables easier Big Data analysis over context, integrated with one of the most popular BigData platforms: [Apache Flink](https://flink.apache.org/). Apache Flink is a framework and distributed processing engine for stateful computations over unbounded and bounded data streams. Flink has been designed to run in all common cluster environments, perform computations at in-memory speed and at any scale.
 
-  
-The tutorial uses [cUrl](https://ec.haxx.se/) commands throughout, but is also available as [Postman documentation](https://fiware.github.io/tutorials.Historic-Context-NIFI/)
 
-  
+The tutorial uses [cUrl](https://ec.haxx.se/) commands throughout, but is also available as [Postman documentation](https://fiware.github.io/tutorials.Big-Data-Analysis/)
+
+
 [![Run in Postman](https://run.pstmn.io/button.svg)](https://www.getpostman.com/collections/64eda5ebb4b337c8784f)
 
-  
+
 ## Contents
 
 <details>
 
 <summary><strong>Details</strong></summary>
 
-  
+
 -  [Real-time Processing of Historic Context Information using Apache Flink](#real-time-processing-of-historic-context-information-using-apache-flink)
 -  [Architecture](#architecture)
 -  [Prerequisites](#prerequisites)
@@ -36,7 +36,7 @@ The tutorial uses [cUrl](https://ec.haxx.se/) commands throughout, but is also a
 
 </details>
 
-  
+
 
 # Real-time Processing of Historic Context Information using Apache Flink
 
@@ -55,14 +55,14 @@ The [FIWARE Cosmos Orion Flink Connector](http://fiware-cosmos-flink.rtfd.io) is
 For the purpose of this tutorial, a series of dummy IoT devices have been created, which will be attached to the context broker. Details of the architecture and protocol used can be found in the [IoT Sensors tutorial](https://github.com/FIWARE/tutorials.IoT-Sensors). The state of each device can be seen on the UltraLight device monitor web page found at: `http://localhost:3000/device/monitor`
 
 
-![FIWARE Monitor](https://fiware.github.io/tutorials.Historic-Context-NIFI/img/device-monitor.png)
- 
+![FIWARE Monitor](https://fiware.github.io/tutorials.Big-Data-Analysis/img/device-monitor.png)
+
 # Architecture
 
 
 This application builds on the components and dummy IoT devices created in [previous tutorials](https://github.com/FIWARE/tutorials.IoT-Agent/). It will make use of three FIWARE components - the [Orion Context Broker](https://fiware-orion.readthedocs.io/en/latest/), the [IoT Agent for Ultralight 2.0](https://fiware-iotagent-ul.readthedocs.io/en/latest/), and the [Cosmos Orion Flink Connector](https://fiware-cosmos-flink.readthedocs.io/en/latest/) for connecting Orion to an Apache Flink cluster. Additional databases are now involved - both the Orion Context Broker and the IoT Agent rely on [MongoDB](https://www.mongodb.com/) technology to keep persistence of the information they hold
 
-  
+
 
 Therefore the overall architecture will consist of the following elements:
 
@@ -86,7 +86,7 @@ Therefore the overall architecture will consist of the following elements:
     - returns context data back to the Orion Context Broker in
  [NGSI](https://fiware.github.io/specifications/OpenAPI/ngsiv2) format.
 
-  
+
 Since all interactions between the elements are initiated by HTTP requests, the entities can be containerized and run from exposed ports.
 
 The specific architecture of each section of the tutorial is discussed below.
@@ -103,7 +103,7 @@ technology which allows to different components isolated into their respective e
 -   To install Docker on Linux follow the instructions [here](https://docs.docker.com/install/)
 
 **Docker Compose** is a tool for defining and running multi-container Docker applications. A series of
-[YAML files](https://github.com/FIWARE/tutorials.Historic-Context-NIFI/tree/master/docker-compose) are used to configure
+[YAML files](https://github.com/FIWARE/tutorials.Big-Data-Analysis/tree/master/docker-compose) are used to configure
 the required services for the application. This means all container services can be brought up in a single command.
 Docker Compose is installed by default as part of Docker for Windows and Docker for Mac, however Linux users will need
 to follow the instructions found [here](https://docs.docker.com/compose/install/)
@@ -119,7 +119,7 @@ Please ensure that you are using Docker version 18.03 or higher and Docker Compo
 necessary.
 
 ## Maven
-[Apache Maven](https://maven.apache.org/download.cgi) is a software project management and comprehension tool. Based on the concept of a project object model (POM), Maven can manage a project's build, reporting and documentation from a central piece of information. We will use Maven to define and download our dependencies and to build and package our code into a JAR file. 
+[Apache Maven](https://maven.apache.org/download.cgi) is a software project management and comprehension tool. Based on the concept of a project object model (POM), Maven can manage a project's build, reporting and documentation from a central piece of information. We will use Maven to define and download our dependencies and to build and package our code into a JAR file.
 
 ## IntelliJ (optional)
 [IntelliJ](https://www.jetbrains.com/idea/) is an IDE that eases the development of Scala programs. We will use it to write and run our code.
@@ -132,11 +132,11 @@ to provide a command-line functionality similar to a Linux distribution on Windo
 
 # Start Up
 
-  
+
 
 Before you start, you should ensure that you have obtained or built the necessary Docker images locally. Please clone the repository and create the necessary images by running the commands shown below. Note that you might need to run some of the commands as a privileged user:
 
-  
+
 ```bash
 
 git clone https://github.com/sonsoleslp/fiware-cosmos-orion-flink-connector-tutorial.git
@@ -147,7 +147,7 @@ cd fiware-cosmos-orion-flink-connector-tutorial
 This command will also import seed data from the previous tutorials and provision the dummy IoT sensors on startup.
 
 To start the system, run the following command:
- 
+
 ```bash
 ./services start
 ```
@@ -157,7 +157,7 @@ To start the system, run the following command:
 > ```bash
 > ./services stop
 > ```
-  
+
 
 Next, in order to use the Orion Flink Connector we need to install the JAR using Maven:
 
@@ -174,17 +174,17 @@ unlock a **Smart Door** and switch on a **Smart Lamp**. This can be done by sele
 the drop down list and pressing the `send` button. The stream of measurements coming from the devices can then be seen
 on the same page:
 
-![](https://fiware.github.io/tutorials.Historic-Context-NIFI/img/door-open.gif)
-  
+![](https://fiware.github.io/tutorials.Big-Data-Analysis/img/door-open.gif)
+
 ### Running examples locally
 
-For running locally we should download [IntelliJ](https://www.jetbrains.com/idea/download) and open the `job` directory of the project using [Maven](https://www.jetbrains.com/help/idea/maven-support.html#maven_import_project_start). Use JDK 1.8 
+For running locally we should download [IntelliJ](https://www.jetbrains.com/idea/download) and open the `job` directory of the project using [Maven](https://www.jetbrains.com/help/idea/maven-support.html#maven_import_project_start). Use JDK 1.8
 
 #### Example 1: Receiving data and performing operations
 
 The first example makes use of the OrionSource in order to receive notifications from the Orion Context Broker. Specifically, the example counts the number notifications that each type of device sends in one minute. You can find the code of Example 1 in `job/src/main/scala/org/fiware/cosmos/orion/flink/connector/tutorial/example1/Example1.scala`:
 
-```scala 
+```scala
 
 package org.fiware.cosmos.orion.flink.connector.tutorial.example1
 
@@ -210,7 +210,7 @@ object Example1{
     .keyBy("device")
     .timeWindow(Time.seconds(60))
     .sum(1)
-    
+
     // print the results with a single thread, rather than in parallel
     processedDataStream.print().setParallelism(1)
     env.execute("Socket Window NgsiEvent")
@@ -317,7 +317,7 @@ docker network inspect bridge --format='{{(index .IPAM.Config 0).Gateway}}'
 
 ###### :one: Request:
 
-  
+
 
 ```bash
 curl -iX POST \
@@ -343,7 +343,7 @@ curl -iX POST \
 }'
 ```
 
-  
+
 
 The response will be `**201 - Created**`
 
@@ -421,48 +421,48 @@ The second example switches on a lamp when its motion sensor detects movement.
 ##### Switching on a lamp
 Let's take a look at the Example2 code now:
 ```scala
-package org.fiware.cosmos.orion.flink.connector.tutorial.example2  
-  
-  
-import org.apache.flink.streaming.api.scala.{StreamExecutionEnvironment, _}  
-import org.apache.flink.streaming.api.windowing.time.Time  
-import org.fiware.cosmos.orion.flink.connector._  
-  
-  
-object Example2{  
-  final val CONTENT_TYPE = ContentType.Plain  
-  final val METHOD = HTTPMethod.POST  
+package org.fiware.cosmos.orion.flink.connector.tutorial.example2
+
+
+import org.apache.flink.streaming.api.scala.{StreamExecutionEnvironment, _}
+import org.apache.flink.streaming.api.windowing.time.Time
+import org.fiware.cosmos.orion.flink.connector._
+
+
+object Example2{
+  final val CONTENT_TYPE = ContentType.Plain
+  final val METHOD = HTTPMethod.POST
   final val CONTENT = "{\n  \"on\": {\n      \"type\" : \"command\",\n      \"value\" : \"\"\n  }\n}"
   final val HEADERS = Map("fiware-service" -> "openiot","fiware-servicepath" -> "/","Accept" -> "*/*")
-  
-  def main(args: Array[String]): Unit = {  
-    val env = StreamExecutionEnvironment.getExecutionEnvironment  
-  // Create Orion Source. Receive notifications on port 9001  
-  val eventStream = env.addSource(new OrionSource(9001))  
-  
-    // Process event stream  
-  val processedDataStream = eventStream  
-      .flatMap(event => event.entities)  
-      .filter(entity=>(entity.attrs("count").value == "1"))  
-      .map(entity => new Sensor(entity.id))  
-      .keyBy("id")  
-      .timeWindow(Time.seconds(5),Time.seconds(2))  
-      .min("id")  
-  
-    // print the results with a single thread, rather than in parallel  
-  processedDataStream.print().setParallelism(1)  
-  
-    val sinkStream = processedDataStream.map(node => {  
-      new OrionSinkObject("urn:ngsi-ld:Lamp"+ node.id.takeRight(3)+ "@on","http://${IP}:3001/iot/lamp"+ node.id.takeRight(3),CONTENT_TYPE,METHOD)  
-    })   
-    OrionSink.addSink(sinkStream)  
-    env.execute("Socket Window NgsiEvent")  
-  }  
-  
-  case class Sensor(id: String)  
+
+  def main(args: Array[String]): Unit = {
+    val env = StreamExecutionEnvironment.getExecutionEnvironment
+  // Create Orion Source. Receive notifications on port 9001
+  val eventStream = env.addSource(new OrionSource(9001))
+
+    // Process event stream
+  val processedDataStream = eventStream
+      .flatMap(event => event.entities)
+      .filter(entity=>(entity.attrs("count").value == "1"))
+      .map(entity => new Sensor(entity.id))
+      .keyBy("id")
+      .timeWindow(Time.seconds(5),Time.seconds(2))
+      .min("id")
+
+    // print the results with a single thread, rather than in parallel
+  processedDataStream.print().setParallelism(1)
+
+    val sinkStream = processedDataStream.map(node => {
+      new OrionSinkObject("urn:ngsi-ld:Lamp"+ node.id.takeRight(3)+ "@on","http://${IP}:3001/iot/lamp"+ node.id.takeRight(3),CONTENT_TYPE,METHOD)
+    })
+    OrionSink.addSink(sinkStream)
+    env.execute("Socket Window NgsiEvent")
+  }
+
+  case class Sensor(id: String)
 }
 ```
-As you can see, it is similar to the previous example. The main difference is that it writes the processed data back in the Context Broker through the  **`OrionSink`**. 
+As you can see, it is similar to the previous example. The main difference is that it writes the processed data back in the Context Broker through the  **`OrionSink`**.
 ```scala
 val sinkStream = processedDataStream.map(node => {
       new OrionSinkObject(CONTENT, "http://localhost:1026/v2/entities/Lamp:"+node.id.takeRight(3)+"/attrs", CONTENT_TYPE,         METHOD, HEADERS)
@@ -471,7 +471,7 @@ val sinkStream = processedDataStream.map(node => {
 OrionSink.addSink(sinkStream)
 ```
 The arguments of the **`OrionSinkObject`** are:
--   **Message**: ```"{\n  \"on\": {\n      \"type\" : \"command\",\n      \"value\" : \"\"\n  }\n}"```. We send 'on' command 
+-   **Message**: ```"{\n  \"on\": {\n      \"type\" : \"command\",\n      \"value\" : \"\"\n  }\n}"```. We send 'on' command
 -   **URL**: ```"http://localhost:1026/v2/entities/Lamp:"+node.id.takeRight(3)+"/attrs"```. TakeRight(3) gets the number of the room, for example '001')
 -   **Content Type**: `ContentType.Plain`.
 -   **HTTP Method**: `HTTPMethod.POST`.
@@ -521,7 +521,7 @@ You can open a door and the lamp will switch on.
 In the previous examples, we've seen how to get the connector up and running from an IDE like IntelliJ. In a real case scenario, we might want to package our code and submit it to a Flink cluster in order to run our operations in parallel.
 The Flink Dashoard is listening on port 8081:
 
-![Screenshot](https://raw.githubusercontent.com/sonsoleslp/fiware-cosmos-orion-flink-connector-tutorial/master/img/Tutorial%20FIWARE%20Flink.png)
+![Screenshot](https://fiware.github.io/tutorials.Big-Data-Analysis//img/Tutorial%20FIWARE%20Flink.png)
 
 
 ##### Subscribing to notifications
@@ -581,7 +581,7 @@ Click the **Add New** button and upload the JAR. Once uploaded, select it from t
 org.fiware.cosmos.orion.flink.connector.tutorial.example2.Example2
 ```
 
-![Screenshot](https://raw.githubusercontent.com/sonsoleslp/fiware-cosmos-orion-flink-connector-tutorial/master/img/submit-flink.png)
+![Screenshot](https://fiware.github.io/tutorials.Big-Data-Analysis//img/submit-flink.png)
 
 
 Once this field is filled in, we can click the **Submit** button and we will see that out job is running.
