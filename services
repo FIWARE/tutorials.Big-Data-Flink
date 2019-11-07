@@ -17,6 +17,13 @@ stoppingContainers () {
 	docker-compose --log-level ERROR -p fiware down -v --remove-orphans
 }
 
+
+displayServices () {
+	echo ""
+	docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}" --filter name=fiware-*
+	echo ""
+}
+
 if (( $# != 1 )); then
     echo "Illegal number of parameters"
     echo "usage: services [create|start|stop]"
@@ -30,11 +37,15 @@ case "${command}" in
         ;;
     "start")
 		stoppingContainers
-		echo -e "Starting one container \033[1;30mTutorial\033[0m"
+		echo -e "Starting seven containers \033[1;34mOrion\033[0m, \033[1;34mCygnus\033[0m, \033[1;36mIoT-Agent\033[0m, two \033[1;30mFlink\033[0m instances (jobmanager taskmanager)  and a \033[1;30mTutorial\033[0m and \033[1;30mMongoDB\033[0m database."
+		echo -e "- \033[1;34mOrion\033[0m is the context broker"
+		echo -e "- \033[1;36mIoT-Agent\033[0m is configured for the UltraLight Protocol"
 		echo -e "- \033[1;30mTutorial\033[0m acts as a series of dummy IoT Sensors over HTTP"
+		echo -e "- \033[1;Flink\033[0m is a stream-processing framework"	
 		echo ""
 		docker-compose --log-level ERROR -p fiware up -d --remove-orphans
 		loadData
+		displayServices
 		echo -e "Now open \033[4mhttp://localhost:3000/device/monitor\033[0m"
 		;;
 	"stop")
