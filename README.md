@@ -553,7 +553,7 @@ curl -iX POST \
 
 ##### Changing the code
 
-We should change localhost in example 2 for the orion container hostname:
+We should replace localhost in example 2 with the orion container hostname:
 
 * Example 2
 ```scala
