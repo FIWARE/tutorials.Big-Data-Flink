@@ -509,7 +509,7 @@ First we need to delete the subscription we created before:
 curl -X DELETE   'http://localhost:1026/v2/subscriptions/$subscriptionId'   -H 'fiware-service: openiot'   -H 'fiware-servicepath: /'
 ```
 
-You can obtain the id of your subscription by performing a GET request to the `/v2/subscriptions` endpoint.
+You can obtain the ID of your subscription by performing a GET request to the `/v2/subscriptions` endpoint.
 
 ```console
 curl -X GET   'http://localhost:1026/v2/subscriptions/'   -H 'fiware-service: openiot'   -H 'fiware-servicepath: /'
