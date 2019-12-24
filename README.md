@@ -17,6 +17,8 @@ The tutorial uses [cUrl](https://ec.haxx.se/) commands throughout, but is also a
 
 [![Run in Postman](https://run.pstmn.io/button.svg)](https://www.getpostman.com/collections/64eda5ebb4b337c8784f)
 
+-   このチュートリアルは[日本語](README.ja.md)でもご覧いただけます。
+
 ## Contents
 
 <details>
@@ -24,13 +26,30 @@ The tutorial uses [cUrl](https://ec.haxx.se/) commands throughout, but is also a
 <summary><strong>Details</strong></summary>
 
 -   [Real-time Processing of Historic Context Information using Apache Flink](#real-time-processing-of-historic-context-information-using-apache-flink)
+    -   [Device Monitor](#device-monitor)
 -   [Architecture](#architecture)
 -   [Prerequisites](#prerequisites)
--   [Docker and Docker Compose](#docker-and-docker-compose)
--   [Cygwin for Windows](#cygwin-for-windows)
+    -   [Docker and Docker Compose](#docker-and-docker-compose)
+    -   [Maven](#maven)
+    -   [IntelliJ (optional)](#intellij-optional)
+    -   [Cygwin for Windows](#cygwin-for-windows)
 -   [Start Up](#start-up)
--   [Example 1: Receiving data and preforming operations](#example-1-receiving-data-and-performing-operations)
--   [Example 2: Receiving data, performing operations and writing back to the Context Broker](#example-2--receiving-data-performing-operations-and-writing-back-to-the-context-broker)
+    -   [Generating Context Data](#generating-context-data)
+    -   [Running examples locally](#running-examples-locally)
+-   [Example](#example)
+    -   [Example 1: Receiving data and preforming operations](#example-1-receiving-data-and-performing-operations)
+        -   [Subscribing to context changes](#subscribing-to-context-changes)
+            -   [:one: Request:](#one-request)
+            -   [:two: Request:](#two-request)
+            -   [Response:](#response)
+    -   [Example 2: Receiving data, performing operations and writing back to the Context Broker](#example-2--receiving-data-performing-operations-and-writing-back-to-the-context-broker)
+        -   [Switching on a lamp](#switching-on-a-lamp)
+        -   [Setting up the scenario](#setting-up-the-scenario)
+    -   [Example 3: Packaging the code and submitting it to the Flink Job Manager](#example-3-packaging-the-code-and-submitting-it-to-the-flink-job-manager)
+        -   [Subscribing to notifications](#subscribing-to-notifications)
+        -   [Changing the code](#changing-the-code)
+        -   [Packaging the code](#packaging-the-code)
+        -   [Submitting the job](#submitting-the-job)
 
 </details>
 
@@ -48,7 +67,7 @@ The [FIWARE Cosmos Orion Flink Connector](http://fiware-cosmos-flink.rtfd.io) is
 ingestion of the context data coming from the notifications sent by **Orion Context Broker** to the Apache Flink
 processing engine. This allows to aggregate data in a time window in order to extract value from them in real-time.
 
-#### Device Monitor
+## Device Monitor
 
 For the purpose of this tutorial, a series of dummy IoT devices have been created, which will be attached to the context
 broker. Details of the architecture and protocol used can be found in the
@@ -185,7 +204,7 @@ mvn install:install-file \
   -Dpackaging=jar
 ```
 
-### Generating Context Data
+## Generating Context Data
 
 For the purpose of this tutorial, we must be monitoring a system in which the context is periodically being updated. The
 dummy IoT Sensors can be used to do this. Open the device monitor page at `http://localhost:3000/device/monitor` and
@@ -195,13 +214,15 @@ on the same page:
 
 ![](https://fiware.github.io/tutorials.Big-Data-Analysis/img/door-open.gif)
 
-### Running examples locally
+## Running examples locally
 
 For running locally we should download [IntelliJ](https://www.jetbrains.com/idea/download) and open the `job` directory
 of the project using [Maven](https://www.jetbrains.com/help/idea/maven-support.html#maven_import_project_start). Use JDK
 1.8
 
-#### Example 1: Receiving data and performing operations
+# Example
+
+## Example 1: Receiving data and performing operations
 
 The first example makes use of the OrionSource in order to receive notifications from the Orion Context Broker.
 Specifically, the example counts the number notifications that each type of device sends in one minute. You can find the
@@ -312,7 +333,7 @@ processedDataStream.print().setParallelism(1)
 
 Or we can persist them using the sink of our choice. Now we can run our code by hitting the play button on IntelliJ.
 
-##### Subscribing to context changes
+### Subscribing to context changes
 
 Once a dynamic context system is up and running (execute Example1), we need to inform **Flink** of changes in context.
 
@@ -321,9 +342,9 @@ This is done by making a POST request to the `/v2/subscription` endpoint of the 
 -   The `fiware-service` and `fiware-servicepath` headers are used to filter the subscription to only listen to
     measurements from the attached IoT Sensors, since they had been provisioned using these settings
 
--   The notification `url` must match the one our Flink program is listening to. Substiture ${MY_IP} for your machine's
-    IP address in the docker0 network (must be accesible from the docker container). You can get this IP like so (maybe
-    yo need to use sudo):
+-   The notification `url` must match the one our Flink program is listening to. Substitute ${MY_IP} for your machine's
+    IP address in the docker0 network (must be accessible from the docker container). You can get this IP like so (maybe
+    you need to use sudo):
 
 ```console
 docker network inspect bridge --format='{{(index .IPAM.Config 0).Gateway}}'
@@ -331,7 +352,7 @@ docker network inspect bridge --format='{{(index .IPAM.Config 0).Gateway}}'
 
 -   The `throttling` value defines the rate that changes are sampled.
 
-###### :one: Request:
+#### :one: Request:
 
 ```console
 curl -iX POST \
@@ -362,7 +383,7 @@ The response will be `**201 - Created**`
 If a subscription has been created, we can check to see if it is firing by making a GET request to the
 `/v2/subscriptions` endpoint.
 
-###### :two: Request:
+#### :two: Request:
 
 ```console
 curl -X GET \
@@ -371,7 +392,7 @@ curl -X GET \
 -H 'fiware-servicepath: /'
 ```
 
-###### Response:
+#### Response:
 
 ```json
 [
@@ -429,11 +450,11 @@ Sensor(Lamp,7)
 Sensor(Motion,6)
 ```
 
-#### Example 2: Receiving data, performing operations and writing back to the Context Broker
+## Example 2: Receiving data, performing operations and writing back to the Context Broker
 
 The second example switches on a lamp when its motion sensor detects movement.
 
-##### Switching on a lamp
+### Switching on a lamp
 
 Let's take a look at the Example2 code now:
 
@@ -501,7 +522,7 @@ The arguments of the **`OrionSinkObject`** are:
 -   **Headers**: `Map("fiware-service" -> "openiot","fiware-servicepath" -> "/","Accept" -> "*/*")`. Optional parameter.
     We add the headers we need in the HTTP Request.
 
-##### Setting up the scenario
+### Setting up the scenario
 
 First we need to delete the subscription we created before:
 
@@ -544,7 +565,7 @@ curl -iX POST \
 
 You can open a door and the lamp will switch on.
 
-#### Example 3: Packaging the code and submitting it to the Flink Job Manager
+## Example 3: Packaging the code and submitting it to the Flink Job Manager
 
 In the previous examples, we've seen how to get the connector up and running from an IDE like IntelliJ. In a real case
 scenario, we might want to package our code and submit it to a Flink cluster in order to run our operations in parallel.
@@ -552,7 +573,7 @@ The Flink Dashoard is listening on port 8081:
 
 ![Screenshot](https://fiware.github.io/tutorials.Big-Data-Analysis//img/Tutorial%20FIWARE%20Flink.png)
 
-##### Subscribing to notifications
+### Subscribing to notifications
 
 First, we need to change the notification URL of our subscription to point to our Flink node like so:
 
@@ -580,7 +601,7 @@ curl -iX POST \
 }'
 ```
 
-##### Changing the code
+### Changing the code
 
 We should change localhost in example 2 for the orion container hostname:
 
@@ -596,14 +617,14 @@ We should change localhost in example 2 for the orion container hostname:
       new OrionSinkObject(CONTENT, "http://orion:1026/v2/entities/Lamp:"+node.id.takeRight(3)+"/attrs", CONTENT_TYPE, METHOD, HEADERS)
 ```
 
-##### Packaging the code
+### Packaging the code
 
 Let's build a JAR package of the example. In it, we need to include all the dependencies we have used, such as the
 connector, but exclude some of the dependencies provided by the environment (Flink, Scala...). This can be done through
 the `maven package` command without the `add-dependencies-for-IDEA` profile checked. This will build a JAR file under
 `target/orion.flink.connector.tutorial-1.0-SNAPSHOT.jar`.
 
-##### Submitting the job
+### Submitting the job
 
 Let's submit the Example 3 code to the Flink cluster we have deployed. In order to do this, open the Flink GUI on the
 browser ([http://localhost:8081](http://localhost:8081)) and select the **Submit new Job** section on the left menu.
