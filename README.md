@@ -220,9 +220,9 @@ For running locally we should download [IntelliJ](https://www.jetbrains.com/idea
 of the project using [Maven](https://www.jetbrains.com/help/idea/maven-support.html#maven_import_project_start). Use JDK
 1.8
 
-# Example
+# Real-time Processing Operations
 
-## Example 1: Receiving data and performing operations
+## Receiving context data and performing operations
 
 The first example makes use of the OrionSource in order to receive notifications from the Orion Context Broker.
 Specifically, the example counts the number notifications that each type of device sends in one minute. You can find the
@@ -342,13 +342,7 @@ This is done by making a POST request to the `/v2/subscription` endpoint of the 
 -   The `fiware-service` and `fiware-servicepath` headers are used to filter the subscription to only listen to
     measurements from the attached IoT Sensors, since they had been provisioned using these settings
 
--   The notification `url` must match the one our Flink program is listening to. Substitute ${MY_IP} for your machine's
-    IP address in the docker0 network (must be accessible from the docker container). You can get this IP like so (maybe
-    you need to use sudo):
-
-```console
-docker network inspect bridge --format='{{(index .IPAM.Config 0).Gateway}}'
-```
+-   The notification `url` must match the one our Flink program is listening to.
 
 -   The `throttling` value defines the rate that changes are sampled.
 
@@ -371,8 +365,7 @@ curl -iX POST \
   },
   "notification": {
     "http": {
-    "url": "http://${MY_IP}:9001"
-    }
+    "url": "http://flink:9001
   },
   "throttling": 5
 }'
@@ -416,8 +409,7 @@ curl -X GET \
             "attrs": [],
             "attrsFormat": "normalized",
             "http": {
-                "url": "http://${MY_IP}:9001"
-            },
+                "url": "http://flink:9001       },
             "lastSuccess": "2019-09-09T09:36:33.00Z",
             "lastSuccessCode": 200
         },
@@ -443,14 +435,14 @@ Finally, check that the `status` of the subscription is `active` - an expired su
 
 After creating the subscription, the output on the IntelliJ console will be like the following:
 
-```
+```text
 Sensor(Bell,3)
 Sensor(Door,4)
 Sensor(Lamp,7)
 Sensor(Motion,6)
 ```
 
-## Example 2: Receiving data, performing operations and writing back to the Context Broker
+## Receiving context data, performing operations and persisting context data
 
 The second example switches on a lamp when its motion sensor detects movement.
 
@@ -536,8 +528,7 @@ You can obtain the ID of your subscription by performing a GET request to the `/
 curl -X GET   'http://localhost:1026/v2/subscriptions/'   -H 'fiware-service: openiot'   -H 'fiware-servicepath: /'
 ```
 
-Now we create other subscription that will only trigger a notification when a motion sensor detects movement. Do not
-forget to change $MY_IP to your machine's IP address in the docker0 network as indicated earlier.
+Now we create other subscription that will only trigger a notification when a motion sensor detects movement.
 
 ```console
 curl -iX POST \
@@ -556,7 +547,7 @@ curl -iX POST \
   },
   "notification": {
     "http": {
-      "url": "http://${MY_IP}:9001/v2/notify"
+      "url": "http://taskmanger:9001"
     }
   },
   "throttling": 5
@@ -594,7 +585,7 @@ curl -iX POST \
   },
   "notification": {
     "http": {
-      "url": "http://taskmanager:9001/notify"
+      "url": "http://flink:9001"
     }
   },
   "throttling": 5

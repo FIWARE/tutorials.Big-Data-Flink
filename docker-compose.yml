@@ -68,9 +68,9 @@ services:
       - "WEB_APP_PORT=${TUTORIAL_APP_PORT}" # Port used by the content provider proxy and web-app for viewing data
       - "IOTA_HTTP_HOST=iot-agent"
       - "IOTA_HTTP_PORT=${IOTA_SOUTH_PORT}"
+      - "IOTA_DEFAULT_RESOURCE=/iot/d"
       - "DUMMY_DEVICES_PORT=${TUTORIAL_DUMMY_DEVICE_PORT}" # Port used by the dummy IOT devices to receive commands
       - "DUMMY_DEVICES_TRANSPORT=HTTP" # Default transport used by dummy IoT devices
-      - "DUMMY_DEVICES_API_KEY=4jggokgpepnvsb2uv4s40d59ov"
       - "CONTEXT_BROKER=http://orion:1026/v2" # URL of the context broker to update context
       - "NGSI_LD_PREFIX="
       - "OPENWEATHERMAP_KEY_ID=<ADD_YOUR_KEY_ID>"
@@ -82,11 +82,13 @@ services:
   jobmanager:
     image: flink:${FLINK_VERSION}
     hostname: jobmanager
-    container_name: jobmanager
+    container_name: flink-jobmanager
     expose:
-      - "6123"
+      - "8081"
     ports:
+      - "6123:6123"
       - "8081:8081"
+      - "9001:9001"
     command: jobmanager
     environment:
       - JOB_MANAGER_RPC_ADDRESS=jobmanager
@@ -94,10 +96,10 @@ services:
   taskmanager:
     image: flink:${FLINK_VERSION}
     hostname: taskmanager
-    container_name: taskmanager
-    expose:
-      - "6121"
-      - "6122"
+    container_name: flink-taskmanager
+    ports:
+      - "6121:6121"
+      - "6122:6122"
     depends_on:
       - jobmanager
     command: taskmanager

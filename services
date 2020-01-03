@@ -21,6 +21,7 @@ stoppingContainers () {
 displayServices () {
 	echo ""
 	docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}" --filter name=fiware-*
+	docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}" --filter name=flink-*
 	echo ""
 }
 
@@ -41,7 +42,7 @@ case "${command}" in
 		echo -e "- \033[1;34mOrion\033[0m is the context broker"
 		echo -e "- \033[1;36mIoT-Agent\033[0m is configured for the UltraLight Protocol"
 		echo -e "- \033[1mTutorial\033[0m acts as a series of dummy IoT Sensors over HTTP"
-		echo -e "- \033[1;Flink\033[0m is a stream-processing framework"	
+		echo -e "- \033[1mFlink\033[0m is a stream-processing framework"	
 		echo ""
 		docker-compose --log-level ERROR -p fiware up -d --remove-orphans
 		loadData

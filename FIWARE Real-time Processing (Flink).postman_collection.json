@@ -1,0 +1,269 @@
+{
+	"info": {
+		"_postman_id": "97dd54fb-6a22-436d-9f28-95e1e9fdb7e4",
+		"name": "FIWARE Real-time Processing (Flink)",
+		"description": "This tutorial is an introduction to the [FIWARE Cosmos Orion Flink Connector](http://fiware-cosmos-flink.rtfd.io), which\nenables easier Big Data analysis over context, integrated with one of the most popular BigData platforms:\n[Apache Flink](https://flink.apache.org/). Apache Flink is a framework and distributed processing engine for stateful\ncomputations over unbounded and bounded data streams. Flink has been designed to run in all common cluster environments,\nperform computations at in-memory speed and at any scale.\n\n# Real-time Processing of Historic Context Information using Apache Flink\n\n> \"Who controls the past controls the future: who controls the present controls the past.\"\n>\n> — George Orwell. \"1984\" (1949)\n\n[FIWARE Cosmos](https://fiware-cosmos-flink.readthedocs.io/en/latest/) is a Generic Enabler that allows for an easier\nBig Data analysis over context integrated with some of the most popular Big Data platforms, such as\n[Apache Flink](https://flink.apache.org/) and [Apache Spark](https://spark.apache.org/).\n\nThe [FIWARE Cosmos Orion Flink Connector](http://fiware-cosmos-flink.rtfd.io) is a software tool that enables a direct\ningestion of the context data coming from the notifications sent by **Orion Context Broker** to the Apache Flink\nprocessing engine. This allows to aggregate data in a time window in order to extract value from them in real-time.\n\n## Device Monitor\n\nFor the purpose of this tutorial, a series of dummy IoT devices have been created, which will be attached to the context\nbroker. Details of the architecture and protocol used can be found in the\n[IoT Sensors tutorial](https://github.com/FIWARE/tutorials.IoT-Sensors). The state of each device can be seen on the\nUltraLight device monitor web page found at: `http://localhost:3000/device/monitor`\n\n![FIWARE Monitor](https://fiware.github.io/tutorials.Big-Data-Analysis/img/device-monitor.png)\n\n# Architecture\n\nThis application builds on the components and dummy IoT devices created in\n[previous tutorials](https://github.com/FIWARE/tutorials.IoT-Agent/). It will make use of three FIWARE components - the\n[Orion Context Broker](https://fiware-orion.readthedocs.io/en/latest/), the\n[IoT Agent for Ultralight 2.0](https://fiware-iotagent-ul.readthedocs.io/en/latest/), and the\n[Cosmos Orion Flink Connector](https://fiware-cosmos-flink.readthedocs.io/en/latest/) for connecting Orion to an Apache\nFlink cluster. Additional databases are now involved - both the Orion Context Broker and the IoT Agent rely on\n[MongoDB](https://www.mongodb.com/) technology to keep persistence of the information they hold\n\nTherefore the overall architecture will consist of the following elements:\n\n-   Three **FIWARE Generic Enablers**:\n    -   The FIWARE [Orion Context Broker](https://fiware-orion.readthedocs.io/en/latest/) which will receive requests\n        using [NGSI](https://fiware.github.io/specifications/OpenAPI/ngsiv2)\n    -   The FIWARE [IoT Agent for Ultralight 2.0](https://fiware-iotagent-ul.readthedocs.io/en/latest/) which will\n        receive northbound measurements from the dummy IoT devices in\n        [Ultralight 2.0](https://fiware-iotagent-ul.readthedocs.io/en/latest/usermanual/index.html#user-programmers-manual)\n        format and convert them to [NGSI](https://fiware.github.io/specifications/OpenAPI/ngsiv2) requests for the\n        context broker to alter the state of the context entities\n    -   The FIWARE [Cosmos Orion Flink Connector](https://fiware-cosmos-flink.readthedocs.io/en/latest/) which will\n        subscribe to context changes and make operations on them in real-time\n-   One **Database**:\n    -   The underlying [MongoDB](https://www.mongodb.com/) database :\n        -   Used by the **Orion Context Broker** to hold context data information such as data entities, subscriptions\n            and registrations\n        -   Used by the **IoT Agent** to hold device information such as device URLs and Keys\n-   Three **Context Providers**:\n    -   The **Stock Management Frontend** is not used in this tutorial. It does the following:\n        -   Display store information and allow users to interact with the dummy IoT devices\n        -   Show which products can be bought at each store\n        -   Allow users to \"buy\" products and reduce the stock count.\n        -   A webserver acting as set of [dummy IoT devices](https://github.com/FIWARE/tutorials.IoT-Sensors) using the\n            [Ultralight 2.0](https://fiware-iotagent-ul.readthedocs.io/en/latest/usermanual/index.html#user-programmers-manual)\n            protocol running over HTTP.\n    -   The **Context Provider NGSI** proxy is not used in this tutorial. It does the following:\n        -   receive requests using [NGSI](https://fiware.github.io/specifications/OpenAPI/ngsiv2)\n        -   makes requests to publicly available data sources using their own APIs in a proprietary format\n        -   returns context data back to the Orion Context Broker in\n            [NGSI](https://fiware.github.io/specifications/OpenAPI/ngsiv2) format.\n\nSince all interactions between the elements are initiated by HTTP requests, the entities can be containerized and run\nfrom exposed ports.\n\nThe specific architecture of each section of the tutorial is discussed below.\n\n# Start Up\n\nBefore you start, you should ensure that you have obtained or built the necessary Docker images locally. Please clone\nthe repository and create the necessary images by running the commands shown below. Note that you might need to run some\nof the commands as a privileged user:\n\n```console\ngit clone https://github.com/FIWARE/tutorials.Big-Data-Analysis.git\ncd tutorials.Big-Data-Analysis\n./services create\n```\n\nThis command will also import seed data from the previous tutorials and provision the dummy IoT sensors on startup.\n\nTo start the system, run the following command:\n\n```console\n./services start\n```\n\n> :information_source: **Note:** If you want to clean up and start over again you can do so with the following command:\n>\n> ```\n> ./services stop\n> ```\n\nNext, in order to use the Orion Flink Connector we need to install the JAR using Maven:\n\n```console\ncd job\nmvn install:install-file \\\n  -Dfile=./orion.flink.connector-1.2.1.jar \\\n  -DgroupId=org.fiware.cosmos \\\n  -DartifactId=orion.flink.connector \\\n  -Dversion=1.2.1 \\\n  -Dpackaging=jar\n```\n\n## Generating Context Data\n\nFor the purpose of this tutorial, we must be monitoring a system in which the context is periodically being updated. The\ndummy IoT Sensors can be used to do this. Open the device monitor page at `http://localhost:3000/device/monitor` and\nunlock a **Smart Door** and switch on a **Smart Lamp**. This can be done by selecting an appropriate the command from\nthe drop down list and pressing the `send` button. The stream of measurements coming from the devices can then be seen\non the same page:\n\n![](https://fiware.github.io/tutorials.Big-Data-Analysis/img/door-open.gif)\n\n## Running examples locally\n\nFor running locally we should download [IntelliJ](https://www.jetbrains.com/idea/download) and open the `job` directory\nof the project using [Maven](https://www.jetbrains.com/help/idea/maven-support.html#maven_import_project_start). Use JDK\n1.8\n",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Receiving context data and performing operations",
+			"item": [
+				{
+					"name": "Orion - Subscribe to Context Changes",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "fiware-service",
+								"value": "openiot"
+							},
+							{
+								"key": "fiware-servicepath",
+								"value": "/"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"description\": \"Notify Flink of all context changes\",\n  \"subject\": {\n    \"entities\": [\n      {\n        \"idPattern\": \".*\"\n      }\n    ]\n  },\n  \"notification\": {\n    \"http\": {\n      \"url\": \"http://taskmanager:9001\"\n    }\n  },\n  \"throttling\": 5\n}"
+						},
+						"url": {
+							"raw": "http://{{orion}}/v2/subscriptions/",
+							"protocol": "http",
+							"host": [
+								"{{orion}}"
+							],
+							"path": [
+								"v2",
+								"subscriptions",
+								""
+							]
+						},
+						"description": "Once a dynamic context system is up and running (execute Example1), we need to inform **Flink** of changes in context.\n\nThis is done by making a POST request to the `/v2/subscription` endpoint of the Orion Context Broker.\n\n-   The `fiware-service` and `fiware-servicepath` headers are used to filter the subscription to only listen to\n    measurements from the attached IoT Sensors, since they had been provisioned using these settings\n\n-   The notification `url` must match the one our Flink program is listening to. Substitute ${MY_IP} for your machine's\n    IP address in the docker0 network (must be accessible from the docker container). You can get this IP like so (maybe\n    you need to use sudo):\n\n```console\ndocker network inspect bridge --format='{{(index .IPAM.Config 0).Gateway}}'\n```\n\n-   The `throttling` value defines the rate that changes are sampled."
+					},
+					"response": []
+				},
+				{
+					"name": "Orion - Check Subscription is working",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "fiware-service",
+								"value": "openiot"
+							},
+							{
+								"key": "fiware-servicepath",
+								"value": "/"
+							}
+						],
+						"url": {
+							"raw": "http://{{orion}}/v2/subscriptions/",
+							"protocol": "http",
+							"host": [
+								"{{orion}}"
+							],
+							"path": [
+								"v2",
+								"subscriptions",
+								""
+							]
+						},
+						"description": "If a subscription has been created, you can check to see if it is firing by making a GET \nrequest to the `/v2/subscriptions` endpoint.\n\nWithin the `notification` section of the response, you can see several additional `attributes` which describe the health of the subscription\n\nIf the criteria of the subscription have been met, `timesSent` should be greater than `0`.\nA zero value would indicate that the `subject` of the subscription is incorrect or the subscription \nhas created with the wrong `fiware-service-path` or `fiware-service` header\n\nThe `lastNotification` should be a recent timestamp - if this is not the case, then the devices\nare not regularly sending data. Remember to unlock the **Smart Door** and switch on the **Smart Lamp**\n\nThe `lastSuccess` should match the `lastNotification` date - if this is not the case \nthen **Draco** is not receiving the subscription properly. Check that the host name\nand port are correct. \n\nFinally, check that the `status` of the subscription is `active` - an expired subscription\nwill not fire."
+					},
+					"response": []
+				}
+			],
+			"description": "The first example makes use of the OrionSource in order to receive notifications from the Orion Context Broker.\nSpecifically, the example counts the number notifications that each type of device sends in one minute. You can find the\ncode of Example 1 in `job/src/main/scala/org/fiware/cosmos/orion/flink/connector/tutorial/example1/Example1.scala`:\n\n```scala\npackage org.fiware.cosmos.orion.flink.connector.tutorial.example1\n\nimport org.apache.flink.streaming.api.scala.{StreamExecutionEnvironment, _}\n\nimport org.apache.flink.streaming.api.windowing.time.Time\n\nimport org.fiware.cosmos.orion.flink.connector.{OrionSource}\n\n\nobject Example1{\n\n  def main(args: Array[String]): Unit = {\n\n    val env = StreamExecutionEnvironment.getExecutionEnvironment\n    // Create Orion Source. Receive notifications on port 9001\n    val eventStream = env.addSource(new OrionSource(9001))\n\n    // Process event stream\n    val processedDataStream = eventStream\n    .flatMap(event => event.entities)\n    .map(entity => new Sensor(entity.`type`,1))\n    .keyBy(\"device\")\n    .timeWindow(Time.seconds(60))\n    .sum(1)\n\n    // print the results with a single thread, rather than in parallel\n    processedDataStream.print().setParallelism(1)\n    env.execute(\"Socket Window NgsiEvent\")\n  }\n  case class Sensor(device: String, sum: Int)\n}\n```\n\nThe first lines of the program are aimed at importing the necessary dependencies, including the connector. After that,\nthe first step is to create an instance of the Orion Source using the class provided by the connector and to add it to\nthe environment provided by Flink.\n\n```scala\nval eventStream = env.addSource(new OrionSource(9001))\n```\n\nThe `OrionSource` accepts a port number as a parameter. The connector will be listening through this port to data coming\nfrom Orion. These data will be in the form of a `DataStream` of `NgsiEvent` objects.\n\nYou can check the details of this object in the\n[connector docs](https://github.com/ging/fiware-cosmos-orion-flink-connector/blob/master/README.md#orionsource).\n\nIn the example, the first step of the processing is flat-mapping the entities. This operation is performed in order to\nput together the entity objects of all the NGSI Events received in a period of time.\n\n```scala\nval processedDataStream = eventStream\n\n.flatMap(event => event.entities)\n```\n\nOnce we have all the entities together, you can iterate over them (with `map`) and extract the desired attributes. In\nthis case, we are interested in the sensor type (Door, Motion, Bell or Lamp).\n\n```scala\n// ...\n\n.map(entity => new Sensor(entity.`type`,1))\n```\n\nIn each iteration, we create a custom object with the properties we need: the sensor type and the increment of each\nnotification. For this purpose, we can define a case class like so:\n\n```scala\ncase class Sensor(device: String, sum: Int)\n```\n\nNow we can group the created objects by the type of device and perform operations on them:\n\n```scala\n// ...\n\n.keyBy(\"device\")\n```\n\nWe can provide a custom processing window, like so:\n\n```scala\n// ...\n\n.timeWindow(Time.seconds(60))\n```\n\nAnd then specify the operation to perform in said time interval:\n\n```scala\n// ...\n\n.sum(1)\n```\n\nAfter the processing, we can print the results on the console:\n\n```scala\nprocessedDataStream.print().setParallelism(1)\n```\n\nOr we can persist them using the sink of our choice. Now we can run our code by hitting the play button on IntelliJ.",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "340df590-5f9d-404d-9309-de603ceda7bd",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "7c113134-6883-49bc-8d5e-7df243d1da60",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Receiving context data, performing operations and persisting context data",
+			"item": [
+				{
+					"name": "Orion - Subscribe to Context Changes",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "fiware-service",
+								"value": "openiot"
+							},
+							{
+								"key": "fiware-servicepath",
+								"value": "/"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"description\": \"Notify Flink of all context changes\",\n  \"subject\": {\n    \"entities\": [\n      {\n        \"idPattern\": \"Motion.*\"\n      }\n    ]\n  },\n  \"notification\": {\n    \"http\": {\n      \"url\": \"http://taskmanager:9001\"\n    }\n  },\n  \"throttling\": 5\n}"
+						},
+						"url": {
+							"raw": "http://{{orion}}/v2/subscriptions/",
+							"protocol": "http",
+							"host": [
+								"{{orion}}"
+							],
+							"path": [
+								"v2",
+								"subscriptions",
+								""
+							]
+						},
+						"description": "First we need to delete the subscription we created before (if necesssary):\n\n```console\ncurl -X DELETE   'http://localhost:1026/v2/subscriptions/$subscriptionId'   -H 'fiware-service: openiot'   -H 'fiware-servicepath: /'\n```\n\nYou can obtain the ID of your subscription by performing a GET request to the `/v2/subscriptions` endpoint.\n\n```console\ncurl -X GET   'http://localhost:1026/v2/subscriptions/'   -H 'fiware-service: openiot'   -H 'fiware-servicepath: /'\n```\n\nNow we create another subscription that will only trigger a notification when a motion sensor detects movement. Do not\nforget to change $MY_IP to your machine's IP address in the docker0 network as indicated earlier."
+					},
+					"response": []
+				},
+				{
+					"name": "Orion - Check Subscription is working",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "fiware-service",
+								"value": "openiot"
+							},
+							{
+								"key": "fiware-servicepath",
+								"value": "/"
+							}
+						],
+						"url": {
+							"raw": "http://{{orion}}/v2/subscriptions/",
+							"protocol": "http",
+							"host": [
+								"{{orion}}"
+							],
+							"path": [
+								"v2",
+								"subscriptions",
+								""
+							]
+						},
+						"description": "If a subscription has been created, you can check to see if it is firing by making a GET \nrequest to the `/v2/subscriptions` endpoint.\n\nWithin the `notification` section of the response, you can see several additional `attributes` which describe the health of the subscription\n\nIf the criteria of the subscription have been met, `timesSent` should be greater than `0`.\nA zero value would indicate that the `subject` of the subscription is incorrect or the subscription \nhas created with the wrong `fiware-service-path` or `fiware-service` header\n\nThe `lastNotification` should be a recent timestamp - if this is not the case, then the devices\nare not regularly sending data. Remember to unlock the **Smart Door** and switch on the **Smart Lamp**\n\nThe `lastSuccess` should match the `lastNotification` date - if this is not the case \nthen **Draco** is not receiving the subscription properly. Check that the host name\nand port are correct. \n\nFinally, check that the `status` of the subscription is `active` - an expired subscription\nwill not fire."
+					},
+					"response": []
+				},
+				{
+					"name": "Orion - Delete Subscription",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "fiware-service",
+								"value": "openiot"
+							},
+							{
+								"key": "fiware-servicepath",
+								"value": "/"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://{{orion}}/v2/subscriptions/{{subscriptionId}}",
+							"protocol": "http",
+							"host": [
+								"{{orion}}"
+							],
+							"path": [
+								"v2",
+								"subscriptions",
+								"{{subscriptionId}}"
+							]
+						},
+						"description": "If a subscription has been created, you can check to see if it is firing by making a GET \nrequest to the `/v2/subscriptions` endpoint.\n\nWithin the `notification` section of the response, you can see several additional `attributes` which describe the health of the subscription\n\nIf the criteria of the subscription have been met, `timesSent` should be greater than `0`.\nA zero value would indicate that the `subject` of the subscription is incorrect or the subscription \nhas created with the wrong `fiware-service-path` or `fiware-service` header\n\nThe `lastNotification` should be a recent timestamp - if this is not the case, then the devices\nare not regularly sending data. Remember to unlock the **Smart Door** and switch on the **Smart Lamp**\n\nThe `lastSuccess` should match the `lastNotification` date - if this is not the case \nthen **Draco** is not receiving the subscription properly. Check that the host name\nand port are correct. \n\nFinally, check that the `status` of the subscription is `active` - an expired subscription\nwill not fire."
+					},
+					"response": []
+				}
+			],
+			"description": "The second example switches on a lamp when its motion sensor detects movement.\n\n### Switching on a lamp\n\nLet's take a look at the Example2 code now:\n\n```scala\npackage org.fiware.cosmos.orion.flink.connector.tutorial.example2\n\n\nimport org.apache.flink.streaming.api.scala.{StreamExecutionEnvironment, _}\nimport org.apache.flink.streaming.api.windowing.time.Time\nimport org.fiware.cosmos.orion.flink.connector._\n\n\nobject Example2{\n  final val CONTENT_TYPE = ContentType.Plain\n  final val METHOD = HTTPMethod.POST\n  final val CONTENT = \"{\\n  \\\"on\\\": {\\n      \\\"type\\\" : \\\"command\\\",\\n      \\\"value\\\" : \\\"\\\"\\n  }\\n}\"\n  final val HEADERS = Map(\"fiware-service\" -> \"openiot\",\"fiware-servicepath\" -> \"/\",\"Accept\" -> \"*/*\")\n\n  def main(args: Array[String]): Unit = {\n    val env = StreamExecutionEnvironment.getExecutionEnvironment\n  // Create Orion Source. Receive notifications on port 9001\n  val eventStream = env.addSource(new OrionSource(9001))\n\n    // Process event stream\n  val processedDataStream = eventStream\n      .flatMap(event => event.entities)\n      .filter(entity=>(entity.attrs(\"count\").value == \"1\"))\n      .map(entity => new Sensor(entity.id))\n      .keyBy(\"id\")\n      .timeWindow(Time.seconds(5),Time.seconds(2))\n      .min(\"id\")\n\n    // print the results with a single thread, rather than in parallel\n  processedDataStream.print().setParallelism(1)\n\n    val sinkStream = processedDataStream.map(node => {\n      new OrionSinkObject(\"urn:ngsi-ld:Lamp\"+ node.id.takeRight(3)+ \"@on\",\"http://${IP}:3001/iot/lamp\"+ node.id.takeRight(3),CONTENT_TYPE,METHOD)\n    })\n    OrionSink.addSink(sinkStream)\n    env.execute(\"Socket Window NgsiEvent\")\n  }\n\n  case class Sensor(id: String)\n}\n```\n\nAs you can see, it is similar to the previous example. The main difference is that it writes the processed data back in\nthe Context Broker through the **`OrionSink`**.\n\n```scala\nval sinkStream = processedDataStream.map(node => {\n      new OrionSinkObject(CONTENT, \"http://localhost:1026/v2/entities/Lamp:\"+node.id.takeRight(3)+\"/attrs\", CONTENT_TYPE,         METHOD, HEADERS)\n    })\n\nOrionSink.addSink(sinkStream)\n```\n\nThe arguments of the **`OrionSinkObject`** are:\n\n-   **Message**: `\"{\\n \\\"on\\\": {\\n \\\"type\\\" : \\\"command\\\",\\n \\\"value\\\" : \\\"\\\"\\n }\\n}\"`. We send 'on' command\n-   **URL**: `\"http://localhost:1026/v2/entities/Lamp:\"+node.id.takeRight(3)+\"/attrs\"`. TakeRight(3) gets the number of\n    the room, for example '001')\n-   **Content Type**: `ContentType.Plain`.\n-   **HTTP Method**: `HTTPMethod.POST`.\n-   **Headers**: `Map(\"fiware-service\" -> \"openiot\",\"fiware-servicepath\" -> \"/\",\"Accept\" -> \"*/*\")`. Optional parameter.\n    We add the headers we need in the HTTP Request.\n\n",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "093c8bac-5e67-4852-a214-dacd0578033c",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "8a3942e9-594e-4623-8d61-f4439b5b0de0",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			],
+			"protocolProfileBehavior": {}
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "aa3ebb0d-a1ad-46e3-aaa1-ae23e9d10750",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "79a12b20-92c5-46fc-9020-9497b0a40350",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"id": "69ad451a-7436-470e-8d4e-46f47e97ff49",
+			"key": "orion",
+			"value": "localhost:1026",
+			"type": "string"
+		}
+	],
+	"protocolProfileBehavior": {}
+}
