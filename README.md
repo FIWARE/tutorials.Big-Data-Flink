@@ -61,7 +61,7 @@ array of IoT sensors and other context data providers.
 
 The massive amount of data involved enventually becomes too much for a single machine to analyse, process and store, and
 therefore the work must be delegated to additional distributed services. These distributed systems form the basis of
-so-called **Big Data Analysis**. The distribution of tasks allows developers to be able to extract insights  
+so-called **Big Data Analysis**. The distribution of tasks allows developers to be able to extract insights
 from huge data sets which would be too complex to be dealt with using traditional methods. and uncover hidden patterns
 and correlations.
 
@@ -135,6 +135,10 @@ Therefore the overall architecture will consist of the following elements:
         -   makes requests to publicly available data sources using their own APIs in a proprietary format
         -   returns context data back to the Orion Context Broker in
             [NGSI](https://fiware.github.io/specifications/OpenAPI/ngsiv2) format.
+
+The overall architecture can be seen below:
+
+![](https://fiware.github.io/tutorials.Big-Data-Analysis/img/architecture.png)
 
 Since all interactions between the elements are initiated by HTTP requests, the entities can be containerized and run
 from exposed ports.
@@ -338,6 +342,8 @@ find the source code of the example in
 
 Goto `http://localhost:8081/#/submit`
 
+![](https://fiware.github.io/tutorials.Big-Data-Analysis/img/submit-logger.png)
+
 Submit new job
 
 -   **Filename:** `cosmos-examples-1.0.jar`
@@ -537,9 +543,13 @@ find the source code of the example in
 
 Goto `http://localhost:8081/#/job/running`
 
+![](https://fiware.github.io/tutorials.Big-Data-Analysis/img/running-jobs.png)
+
 Select the running job (if any) and click on **Cancel Job**
 
 Thereafter goto `http://localhost:8081/#/submit`
+
+![](https://fiware.github.io/tutorials.Big-Data-Analysis/img/submit-feedback.png)
 
 Submit new job
 
