@@ -107,7 +107,7 @@ keep persistence of the information they hold. We will also be using the dummy I
 
 Therefore the overall architecture will consist of the following elements:
 
--   Three **FIWARE Generic Enablers**:
+-   Two **FIWARE Generic Enablers** as independent microservices:
     -   The FIWARE [Orion Context Broker](https://fiware-orion.readthedocs.io/en/latest/) which will receive requests
         using [NGSI](https://fiware.github.io/specifications/OpenAPI/ngsiv2)
     -   The FIWARE [IoT Agent for Ultralight 2.0](https://fiware-iotagent-ul.readthedocs.io/en/latest/) which will
@@ -115,21 +115,21 @@ Therefore the overall architecture will consist of the following elements:
         [Ultralight 2.0](https://fiware-iotagent-ul.readthedocs.io/en/latest/usermanual/index.html#user-programmers-manual)
         format and convert them to [NGSI](https://fiware.github.io/specifications/OpenAPI/ngsiv2) requests for the
         context broker to alter the state of the context entities
-    -   The FIWARE [Cosmos Orion Flink Connector](https://fiware-cosmos-flink.readthedocs.io/en/latest/) which will
+- An [Apache Flink cluster](https://ci.apache.org/projects/flink/flink-docs-stable/concepts/runtime.html) consisting of a single **JobManager** and a single **TaskManager**
+    -   The FIWARE [Cosmos Orion Flink Connector](https://fiware-cosmos-flink.readthedocs.io/en/latest/) will be deployed as part fo the dataflow which will
         subscribe to context changes and make operations on them in real-time
--   One **Database**:
-    -   The underlying [MongoDB](https://www.mongodb.com/) database :
-        -   Used by the **Orion Context Broker** to hold context data information such as data entities, subscriptions
-            and registrations
-        -   Used by the **IoT Agent** to hold device information such as device URLs and Keys
+-   One [MongoDB](https://www.mongodb.com/) **database** :
+    -   Used by the **Orion Context Broker** to hold context data information such as data entities, subscriptions
+        and registrations
+    -   Used by the **IoT Agent** to hold device information such as device URLs and Keys
 -   Three **Context Providers**:
+    -   A webserver acting as set of [dummy IoT devices](https://github.com/FIWARE/tutorials.IoT-Sensors) using the
+        [Ultralight 2.0](https://fiware-iotagent-ul.readthedocs.io/en/latest/usermanual/index.html#user-programmers-manual)
+        protocol running over HTTP.
     -   The **Stock Management Frontend** is not used in this tutorial. It does the following:
         -   Display store information and allow users to interact with the dummy IoT devices
         -   Show which products can be bought at each store
         -   Allow users to "buy" products and reduce the stock count.
-        -   A webserver acting as set of [dummy IoT devices](https://github.com/FIWARE/tutorials.IoT-Sensors) using the
-            [Ultralight 2.0](https://fiware-iotagent-ul.readthedocs.io/en/latest/usermanual/index.html#user-programmers-manual)
-            protocol running over HTTP.
     -   The **Context Provider NGSI** proxy is not used in this tutorial. It does the following:
         -   receive requests using [NGSI](https://fiware.github.io/specifications/OpenAPI/ngsiv2)
         -   makes requests to publicly available data sources using their own APIs in a proprietary format
@@ -192,7 +192,7 @@ The containers within the flink cluster are driven by a single environment varia
 
 | Key                     | Value        | Description                                                           |
 | ----------------------- | ------------ | --------------------------------------------------------------------- |
-| JOB_MANAGER_RPC_ADDRESS | `jobmanager` | URL of the _master_ Job Manager whcih coordinates the task processing |
+| JOB_MANAGER_RPC_ADDRESS | `jobmanager` | URL of the _master_ Job Manager which coordinates the task processing |
 
 # Prerequisites
 
