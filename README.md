@@ -81,15 +81,6 @@ Obviously in reality our existing Supermarket scenario is far too small to requi
 will serve as a basis for demonstrating the type of real-time processing which may be required in a larger solution
 which is processing a continous stream of context-data events.
 
-## Device Monitor
-
-For the purpose of this tutorial, a series of dummy IoT devices have been created, which will be attached to the context
-broker. Details of the architecture and protocol used can be found in the
-[IoT Sensors tutorial](https://github.com/FIWARE/tutorials.IoT-Sensors). The state of each device can be seen on the
-UltraLight device monitor web page found at: `http://localhost:3000/device/monitor`
-
-![FIWARE Monitor](https://fiware.github.io/tutorials.Big-Data-Analysis/img/device-monitor.png)
-
 # Architecture
 
 This application builds on the components and dummy IoT devices created in
@@ -116,7 +107,7 @@ Therefore the overall architecture will consist of the following elements:
         format and convert them to [NGSI](https://fiware.github.io/specifications/OpenAPI/ngsiv2) requests for the
         context broker to alter the state of the context entities
 - An [Apache Flink cluster](https://ci.apache.org/projects/flink/flink-docs-stable/concepts/runtime.html) consisting of a single **JobManager** and a single **TaskManager**
-    -   The FIWARE [Cosmos Orion Flink Connector](https://fiware-cosmos-flink.readthedocs.io/en/latest/) will be deployed as part fo the dataflow which will
+    -   The FIWARE [Cosmos Orion Flink Connector](https://fiware-cosmos-flink.readthedocs.io/en/latest/) will be deployed as part of the dataflow which will
         subscribe to context changes and make operations on them in real-time
 -   One [MongoDB](https://www.mongodb.com/) **database** :
     -   Used by the **Orion Context Broker** to hold context data information such as data entities, subscriptions
@@ -424,11 +415,11 @@ curl -X GET \
             "attrs": [],
             "attrsFormat": "normalized",
             "http": {
-                "url": "http://flink:9001       },
+                "url": "http://jobmanager:9001"
+            },
             "lastSuccess": "2019-09-09T09:36:33.00Z",
             "lastSuccessCode": 200
-        },
-        "throttling": 5
+        }
     }
 ]
 ```
