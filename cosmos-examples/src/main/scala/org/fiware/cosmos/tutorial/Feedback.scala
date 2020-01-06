@@ -13,7 +13,7 @@ import org.fiware.cosmos.orion.flink.connector._
 object Feedback {
   final val CONTENT_TYPE = ContentType.JSON
   final val METHOD = HTTPMethod.PATCH
-  final val CONTENT = "{\n  \"on\": {\n      \"type\" : \"command\",\n      \"value\" : \"\"\n  }\n}"
+  final val CONTENT = "{  \"on\": {      \"type\" : \"command\",      \"value\" : \"\"  }}"
   final val HEADERS = Map("fiware-service" -> "openiot","fiware-servicepath" -> "/","Accept" -> "*/*")
 
   def main(args: Array[String]): Unit = {
@@ -31,10 +31,10 @@ object Feedback {
       .min("id")
 
     // print the results with a single thread, rather than in parallel
-    processedDataStream.print().setParallelism(1)
+    processedDataStream.printToErr().setParallelism(1)
 
     val sinkStream = processedDataStream.map(node => {
-      new OrionSinkObject(CONTENT, "http://localhost:1026/v2/entities/Lamp:"+node.id.takeRight(3)+"/attrs", CONTENT_TYPE, METHOD, HEADERS)
+      new OrionSinkObject(CONTENT, "http://orion:1026/v2/entities/Lamp:"+node.id.takeRight(3)+"/attrs", CONTENT_TYPE, METHOD, HEADERS)
     })
     OrionSink.addSink(sinkStream)
     env.execute("Socket Window NgsiEvent")

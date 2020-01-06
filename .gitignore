@@ -41,3 +41,5 @@ cosmos-examples/target
 cosmos-examples/.idea
 /.idea
 *.iml
+stdout.log
+stderr.log

@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.fiware.cosmos</groupId>
-    <artifactId>orion.flink.connector.tutorial</artifactId>
+    <artifactId>cosmos-examples</artifactId>
     <version>1.0</version>
 
     <properties>
@@ -44,6 +44,7 @@
             <groupId>org.fiware.cosmos</groupId>
             <artifactId>orion.flink.connector</artifactId>
             <version>1.2.1</version>
+            <scope>compile</scope>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/org.json4s/json4s-jackson -->
