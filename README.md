@@ -2,15 +2,15 @@
 
 [![FIWARE Context processing, analysis and visualisation](https://nexus.lab.fiware.org/static/badges/chapters/processing.svg)](https://github.com/FIWARE/catalogue/blob/master/processing/README.md)
 [![License: MIT](https://img.shields.io/github/license/fiware/tutorials.Big-Data-Analysis.svg)](https://opensource.org/licenses/MIT)
-[![NGSI v2](https://img.shields.io/badge/NGSI-v2-blue.svg)](https://fiware-ges.github.io/orion/api/v2/stable/)
 [![Support badge](https://nexus.lab.fiware.org/repository/raw/public/badges/stackoverflow/fiware.svg)](https://stackoverflow.com/questions/tagged/fiware)
-<br/> [![Documentation](https://img.shields.io/readthedocs/fiware-tutorials.svg)](https://fiware-tutorials.rtfd.io)
+[![NGSI v2](https://img.shields.io/badge/NGSI-v2-blue.svg)](https://fiware-ges.github.io/orion/api/v2/stable/) <br/>
+[![Documentation](https://img.shields.io/readthedocs/fiware-tutorials.svg)](https://fiware-tutorials.rtfd.io)
 
 This tutorial is an introduction to the [FIWARE Cosmos Orion Flink Connector](http://fiware-cosmos-flink.rtfd.io), which
-enables easier Big Data analysis over context, integrated with one of the most popular BigData platforms:
-[Apache Flink](https://flink.apache.org/). Apache Flink is a framework and distributed processing engine for stateful
-computations over unbounded and bounded data streams. Flink has been designed to run in all common cluster environments,
-perform computations at in-memory speed and at any scale.
+facilitates Big Data analysis of context data, through an integration with [Apache Flink](https://flink.apache.org/),
+one of the most popular Big Data platforms. Apache Flink is a framework and distributed processing engine for stateful
+computations both over unbounded and bounded data streams. Flink has been designed to run in all common cluster
+environments, perform computations at in-memory speed and at any scale.
 
 The tutorial uses [cUrl](https://ec.haxx.se/) commands throughout, but is also available as
 [Postman documentation](https://fiware.github.io/tutorials.Big-Data-Analysis/)
@@ -53,19 +53,37 @@ The tutorial uses [cUrl](https://ec.haxx.se/) commands throughout, but is also a
 
 </details>
 
-# Real-time Processing of Historic Context Information using Apache Flink
+# Real-time Processing and Big Data Analysis
 
 > "Who controls the past controls the future: who controls the present controls the past."
 >
 > — George Orwell. "1984" (1949)
 
-[FIWARE Cosmos](https://fiware-cosmos-flink.readthedocs.io/en/latest/) is a Generic Enabler that allows for an easier
-Big Data analysis over context integrated with some of the most popular Big Data platforms, such as
-[Apache Flink](https://flink.apache.org/) and [Apache Spark](https://spark.apache.org/).
+Smart solutions based on FIWARE are architecturally designed around microservices. They are therefore are designed to
+scale-up from simple applications (such as the Supermarket tutorial) through to city-wide installations base on a large
+array of IoT sensors and other context data providers.
 
-The [FIWARE Cosmos Orion Flink Connector](http://fiware-cosmos-flink.rtfd.io) is a software tool that enables a direct
-ingestion of the context data coming from the notifications sent by **Orion Context Broker** to the Apache Flink
-processing engine. This allows to aggregate data in a time window in order to extract value from them in real-time.
+The massive amount of data involved enventually becomes too much for a single machine to analyse, process and store, and
+therefore the work must be delegated to additional distributed services. These distributed systems form the basis of
+so-called **Big Data Analysis**. The distribution of tasks allows developers to be able to extract insights  
+from huge data sets which would be too complex to be dealt with using traditional methods. and uncover hidden patterns
+and correlations.
+
+As we have seen, context data is core to any Smart Solution, and the Context Broker is able to monitor changes of state
+and raise [subscription events](https://github.com/Fiware/tutorials.Subscriptions) as the context changes. For smaller
+installations, each subscription event can be processed one-by-one by a single receiving endpoint, however as the system
+grows, another technique will be required to avoid overwhelming the listener, potentially blocking resources and missing
+updates.
+
+**Apache Flink** is a Java/Scala based stream-processing framework which enables the delegation of data-flow processes.
+Therefore additional computational resources can be called upon to deal with data as events arrive. The **Cosmos Flink**
+connector allows developers write custom business logic to listen for context data subscription events and then process
+the flow of the context data. Flink is able to delegate these actions to other workers where they will be acted upon
+either in sequentiallly or in parallel as required. The data flow processing itself can be arbitrarily complex.
+
+Obviously in reality our existing Supermarket scenario is far too small to require the use of a Big Data solution, but
+will serve as a basis for demonstrating the type of real-time processing which may be required in a larger solution
+which is processing a continous stream of context-data events.
 
 ## Device Monitor
 
@@ -82,9 +100,14 @@ This application builds on the components and dummy IoT devices created in
 [previous tutorials](https://github.com/FIWARE/tutorials.IoT-Agent/). It will make use of three FIWARE components - the
 [Orion Context Broker](https://fiware-orion.readthedocs.io/en/latest/), the
 [IoT Agent for Ultralight 2.0](https://fiware-iotagent-ul.readthedocs.io/en/latest/), and the
-[Cosmos Orion Flink Connector](https://fiware-cosmos-flink.readthedocs.io/en/latest/) for connecting Orion to an Apache
-Flink cluster. Additional databases are now involved - both the Orion Context Broker and the IoT Agent rely on
-[MongoDB](https://www.mongodb.com/) technology to keep persistence of the information they hold
+[Cosmos Orion Flink Connector](https://fiware-cosmos-flink.readthedocs.io/en/latest/) for connecting Orion to an
+[Apache Flink cluster](https://ci.apache.org/projects/flink/flink-docs-stable/concepts/runtime.html). The Flink cluster
+itself will consist of a single **JobManager** _master_ to coordinate execution and a single **TaskManager** _worker_ to
+execute the tasks.
+
+Both the Orion Context Broker and the IoT Agent rely on open source [MongoDB](https://www.mongodb.com/) technology to
+keep persistence of the information they hold. We will also be using the dummy IoT devices created in the
+[previous tutorial](https://github.com/FIWARE/tutorials.IoT-Agent/).
 
 Therefore the overall architecture will consist of the following elements:
 
@@ -120,7 +143,58 @@ Therefore the overall architecture will consist of the following elements:
 Since all interactions between the elements are initiated by HTTP requests, the entities can be containerized and run
 from exposed ports.
 
-The specific architecture of each section of the tutorial is discussed below.
+The configuration information of the Apache Flink cluster can be seen in the `jobmanager` and `taskmanager` sections of
+the associated `docker-compose.yml` file:
+
+## Flink Cluster Configuration
+
+```yaml
+jobmanager:
+    image: flink:1.9.0-scala_2.11
+    hostname: jobmanager
+    container_name: flink-jobmanager
+    expose:
+        - "8081"
+        - "9001"
+    ports:
+        - "6123:6123"
+        - "8081:8081"
+        - "9001:9001"
+    command: jobmanager
+    environment:
+        - JOB_MANAGER_RPC_ADDRESS=jobmanager
+
+taskmanager:
+    image: flink:${FLINK_VERSION}
+    hostname: taskmanager
+    container_name: flink-taskmanager
+    ports:
+        - "6121:6121"
+        - "6122:6122"
+    depends_on:
+        - jobmanager
+    command: taskmanager
+    links:
+        - "jobmanager:jobmanager"
+    environment:
+        - JOB_MANAGER_RPC_ADDRESS=jobmanager
+```
+
+The `jobmanager` container is listening on three ports:
+
+-   Port `8081` is exposed so we can see the web front-end of the Apache Flink Dashobard
+-   Port `9001` is exposed so that the installation can recieve context data subscriptions
+-   Port `6123` is the standard **JobManager** RPC port, used for internal communications
+
+The `taskmanager` container is listening on two ports:
+
+-   Ports `6121` and `6122` are used and RPC ports by the **TaskManager**, used for internal communications
+
+The containers within the flink cluster are driven by a single environment variable as shown:
+
+| Key                     | Value        | Description                                                           |
+| ----------------------- | ------------ | --------------------------------------------------------------------- |
+| JOB_MANAGER_RPC_ADDRESS | `jobmanager` | URL of the _master_ Job Manager whcih coordinates the task processing |
 
 # Prerequisites
 
@@ -156,11 +230,6 @@ the concept of a project object model (POM), Maven can manage a project's build,
 central piece of information. We will use Maven to define and download our dependencies and to build and package our
 code into a JAR file.
 
-## IntelliJ (optional)
-
-[IntelliJ](https://www.jetbrains.com/idea/) is an IDE that eases the development of Scala programs. We will use it to
-write and run our code.
-
 ## Cygwin for Windows
 
 We will start up our services using a simple Bash script. Windows users should download [cygwin](http://www.cygwin.com/)
@@ -192,6 +261,49 @@ To start the system, run the following command:
 > ./services stop
 > ```
 
+## Generating Context Data
+
+For the purpose of this tutorial, we must be monitoring a system in which the context is periodically being updated. The
+dummy IoT Sensors can be used to do this. Open the device monitor page at `http://localhost:3000/device/monitor` and
+unlock a **Smart Door** and switch on a **Smart Lamp**. This can be done by selecting an appropriate the command from
+the drop down list and pressing the `send` button. The stream of measurements coming from the devices can then be seen
+on the same page:
+
+![](https://fiware.github.io/tutorials.Big-Data-Analysis/img/door-open.gif)
+
+# Real-time Processing Operations
+
+Dataflow within **Apache Flink** is defined within the
+[Flink documentation](https://ci.apache.org/projects/flink/flink-docs-release-1.9/concepts/programming-model.html) as
+follows:
+
+> "The basic building blocks of Flink programs are streams and transformations. Conceptually a stream is a (potentially
+> never-ending) flow of data records, and a transformation is an operation that takes one or more streams as input, and
+> produces one or more output streams as a result.
+>
+> When executed, Flink programs are mapped to streaming dataflows, consisting of streams and transformation operators.
+> Each dataflow starts with one or more sources and ends in one or more sinks. The dataflows resemble arbitrary directed
+> acyclic graphs (DAGs). Although special forms of cycles are permitted via iteration constructs, for the most part this
+> can be glossed over this for simplicity."
+
+![](https://fiware.github.io/tutorials.Big-Data-Analysis/img/streaming-dataflow.png)
+
+This means that to create a streaming data flow we must supply the following:
+
+-   A mechanism for reading Context data as a **Source Operator**
+-   Business logic to define the transform operations
+-   A mechanism for pushing Context data back to the context broker as a **Sink Operator**
+
+The `orion-flink.connect.jar` offers both **Source** and **Sink** operations. It therefore only remains to write the
+necessary Scala code to connect the streaming dataflow pipeline operations together. Two examples will be detailed
+below, all the source code for this tutorial can be found within the
+(https://github.com/FIWARE/tutorials.Big-Data-Analysis/tree/master/cosmos-examples) directory.
+
+Further examples can be found on the
+[Apache Flink website](https://ci.apache.org/projects/flink/flink-docs-release-1.9/getting-started)
+
+## Compiling sources
+
 Next, in order to use the Orion Flink Connector we need to install the JAR using Maven:
 
 ```console
@@ -204,24 +316,6 @@ mvn install:install-file \
   -Dpackaging=jar
 ```
 
-## Generating Context Data
-
-For the purpose of this tutorial, we must be monitoring a system in which the context is periodically being updated. The
-dummy IoT Sensors can be used to do this. Open the device monitor page at `http://localhost:3000/device/monitor` and
-unlock a **Smart Door** and switch on a **Smart Lamp**. This can be done by selecting an appropriate the command from
-the drop down list and pressing the `send` button. The stream of measurements coming from the devices can then be seen
-on the same page:
-
-![](https://fiware.github.io/tutorials.Big-Data-Analysis/img/door-open.gif)
-
-## Running examples locally
-
-For running locally we should download [IntelliJ](https://www.jetbrains.com/idea/download) and open the `job` directory
-of the project using [Maven](https://www.jetbrains.com/help/idea/maven-support.html#maven_import_project_start). Use JDK
-1.8
-
-# Real-time Processing Operations
-
 ## Receiving context data and performing operations
 
 The first example makes use of the OrionSource in order to receive notifications from the Orion Context Broker.
@@ -229,16 +323,14 @@ Specifically, the example counts the number notifications that each type of devi
 code of Example 1 in `job/src/main/scala/org/fiware/cosmos/orion/flink/connector/tutorial/example1/Example1.scala`:
 
 ```scala
-package org.fiware.cosmos.orion.flink.connector.tutorial.example1
+package org.fiware.cosmos.tutorial
 
 import org.apache.flink.streaming.api.scala.{StreamExecutionEnvironment, _}
-
 import org.apache.flink.streaming.api.windowing.time.Time
-
 import org.fiware.cosmos.orion.flink.connector.{OrionSource}
 
 
-object Example1{
+object Logger{
 
   def main(args: Array[String]): Unit = {
 
@@ -448,10 +540,10 @@ The second example switches on a lamp when its motion sensor detects movement.
 
 ### Switching on a lamp
 
-Let's take a look at the Example2 code now:
+Let's take a look at the Feedback code now:
 
 ```scala
-package org.fiware.cosmos.orion.flink.connector.tutorial.example2
+package org.fiware.cosmos.tutorial
 
 
 import org.apache.flink.streaming.api.scala.{StreamExecutionEnvironment, _}
@@ -459,7 +551,7 @@ import org.apache.flink.streaming.api.windowing.time.Time
 import org.fiware.cosmos.orion.flink.connector._
 
 
-object Example2{
+object Feedback{
   final val CONTENT_TYPE = ContentType.Plain
   final val METHOD = HTTPMethod.POST
   final val CONTENT = "{\n  \"on\": {\n      \"type\" : \"command\",\n      \"value\" : \"\"\n  }\n}"
@@ -630,3 +722,14 @@ org.fiware.cosmos.orion.flink.connector.tutorial.example2.Example2
 
 Once this field is filled in, we can click the **Submit** button and we will see that out job is running. Now we can
 open a door and see the lamp turning on.
+
+## Running examples locally
+
+For running locally we should download [IntelliJ](https://www.jetbrains.com/idea/download) and open the `job` directory
+of the project using [Maven](https://www.jetbrains.com/help/idea/maven-support.html#maven_import_project_start). Use JDK
+1.8
+
+## IntelliJ (optional)
+
+[IntelliJ](https://www.jetbrains.com/idea/) is an IDE that eases the development of Scala programs. We will use it to
+write and run our code.

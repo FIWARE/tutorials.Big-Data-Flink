@@ -84,11 +84,11 @@ services:
     hostname: jobmanager
     container_name: flink-jobmanager
     expose:
-      - "8081"
+      - "${FLINK_WEB_APP_PORT}"
     ports:
-      - "6123:6123"
-      - "8081:8081"
-      - "9001:9001"
+      - "${FLINK_JOB_MANAGER_PORT}:${FLINK_JOB_MANAGER_PORT}"
+      - "${FLINK_WEB_APP_PORT}:${FLINK_WEB_APP_PORT}"
+      - "${FLINK_SERVICE_PORT}:${FLINK_SERVICE_PORT}"
     command: jobmanager
     environment:
       - JOB_MANAGER_RPC_ADDRESS=jobmanager
@@ -98,8 +98,8 @@ services:
     hostname: taskmanager
     container_name: flink-taskmanager
     ports:
-      - "6121:6121"
-      - "6122:6122"
+      - "${FLINK_TASK_MANAGER_PORT_1}:${FLINK_TASK_MANAGER_PORT_1}"
+      - "${FLINK_TASK_MANAGER_PORT_2}:${FLINK_TASK_MANAGER_PORT_2}"
     depends_on:
       - jobmanager
     command: taskmanager
@@ -107,6 +107,7 @@ services:
       - "jobmanager:jobmanager"
     environment:
       - JOB_MANAGER_RPC_ADDRESS=jobmanager
+
   # Database
   mongo-db:
     image: mongo:${MONGO_DB_VERSION}

@@ -1,4 +1,4 @@
-package org.fiware.cosmos.orion.flink.connector.tutorial.example1
+package org.fiware.cosmos.tutorial
 
 
 import org.apache.flink.streaming.api.scala.{StreamExecutionEnvironment, _}
@@ -9,7 +9,7 @@ import org.fiware.cosmos.orion.flink.connector.{OrionSource}
   * Example1 Orion Connector
   * @author @Javierlj
   */
-object Example1{
+object Logger{
 
   def main(args: Array[String]): Unit = {
     val env = StreamExecutionEnvironment.getExecutionEnvironment

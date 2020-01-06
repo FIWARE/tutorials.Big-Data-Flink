@@ -1,4 +1,4 @@
-package org.fiware.cosmos.orion.flink.connector.tutorial.example2
+package org.fiware.cosmos.tutorial
 
 
 import org.apache.flink.streaming.api.scala.{StreamExecutionEnvironment, _}
@@ -10,7 +10,7 @@ import org.fiware.cosmos.orion.flink.connector._
   * Example2 Orion Connector
   * @author @Javierlj
   */
-object Example2 {
+object Feedback {
   final val CONTENT_TYPE = ContentType.JSON
   final val METHOD = HTTPMethod.PATCH
   final val CONTENT = "{\n  \"on\": {\n      \"type\" : \"command\",\n      \"value\" : \"\"\n  }\n}"

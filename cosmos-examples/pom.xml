@@ -6,7 +6,7 @@
 
     <groupId>org.fiware.cosmos</groupId>
     <artifactId>orion.flink.connector.tutorial</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -128,7 +128,7 @@
             <plugin>
                 <groupId>net.alchim31.maven</groupId>
                 <artifactId>scala-maven-plugin</artifactId>
-                <version>3.2.2</version>
+                <version>4.3.0</version>
                 <executions>
                     <execution>
                         <goals>
