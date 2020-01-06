@@ -15,7 +15,7 @@ environments, perform computations at in-memory speed and at any scale.
 The tutorial uses [cUrl](https://ec.haxx.se/) commands throughout, but is also available as
 [Postman documentation](https://fiware.github.io/tutorials.Big-Data-Analysis/)
 
-[![Run in Postman](https://run.pstmn.io/button.svg)](https://www.getpostman.com/collections/64eda5ebb4b337c8784f)
+[![Run in Postman](https://run.pstmn.io/button.svg)](https://www.getpostman.com/collections/https://app.getpostman.com/run-collection/fb0de86dea21e2073054)
 
 -   このチュートリアルは[日本語](README.ja.md)でもご覧いただけます。
 
@@ -53,7 +53,7 @@ The tutorial uses [cUrl](https://ec.haxx.se/) commands throughout, but is also a
 
 > "Who controls the past controls the future: who controls the present controls the past."
 >
-> — George Orwell. "1984" (1949)
+> — George Orwell. "1984"
 
 Smart solutions based on FIWARE are architecturally designed around microservices. They are therefore are designed to
 scale-up from simple applications (such as the Supermarket tutorial) through to city-wide installations base on a large
