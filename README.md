@@ -284,7 +284,7 @@ this tutorial can be found within the
 [cosmos-examples](https://github.com/FIWARE/tutorials.Big-Data-Analysis/tree/master/cosmos-examples) directory.
 
 Further Flink processing examples can be found on the
-[Apache Flink website](https://ci.apache.org/projects/flink/flink-docs-release-1.9/getting-started)
+[Apache Flink](https://ci.apache.org/projects/flink/flink-docs-release-1.9/getting-started) and [Cosmos Flink](https://fiware-cosmos-flink-examples.readthedocs.io/) websites.
 
 ### Compiling a JAR file for Flink
 
