@@ -61,9 +61,9 @@ array of IoT sensors and other context data providers.
 
 The massive amount of data involved enventually becomes too much for a single machine to analyse, process and store, and
 therefore the work must be delegated to additional distributed services. These distributed systems form the basis of
-so-called **Big Data Analysis**. The distribution of tasks allows developers to be able to extract insights
-from huge data sets which would be too complex to be dealt with using traditional methods. and uncover hidden patterns
-and correlations.
+so-called **Big Data Analysis**. The distribution of tasks allows developers to be able to extract insights from huge
+data sets which would be too complex to be dealt with using traditional methods. and uncover hidden patterns and
+correlations.
 
 As we have seen, context data is core to any Smart Solution, and the Context Broker is able to monitor changes of state
 and raise [subscription events](https://github.com/Fiware/tutorials.Subscriptions) as the context changes. For smaller
@@ -106,12 +106,14 @@ Therefore the overall architecture will consist of the following elements:
         [Ultralight 2.0](https://fiware-iotagent-ul.readthedocs.io/en/latest/usermanual/index.html#user-programmers-manual)
         format and convert them to [NGSI](https://fiware.github.io/specifications/OpenAPI/ngsiv2) requests for the
         context broker to alter the state of the context entities
-- An [Apache Flink cluster](https://ci.apache.org/projects/flink/flink-docs-stable/concepts/runtime.html) consisting of a single **JobManager** and a single **TaskManager**
-    -   The FIWARE [Cosmos Orion Flink Connector](https://fiware-cosmos-flink.readthedocs.io/en/latest/) will be deployed as part of the dataflow which will
-        subscribe to context changes and make operations on them in real-time
+-   An [Apache Flink cluster](https://ci.apache.org/projects/flink/flink-docs-stable/concepts/runtime.html) consisting
+    of a single **JobManager** and a single **TaskManager**
+    -   The FIWARE [Cosmos Orion Flink Connector](https://fiware-cosmos-flink.readthedocs.io/en/latest/) will be
+        deployed as part of the dataflow which will subscribe to context changes and make operations on them in
+        real-time
 -   One [MongoDB](https://www.mongodb.com/) **database** :
-    -   Used by the **Orion Context Broker** to hold context data information such as data entities, subscriptions
-        and registrations
+    -   Used by the **Orion Context Broker** to hold context data information such as data entities, subscriptions and
+        registrations
     -   Used by the **IoT Agent** to hold device information such as device URLs and Keys
 -   Three **Context Providers**:
     -   A webserver acting as set of [dummy IoT devices](https://github.com/FIWARE/tutorials.IoT-Sensors) using the
@@ -284,7 +286,8 @@ this tutorial can be found within the
 [cosmos-examples](https://github.com/FIWARE/tutorials.Big-Data-Analysis/tree/master/cosmos-examples) directory.
 
 Further Flink processing examples can be found on the
-[Apache Flink Website](https://ci.apache.org/projects/flink/flink-docs-release-1.9/getting-started) and [Flink Connector Examples](https://fiware-cosmos-flink-examples.readthedocs.io/).
+[Apache Flink Website](https://ci.apache.org/projects/flink/flink-docs-release-1.9/getting-started) and
+[Flink Connector Examples](https://fiware-cosmos-flink-examples.readthedocs.io/).
 
 ### Compiling a JAR file for Flink
 
