@@ -299,10 +299,10 @@ Maven:
 ```console
 cd cosmos-examples
 mvn install:install-file \
-  -Dfile=./orion.flink.connector-1.2.1.jar \
+  -Dfile=./orion.flink.connector-1.2.3.jar \
   -DgroupId=org.fiware.cosmos \
   -DartifactId=orion.flink.connector \
-  -Dversion=1.2.1 \
+  -Dversion=1.2.3 \
   -Dpackaging=jar
 ```
 
