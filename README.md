@@ -15,7 +15,7 @@ environments, perform computations at in-memory speed and at any scale.
 The tutorial uses [cUrl](https://ec.haxx.se/) commands throughout, but is also available as
 [Postman documentation](https://fiware.github.io/tutorials.Big-Data-Analysis/)
 
-[![Run in Postman](https://run.pstmn.io/button.svg)](https://www.getpostman.com/collections/https://app.getpostman.com/run-collection/fb0de86dea21e2073054)
+[![Run in Postman](https://run.pstmn.io/button.svg)](https://app.getpostman.com/run-collection/fb0de86dea21e2073054)
 
 -   このチュートリアルは[日本語](README.ja.md)でもご覧いただけます。
 
@@ -24,8 +24,8 @@ The tutorial uses [cUrl](https://ec.haxx.se/) commands throughout, but is also a
 <details>
 
 <summary><strong>Details</strong></summary>
+
 -   [Real-time Processing and Big Data Analysis](#real-time-processing-and-big-data-analysis)
-    -   [Device Monitor](#device-monitor)
 -   [Architecture](#architecture)
     -   [Flink Cluster Configuration](#flink-cluster-configuration)
 -   [Prerequisites](#prerequisites)

@@ -2,20 +2,21 @@
 
 [![FIWARE Context processing, analysis and visualisation](https://nexus.lab.fiware.org/static/badges/chapters/processing.svg)](https://github.com/FIWARE/catalogue/blob/master/processing/README.md)
 [![License: MIT](https://img.shields.io/github/license/fiware/tutorials.Big-Data-Analysis.svg)](https://opensource.org/licenses/MIT)
-[![NGSI v2](https://img.shields.io/badge/NGSI-v2-blue.svg)](https://fiware-ges.github.io/orion/api/v2/stable/)
 [![Support badge](https://nexus.lab.fiware.org/repository/raw/public/badges/stackoverflow/fiware.svg)](https://stackoverflow.com/questions/tagged/fiware)
-<br/> [![Documentation](https://img.shields.io/readthedocs/fiware-tutorials.svg)](https://fiware-tutorials.rtfd.io)
+[![NGSI v2](https://img.shields.io/badge/NGSI-v2-blue.svg)](https://fiware-ges.github.io/orion/api/v2/stable/) <br/>
+[![Documentation](https://img.shields.io/readthedocs/fiware-tutorials.svg)](https://fiware-tutorials.rtfd.io)
 
-このチュートリアルは、[FIWARE Cosmos Orion Flink Connector](http://fiware-cosmos-flink.rtfd.io) の概要であり、最も
-一般的な BigData プラットフォームの1つである、[Apache Flink](https://flink.apache.org/) と統合された、コンテキスト
-を介した簡単なビッグデータ分析を可能にします。Apache Flink は、無制限および有界のデータストリーム上でステートフルな
-計算を行うためのフレームワークおよび分散処理エンジンです。Flink は、すべての一般的なクラスタ環境で実行され、メモリ
-内の速度と任意の規模で計算を実行するように設計されています。
+このチュートリアルは [FIWARE Cosmos Orion Flink Connector](http://fiware-cosmos-flink.rtfd.io) の紹介です。これは、最も
+人気のあるビッグデータ・プラットフォームの1つである [Apache Flink](https://flink.apache.org/) との統合により、コンテキスト
+・データのビッグデータ分析を容易にします。Apache Flink は、無制限および有界のデータ・ストリーム上でステートフルな計算を
+行うためのフレームワークおよび分散処理エンジンです。Flink は、すべての一般的なクラスタ環境で実行され、メモリ内の速度と
+任意の規模で計算を実行するように設計されています。
 
 チュートリアルでは [cUrl](https://ec.haxx.se/) コマンドを使用しますが、
-[Postman documentation](https://fiware.github.io/tutorials.Big-Data-Analysis/) としても利用可能です。
+[Postman ドキュメント](https://fiware.github.io/tutorials.Big-Data-Analysis/) としても利用可能です。
 
-[![Run in Postman](https://run.pstmn.io/button.svg)](https://www.getpostman.com/collections/64eda5ebb4b337c8784f)
+[![Run in Postman](https://run.pstmn.io/button.svg)](https://app.getpostman.com/run-collection/fb0de86dea21e2073054)
+
 
 ## コンテンツ
 
@@ -23,108 +24,178 @@
 
 <summary><strong>詳細</strong></summary>
 
--   [Apache Flink を使用した履歴コンテキスト情報のリアルタイム処理](#real-time-processing-of-historic-context-information-using-apache-flink)
-    -   [Device Monitor](#device-monitor)
+-   [リアルタイム処理とビッグデータ分析](#real-time-processing-and-big-data-analysis)
 -   [アーキテクチャ](#architecture)
+    -   [Flink Cluster の設定](#flink-cluster-configuration)
 -   [前提条件](#prerequisites)
     -   [Docker および Docker Compose](#docker-and-docker-compose)
     -   [Maven](#maven)
-    -   [IntelliJ (optional)](#intellij-optional)
     -   [Cygwin for Windows](#cygwin-for-windows)
 -   [起動](#start-up)
-    -   [コンテキスト・データの生成](#generating-context-data)
-    -   [サンプルをローカルで実行](#running-examples-locally)
--   [例](#example)
-    -   [例1 : データの受信と操作の実行](#example-1-receiving-data-and-performing-operations)
-        -   [コンテキスト変更のサブスクライブ](#subscribing-to-context-changes)
-            -   [:one: リクエスト:](#one-request)
-            -   [:two: リクエスト:](#two-request)
-            -   [レスポンス:](#response)
-    -   [例2 : データの受信、操作の実行、Context Broker への書き戻し](#example-2--receiving-data-performing-operations-and-writing-back-to-the-context-broker)
-        -   [ランプをオンにする](#switching-on-a-lamp)
-        -   [シナリオのセットアップ](#setting-up-the-scenario)
-    -   [例3 : コードをパッケージ化し、Flink Job Manager に送信](#example-3-packaging-the-code-and-submitting-it-to-the-flink-job-manager)
-        -   [通知のサブスクライブ](#subscribing-to-notifications)
-        -   [コードの変更](#changing-the-code)
-        -   [コードのパッケージ化](#packaging-the-code)
-        -   [ジョブを送信](#submitting-the-job)
+-   [リアルタイム・プロセシング・オペレーション](#real-time-processing-operations)
+    -   [Flink 用の JAR ファイルのコンパイル](#compiling-a-jar-file-for-flink)
+    -   [コンテキスト・データのストリームの生成](#generating-a-stream-of-context-data)
+    -   [ロガー - コンテキスト・データのストリームの読み取り](#logger---reading-context-data-streams)
+        -   [ロガー - JAR のインストール](#logger---installing-the-jar)
+        -   [ロガー - コンテキスト変更のサブスクライブ](#logger---subscribing-to-context-changes)
+        -   [ロガー - 出力の確認](#logger---checking-the-output)
+        -   [ロガー - コードの分析](#logger---analyzing-the-code)
+    -   [フィードバック・ループ - コンテキスト・データの永続化](#feedback-loop---persisting-context-data)
+        -   [フィードバック・ループ - JAR のインストール](#feedback-loop---installing-the-jar)
+        -   [フィードバック・ループ - コンテキスト変更のサブスクライブ](#feedback-loop---subscribing-to-context-changes)
+        -   [フィードバック・ループ - 出力の確認](#feedback-loop---checking-the-output)
+        -   [フィードバック・ループ - コードの分析](#feedback-loop---analyzing-the-code)
+-   [次のステップ](#next-steps)
 
 </details>
 
-<a name="real-time-processing-of-historic-context-information-using-apache-flink"></a>
+<a name="real-time-processing-and-big-data-analysis"></a>
 
-# Apache Flinkを使用した履歴コンテキスト情報のリアルタイム処理
+# リアルタイム処理とビッグデータ分析
 
 > "Who controls the past controls the future: who controls the present controls the past."
 >
-> — George Orwell. "1984" (1949)
+> — George Orwell. "1984"
 
-[FIWARE Cosmos](https://fiware-cosmos-flink.readthedocs.io/en/latest/) は、一般的なイネーブラーであり、
-[Apache Flink](https://flink.apache.org/) や [Apache Spark](https://spark.apache.org/) のような、最も人気のある
-ビッグデータ・プラットフォームの一部と統合され、コンテキストでのビッグデータ分析を容易にします。
+FIWARE に基づくスマート・ソリューションは、マイクロサービスを中心に設計されています。したがって、シンプルな
+アプリケーション (スーパーマーケット・チュートリアルなど) から、IoT センサやその他のコンテキスト・データ・プロバイダの
+大規模な配列に基づく都市全体のインストールにスケールアップするように設計されています。
 
-[FIWARE Cosmos Orion Flink Connector](http://fiware-cosmos-flink.rtfd.io) は、**Orion Context Broker** によって
-送信された通知からのコンテキスト・データを、Apache Flink 処理エンジンに直接取り込むことができるソフトウェア・
-ツールです。これにより、時間枠内のデータを集計して、リアルタイムでデータから値を抽出できます。
+関与する膨大な量のデータは、1台のマシンで分析、処理、保存するには膨大な量になるため、追加の分散サービスに作業を委任する
+必要があります。これらの分散システムは、いわゆる **ビッグデータ分析** の基礎を形成します。タスクの分散により、開発者は、
+従来の方法では処理するには複雑すぎる巨大なデータ・セットから洞察を抽出することができます。隠れたパターンと相関関係を
+明らかにします。
 
-<a name="device-monitor"></a>
+これまで見てきたように、コンテキスト・データはすべてのスマート・ソリューションの中核であり、Context Broker は状態の変化を
+監視し、コンテキストの変化に応じて、[サブスクリプション・イベント](https://github.com/Fiware/tutorials.Subscriptions)
+を発生させることができます。小規模なインストールの場合、各サブスクリプション・イベントは単一の受信エンドポイントで1つずつ
+処理できますが、システムが大きくなると、リスナーを圧倒し、潜在的にリソースをブロックし、更新が失われないようにするために
+別の手法が必要になります。
 
-## Device Monitor
+**Apache Flink** は、データ・フロー・プロセスの委任を可能にする Java/Scala ベースのストリーム処理フレームワークです。
+したがって、イベントの到着時にデータを処理するために、追加の計算リソースを呼び出すことができます。 **Cosmos Flink**
+コネクタを使用すると、開発者はカスタム・ビジネスロジックを記述して、コンテキスト・データのサブスクリプション・イベントを
+リッスンし、コンテキスト・データのフローを処理できます。 Flink はこれらのアクションを他のワーカーに委任することができ、
+そこで必要に応じて順次または並行してアクションが実行されます。データフローの処理自体は、任意に複雑にすることができます。
 
-このチュートリアルの目的のために、一連のダミー IoT デバイスが作成され、Context Broker に接続されます。使用される
-アーキテクチャとプロトコルの詳細は、[IoT Sensors tutorial](https://github.com/FIWARE/tutorials.IoT-Sensors) に
-記載されています。各デバイスの状態は、`http://localhost:3000/device/monitor` にある UltraLight device monitor の
-Web ページで確認できます。
-
-![FIWARE Monitor](https://fiware.github.io/tutorials.Big-Data-Analysis/img/device-monitor.png)
+実際には、明らかに、既存のスーパーマーケット・シナリオは小さすぎてビッグデータ・ソリューションを使用する必要はありませんが、
+コンテキスト・データ・イベントの連続ストリームを処理する大規模ソリューションで必要となる可能性のある、リアルタイム処理の
+タイプを実証するための基盤として機能します。
 
 <a name="architecture"></a>
 
 # アーキテクチャ
 
-このアプリケーションは、[以前のチュートリアル](https://github.com/FIWARE/tutorials.IoT-Agent/) で作成された
-コンポーネントとダミー IoT デバイス上に構築されます。3つの FIWARE コンポーネント -
+このアプリケーションは、[以前のチュートリアル](https://github.com/FIWARE/tutorials.IoT-Agent/)で作成されたコンポーネントと
+ダミー IoT デバイス上に構築されます。 3つの FIWARE コンポーネントを使用します。
 [Orion Context Broker](https://fiware-orion.readthedocs.io/en/latest/),
-[IoT Agent for Ultralight 2.0](https://fiware-iotagent-ul.readthedocs.io/en/latest/), と
-[Cosmos Orion Flink Connector](https://fiware-cosmos-flink.readthedocs.io/en/latest/) は、Orion を Apache Flink
-クラスタに接続します。これで、データベースが追加されました。Orion Context Broker と IoT Agent は、保持する情報の
-永続性を維持するために [MongoDB](https://www.mongodb.com/) テクノロジを利用しています。
+[IoT Agent for Ultralight 2.0](https://fiware-iotagent-ul.readthedocs.io/en/latest/) および Orion を
+[Apache Flink cluster](https://ci.apache.org/projects/flink/flink-docs-stable/concepts/runtime.html) クラスタに接続する
+ための [Cosmos Orion Flink Connector](https://fiware-cosmos-flink.readthedocs.io/en/latest/) です。Flink クラスタ自体は、
+実行を調整する単一の **JobManager** _master_ と、タスクを実行する単一の **TaskManager** _worker_ で構成されます。
+
+Orion Context Broker と IoT Agent はどちらも、オープンソースの [MongoDB](https://www.mongodb.com/) テクノロジーに依存して、
+保持している情報の永続性を維持しています。また、[以前のチュートリアル](https://github.com/FIWARE/tutorials.IoT-Agent/)で
+作成したダミー IoT デバイスを使用します。
 
 したがって、全体的なアーキテクチャは次の要素で構成されます :
 
--   3つの **FIWARE Generic Enablers** :
+-   独立したマイクロサービスとしての2つの **FIWARE Generic Enablers** :
     -   FIWARE [Orion Context Broker](https://fiware-orion.readthedocs.io/en/latest/)は、
         [NGSI](https://fiware.github.io/specifications/OpenAPI/ngsiv2) を使用してリクエストを受信します
     -   FIWARE [IoT Agent for Ultralight 2.0](https://fiware-iotagent-ul.readthedocs.io/en/latest/) は、ダミー IoT
         デバイスから Ultralight 2.0 形式のノースバウンド測定値を受信し、Context Broker の
         [NGSI](https://fiware.github.io/specifications/OpenAPI/ngsiv2) リクエストに変換して、コンテキスト・
         エンティティの状態を変更します
+-   [Apache Flink cluster](https://ci.apache.org/projects/flink/flink-docs-stable/concepts/runtime.html) は、
+    単一の **JobManager** と単一の **TaskManager ** で構成されます
     -   FIWARE [Cosmos Orion Flink Connector](https://fiware-cosmos-flink.readthedocs.io/en/latest/) は、
-        コンテキストの変更をサブスクライブし、リアルタイムで操作を行います
--   1つの**データベース** :
-    -   [MongoDB](https://www.mongodb.com/) データベース :
-        -   **Orion Context Broker** がデータのエンティティ、サブスクリプション、レジストレーションなどの
-            コンテキスト・データの情報を保持するために使用します
-        -   **IoT Agent** がデバイスの URL やキーなどのデバイス情報を保持するために使用します
+        コンテキストの変更をサブスクライブし、リアルタイムでそれらの操作を実際に行うデータフローの一部として
+        デプロイされます
+-   1つの [MongoDB](https://www.mongodb.com/) **データベース** :
+    -   **Orion Context Broker** がデータ・エンティティ、サブスクリプション、レジストレーションなどの
+        コンテキスト・データ情報を保持するために使用します
+    -   **IoT Agent** がデバイスの URL やキーなどのデバイス情報を保持するために使用します
 -   3つの**コンテキスト・プロバイダ** :
+    -   HTTP 上で実行される
+        [Ultralight 2.0](https://fiware-iotagent-ul.readthedocs.io/en/latest/usermanual/index.html#user-programmers-manual)
+        を使用する、[ダミー IoT デバイス](https://github.com/FIWARE/tutorials.IoT-Sensors) のセットとして
+        機能する Webサーバ
     -   **在庫管理フロントエンド** は、このチュートリアルでは使用しません。次のことを行います :
         -   ストア情報を表示し、ユーザがダミー IoT デバイスと対話できるようにします
         -   各ストアで購入できる製品を表示します
         -   ユーザが製品を "購入" して在庫数を減らすことを許可します
-        -   HTTP 上で実行される
-            [Ultralight 2.0](https://fiware-iotagent-ul.readthedocs.io/en/latest/usermanual/index.html#user-programmers-manual)
-            を使用する、[ダミー IoT デバイス](https://github.com/FIWARE/tutorials.IoT-Sensors) のセットとして
-            機能する Webサーバ
     -   **Context Provider NGSI** プロキシは、このチュートリアルでは使用しません。次のことを行います :
         -   [NGSI](https://fiware.github.io/specifications/OpenAPI/ngsiv2) を使用してリクエストを受信します
         -   独自形式の独自 API を使用して、公開されているデータソースへのリクエストを行います
         -   コンテキスト・データを[NGSI](https://fiware.github.io/specifications/OpenAPI/ngsiv2) 形式で
             Orion Context Broker に返します
 
+全体のアーキテクチャを以下に示します :
+
+![](https://fiware.github.io/tutorials.Big-Data-Analysis/img/architecture.png)
+
 要素間の相互作用はすべて HTTP リクエストによって開始されるため、エンティティはコンテナ化され、公開されたポートから
 実行できます。
 
-チュートリアルの各セクションの特定のアーキテクチャについては、以下で説明します。
+Apache Flink クラスタの設定情報は、関連する `docker-compose.yml` ファイルの `jobmanager` および `taskmanager`
+セクションで確認できます :
+
+<a name="flink-cluster-configuration"></a>
+
+## Flink Cluster の設定
+
+```yaml
+jobmanager:
+    image: flink:1.9.0-scala_2.11
+    hostname: jobmanager
+    container_name: flink-jobmanager
+    expose:
+        - "8081"
+        - "9001"
+    ports:
+        - "6123:6123"
+        - "8081:8081"
+        - "9001:9001"
+    command: jobmanager
+    environment:
+        - JOB_MANAGER_RPC_ADDRESS=jobmanager
+```
+
+```yaml
+taskmanager:
+    image: flink:1.9.0-scala_2.11
+    hostname: taskmanager
+    container_name: flink-taskmanager
+    ports:
+        - "6121:6121"
+        - "6122:6122"
+    depends_on:
+        - jobmanager
+    command: taskmanager
+    links:
+        - "jobmanager:jobmanager"
+    environment:
+        - JOB_MANAGER_RPC_ADDRESS=jobmanager
+```
+
+`jobmanager` コンテナは3つのポートでリッスンしています :
+
+-   ポート `8081` が公開されているため、Apache Flink ダッシュボードの Web フロントエンドを確認できます
+-   ポート `9001` が公開されていまため、インストレーションがコンテキスト・データのサブスクリプションを
+    受信できます
+-   ポート `6123` は標準の **JobManager** RPC ポートで、内部通信に使用されます
+
+`taskmanager` コンテナは2つのポートでリッスンしています :
+
+-   ポート `6121` と `6122` が使用され、RPC ポートは **TaskManager** によって、内部通信に使用されます
+
+Flinki クラスタ内のコンテナは、次のように単一の環境変数によって駆動されます。
+
+| キー                    | 値           | 説明                                                      |
+| ----------------------- | ------------ | --------------------------------------------------------- |
+| JOB_MANAGER_RPC_ADDRESS | `jobmanager` | タスク処理をコーディネートする _master_ Job Manager のURL |
+
 
 <a name="prerequisites"></a>
 
@@ -167,13 +238,6 @@ Docker バージョン18.03 以降および Docker Compose 1.21 以降を使用�
 ドキュメントを管理できます。Maven を使用して、依存関係を定義およびダウンロードし、コードをビルドして JAR ファイルに
 パッケージ化します。
 
-<a name="intellij-optional"></a>
-
-## IntelliJ (optional)
-
-[IntelliJ](https://www.jetbrains.com/idea/) は、Scala プログラムの開発を容易にする IDE です。コードを作成して実行
-するために使用します。
-
 <a name="cygwin-for-windows"></a>
 
 ## Cygwin for Windows
@@ -210,10 +274,51 @@ cd tutorials.Big-Data-Analysis
 > ./services stop
 > ```
 
-次に、Orion Flink Connector を使用するには、Maven を使用して JAR をインストールする必要があります :
+<a name="real-time-processing-operations"></a>
+
+# リアルタイム・プロセシング・オペレーション
+
+**Apache Flink** 内のデータフローは、
+[Flink ドキュメント](https://ci.apache.org/projects/flink/flink-docs-release-1.9/concepts/programming-model.html)
+で次のように定義されています。
+
+> "Flink プログラムの基本的な構成要素はストリームと変換です。概念的には、ストリームはデータ・レコードの潜在的に終わりの
+> ないフローであり、変換は入力として1つ以上のストリームを受け取り、結果として1つ以上の出力ストリームを生成する操作です。
+>
+> Flink プログラムは、実行されると、ストリームと変換オペレータで構成されるストリーミング・データフローにマッピング
+> されます。各データフローは、1つ以上のソースで始まり、1つ以上のシンクで終わります。 データフローは、任意の有向非巡回
+> グラフ (DAG) に似ています。反復の構造を介して特殊な形式のサイクルが許可されますが、ほとんどの場合、これを単純化するため
+> にこれを変更できます。"
+
+![](https://fiware.github.io/tutorials.Big-Data-Analysis/img/streaming-dataflow.png)
+
+つまり、ストリーミング・データフローを作成するには、次のものを指定する必要があります :
+
+-   **Source Operator** としてコンテキスト・データを読み取るためのメカニズム
+-   変換操作を定義するビジネスロジック
+-   **Sink Operator**としてコンテキスト・データを Context Broker にプッシュバックするメカニズム
+
+`orion-flink.connect.jar` は **Source** と **Sink** の両方の操作を提供します。 したがって、ストリーミング・データフローの
+パイプライン操作を接続するために必要な Scala コードを記述するだけです。処理コードは、flink クラスターにアップロードできる
+JAR ファイルにコンパイルできます。 以下に2つの例を詳しく説明します。このチュートリアルのすべてのソースコードは、
+[cosmos-examples](https://github.com/FIWARE/tutorials.Big-Data-Analysis/tree/master/cosmos-examples) ディレクトリ内に
+あります。
+
+その他の Flink 処理の例は、
+[Apache Flink サイト](https://ci.apache.org/projects/flink/flink-docs-release-1.9/getting-started) および
+[Flink Connector の例](https://fiware-cosmos-flink-examples.readthedocs.io/)にあります。
+
+<a name="compiling-a-jar-file-for-flink"></a>
+
+### Flink 用の JAR ファイルのコンパイル
+
+サンプル JAR ファイルをビルドするために必要な前提条件を保持する既存の `pom.xml` ファイルが作成されました。
+
+Orion Flink Connector を使用するには、最初に Maven を使用してアーティファクト (artifact) としてコネクタ JAR を手動で
+インストールする必要があります :
 
 ```console
-cd job
+cd cosmos-examples
 mvn install:install-file \
   -Dfile=./orion.flink.connector-1.2.3.jar \
   -DgroupId=org.fiware.cosmos \
@@ -222,162 +327,62 @@ mvn install:install-file \
   -Dpackaging=jar
 ```
 
-<a name="generating-context-data"></a>
+その後、同じディレクトリ内で `mvn package` コマンドを実行することでソースコードをコンパイルできます :
 
-## コンテキスト・データの生成
+```console
+cd cosmos-examples
+mvn package
+```
 
-このチュートリアルでは、コンテキストが定期的に更新されるシステムを監視する必要があります。これを行うには、ダミー
-IoT センサを使用できます。`http://localhost:3000/device/monitor` の Device monitor のページを開き、**Smart Door**
-のロックを解除して、**Smart Lamp** をオンにします。これは、ドロップ・ダウン・リストから適切なコマンドを選択し、
-`send` ボタンを押すことで実行できます。デバイスからの測定値のストリームは、同じページで見ることができます :
+`cosmos-examples-1.0.jar` という新しい JAR ファイルが `cosmos-examples/target` ディレクトリ内に作成されます。
+
+<a name="generating-a-stream-of-context-data"></a>
+
+### コンテキスト・データのストリームの生成
+
+このチュートリアルでは、コンテキストが定期的に更新されるシステムを監視する必要があります。これを行うには、ダミー IoT
+センサーを使用できます。`http://localhost:3000/device/monitor` のデバイス・モニターのページを開き、**Smart Door** の
+ロックを解除して、**Smart Lamp** をオンにします。 これは、ドロップ・ダウン・リストから適切なコマンドを選択し、`send`
+ボタンを押すことで実行できます。デバイスからの測定値のストリームは、同じページで見ることができます :
 
 ![](https://fiware.github.io/tutorials.Big-Data-Analysis/img/door-open.gif)
 
-<a name="running-examples-locally"></a>
+<a name="logger---reading-context-data-streams"></a>
 
-## サンプルをローカルで実行
+## ロガー - コンテキスト・データのストリームの読み取り
 
-ローカルで実行するには、[IntelliJ](https://www.jetbrains.com/idea/download) をダウンロードし、
-[Maven](https://www.jetbrains.com/help/idea/maven-support.html#maven_import_project_start) を使用して
-プロジェクトの `job` ディレクトリを開く必要があります。JDK 1.8 を使用してください。
+最初の例では、Orion Context Broker から通知を受信するために、`OrionSource` オペレータを使用します。具体的には、
+この例では、各タイプのデバイスが1分で送信する通知の数をカウントします。 サンプルのソースコードは
+[org/fiware/cosmos/tutorial/Logger.scala](https://github.com/FIWARE/tutorials.Big-Data-Analysis/blob/master/cosmos-examples/src/main/scala/org/fiware/cosmos/tutorial/Logger.scala)
+にあります。
 
-<a name="example"></a>
+<a name="logger---installing-the-jar"></a>
 
-# 例
+### ロガー - JAR のインストール
 
-<a name="example-1-receiving-data-and-performing-operations"></a>
+`http://localhost:8081/#/submit` を開きます
 
-## 例1 : データの受信と操作の実行
+![](https://fiware.github.io/tutorials.Big-Data-Analysis/img/submit-logger.png)
 
-最初の例は、Orion Context Broker から通知を受信するために OrionSource を利用しています。具体的には、この例では、
-各タイプのデバイスが1分間に送信する通知の数をカウントします。例1のコードは、
-`job/src/main/scala/org/fiware/cosmos/orion/flink/connector/tutorial/example1/Example1.scala` にあります。
+新しいジョブを設定します
 
-```scala
-package org.fiware.cosmos.orion.flink.connector.tutorial.example1
+-   **Filename:** `cosmos-examples-1.0.jar`
+-   **Entry Class:** `org.fiware.cosmos.tutorial.Logger`
 
-import org.apache.flink.streaming.api.scala.{StreamExecutionEnvironment, _}
+<a name="logger---subscribing-to-context-changes"></a>
 
-import org.apache.flink.streaming.api.windowing.time.Time
+### ロガー - コンテキスト変更のサブスクライブ
 
-import org.fiware.cosmos.orion.flink.connector.{OrionSource}
-
-
-object Example1{
-
-  def main(args: Array[String]): Unit = {
-
-    val env = StreamExecutionEnvironment.getExecutionEnvironment
-    // Create Orion Source. Receive notifications on port 9001
-    val eventStream = env.addSource(new OrionSource(9001))
-
-    // Process event stream
-    val processedDataStream = eventStream
-    .flatMap(event => event.entities)
-    .map(entity => new Sensor(entity.`type`,1))
-    .keyBy("device")
-    .timeWindow(Time.seconds(60))
-    .sum(1)
-
-    // print the results with a single thread, rather than in parallel
-    processedDataStream.print().setParallelism(1)
-    env.execute("Socket Window NgsiEvent")
-  }
-  case class Sensor(device: String, sum: Int)
-}
-```
-
-プログラムの最初の行は、コネクタを含む必要な依存関係をインポートすることを目的としています。その後、最初のステップ
-は、コネクタによって提供されるクラスを使用して Orion Source のインスタンスを作成し、それを Flink によって提供される
-環境に追加することです。
-
-```scala
-val eventStream = env.addSource(new OrionSource(9001))
-```
-
-`OrionSource` はパラメータとしてポート番号を受け入れます。コネクタは、このポートを介して Orion からのデータを
-リッスンします。これらのデータは、`NgsiEvent` オブジェクトの　`DataStream` の形式になります。
-
-[connector docs](https://github.com/ging/fiware-cosmos-orion-flink-connector/blob/master/README.md#orionsource)
-でこのオブジェクトの詳細を確認できます。
-
-この例では、処理の最初のステップはエンティティのフラット・マッピングです。この操作は、一定期間内に受信したすべての
-NGSI イベントのエンティティ・オブジェクトをまとめるために実行されます。
-
-```scala
-val processedDataStream = eventStream
-
-.flatMap(event => event.entities)
-```
-
-すべてのエンティティをまとめたら、`map` でエンティティを反復処理し、目的の属性を抽出します。この場合、
-センサ・タイプ (ドア, モーション, ベル または ランプ) に関心があります。
-
-```scala
-// ...
-
-.map(entity => new Sensor(entity.`type`,1))
-```
-
-各反復で、必要なプロパティを持つカスタム・オブジェクトを作成します。センサ・タイプと各通知の増分です。
-このために、次のようにケースクラスを定義できます :
-
-```scala
-case class Sensor(device: String, sum: Int)
-```
-
-これで、作成したオブジェクトをデバイスのタイプ別にグループ化し、それらに対して操作を実行できます :
-
-```scala
-// ...
-
-.keyBy("device")
-```
-
-次のようなカスタム処理ウィンドウを提供できます :
-
-```scala
-// ...
-
-.timeWindow(Time.seconds(60))
-```
-
-そして、上記の時間間隔で実行する操作を指定します :
-
-```scala
-// ...
-
-.sum(1)
-```
-
-処理後、結果をコンソールに印刷できます :
-
-```scala
-processedDataStream.print().setParallelism(1)
-```
-
-または、選択したシンクを使用して永続化することもできます。これで、IntelliJ の再生ボタンを押すことでコードを
-実行できます。
-
-<a name="subscribing-to-context-changes"></a>
-
-### コンテキスト変更のサブスクライブ
-
-動的コンテキスト・システムが起動して実行されると (例1を実行)、**Flink** にコンテキストの変更を通知する必要が
-あります。
+動的コンテキスト・システムが起動して実行されると (`Logger` を実行)、**Flink** にコンテキストの変更を通知する
+必要があります。
 
 これは、Orion Context Broker の `/v2/subscription` エンドポイントに POST リクエストを行うことで実行できます。
 
--   これらの設定を使用してプロビジョニングされているため、`fiware-service` および `fiware-servicepath` ヘッダを
-    使用してサブスクリプションをフィルタリングし、接続された IoT センサからの測定値のみをリッスンします
+-   `fiware-service` および `fiware-servicepath` ヘッダは、これらの設定を使用してプロビジョニングされている
+    ため、接続された IoT センサからの測定値のみをリッスンするようにサブスクリプションをフィルター処理する
+    ために使用されます
 
--   通知の `url` は、Flink プログラムがリッスンしているものと一致する必要があります。docker0 ネットワーク内の
-    マシンの IP アドレスを  ${MY_IP} に置き換えます (Docker コンテナからアクセスできる必要があります)。
-    次のようにこの IP を取得できます (sudo が必要な場合があります) :
-
-```console
-docker network inspect bridge --format='{{(index .IPAM.Config 0).Gateway}}'
-```
+-   通知 URL は、Flink プログラムがリッスンしている URL と一致する必要があります
 
 -   `throttling` 値は、変更がサンプリングされるレートを定義します
 
@@ -402,14 +407,12 @@ curl -iX POST \
   },
   "notification": {
     "http": {
-    "url": "http://${MY_IP}:9001"
-    }
-  },
-  "throttling": 5
+    "url": "http://jobmanager:9001
+  }
 }'
 ```
 
-レスポンスは `**201 - Created**` になります
+レスポンスは **201 - Created** になります
 
 サブスクリプションが作成されている場合、`/v2/subscriptions` エンドポイントに対して GET リクエストを行うことで、
 サブスクリプションが起動しているかどうかを確認できます。
@@ -451,12 +454,11 @@ curl -X GET \
             "attrs": [],
             "attrsFormat": "normalized",
             "http": {
-                "url": "http://${MY_IP}:9001"
+                "url": "http://jobmanager:9001"
             },
             "lastSuccess": "2019-09-09T09:36:33.00Z",
             "lastSuccessCode": 200
-        },
-        "throttling": 5
+        }
     }
 ]
 ```
@@ -477,7 +479,18 @@ curl -X GET \
 最後に、サブスクリプションの `status` が `active` であることを確認します。有効期限が切れたサブスクリプションは
 実行されません。
 
-サブスクリプションを作成すると、IntelliJ コンソールの出力は次のようになります :
+<a name="logger---checking-the-output"></a>
+
+### ロガー - 出力の確認
+
+サブスクリプションを1分間実行したままにして、次を実行します :
+
+```console
+docker logs flink-taskmanager -f --until=60s > stdout.log 2>stderr.log
+cat stderr.log
+```
+
+サブスクリプションを作成すると、コンソールの出力は次のようになります :
 
 ```
 Sensor(Bell,3)
@@ -485,20 +498,152 @@ Sensor(Door,4)
 Sensor(Lamp,7)
 Sensor(Motion,6)
 ```
-<a name="example-2--receiving-data-performing-operations-and-writing-back-to-the-context-broker"></a>
 
-## 例2 : データの受信、操作の実行、Context Broker への書き戻し
+<a name="logger---analyzing-the-code"></a>
+
+### ロガー - コードの分析
+
+```scala
+package org.fiware.cosmos.tutorial
+
+
+import org.apache.flink.streaming.api.scala.{StreamExecutionEnvironment, _}
+import org.apache.flink.streaming.api.windowing.time.Time
+import org.fiware.cosmos.orion.flink.connector.{OrionSource}
+
+object Logger{
+
+  def main(args: Array[String]): Unit = {
+    val env = StreamExecutionEnvironment.getExecutionEnvironment
+    // Create Orion Source. Receive notifications on port 9001
+    val eventStream = env.addSource(new OrionSource(9001))
+
+    // Process event stream
+
+    val processedDataStream = eventStream
+    .flatMap(event => event.entities)
+    .map(entity => new Sensor(entity.`type`,1))
+    .keyBy("device")
+    .timeWindow(Time.seconds(60))
+    .sum(1) 
+
+    // print the results with a single thread, rather than in parallel
+    processedDataStream.print().setParallelism(1)
+    env.execute("Socket Window NgsiEvent")
+  }
+  case class Sensor(device: String, sum: Int)
+}
+```
+
+プログラムの最初の行は、コネクタを含む必要な依存関係をインポートすることを目的としています。次のステップは、コネクタが
+提供するクラスを使用して `OrionSource` のインスタンスを作成し、Flink が提供する環境に追加することです。
+
+`OrionSource` コンストラクタはパラメータとしてポート番号 (`9001`) を受け入れます。このポートは、Orion からの
+サブスクリプション通知をリッスンするために使用され、`NgsiEvent` オブジェクトの `DataStream` に変換されます。これらの
+オブジェクトの定義は、
+[Orion-Flink Connector ドキュメント](https://github.com/ging/fiware-cosmos-orion-flink-connector/blob/master/README.md#orionsource)
+に記載されています。
+
+ストリーム処理は、5つの個別のステップで構成されています。最初のステップ (`flatMap()`) は、一定期間内に受信したすべての
+NGSI イベントのエンティティ・オブジェクトをまとめるために実行されます。その後、コードはそれらを `map()` 操作で繰り返し、
+目的の属性を抽出します。この場合、センサの `type` (`Door`, `Motion`, `Bell` or `Lamp`) に関心があります。
+
+各反復内で、必要なプロパティを持つカスタム・オブジェクトを作成します : センサの `type` と各通知の増分。このために、
+次のようにケース・クラスを定義できます :
+
+```scala
+case class Sensor(device: String, sum: Int)
+```
+
+その後、作成されたオブジェクトをデバイスのタイプ (`keyBy("device")`) でグループ化し、それらに対して `timeWindow()` や
+`sum()` などの操作を実行できます。
+
+処理後、結果がコンソールに出力されます :
+
+```scala
+processedDataStream.print().setParallelism(1)
+```
+
+<a name="feedback-loop---persisting-context-data"></a>
+
+## フィードバック・ループ - コンテキスト・データの永続化
 
 2番目の例では、モーション・センサが動きを検出するとランプをオンにします。
 
-<a name="switching-on-a-lamp"></a>
+データフロー・ストリームは、通知を受信するために `OrionSource` オペレータを使用し、モーション・センサにのみ応答する
+ように入力をフィルタし、`OrionSink` を使用して処理されたコンテキストを Context Broker にプッシュします。サンプルの
+ソースコードは
+[org/fiware/cosmos/tutorial/Feedback.scala](https://github.com/FIWARE/tutorials.Big-Data-Analysis/blob/master/cosmos-examples/src/main/scala/org/fiware/cosmos/tutorial/Feedback.scala)
+にあります。
 
-### ランプをオンにする
+<a name="feedback-loop---installing-the-jar"></a>
 
-次に Example2 のコードを見てみましょう :
+### フィードバック・ループ - JAR のインストール
+
+`http://localhost:8081/#/job/running` を開きます
+
+![](https://fiware.github.io/tutorials.Big-Data-Analysis/img/running-jobs.png)
+
+実行中のジョブ (存在する場合) を選択し、**Cancel Job**  をクリックします
+
+その後、`http://localhost:8081/#/submit` を開きます
+
+![](https://fiware.github.io/tutorials.Big-Data-Analysis/img/submit-feedback.png)
+
+新しいジョブを設定します
+
+-   **Filename:** `cosmos-examples-1.0.jar`
+-   **Entry Class:** `org.fiware.cosmos.tutorial.Feedback`
+
+<a name="feedback-loop---subscribing-to-context-changes"></a>
+
+### フィードバック・ループ - コンテキスト変更のサブスクライブ
+
+以前の例を実行していない場合は、新しいサブスクリプションを設定する必要があります。モーション・センサが動きを検出した
+ときにのみ通知をトリガーするように、より限定したサブスクリプションを設定できます。
+
+> **注 :** 以前のサブスクリプションが既に存在する場合、2番目のより限定した Motion のみのサブスクリプションを作成する
+> この手順は不要です。Scala タスク自体のビジネスロジック内にフィルタがあります。
+
+
+```console
+curl -iX POST \
+  'http://localhost:1026/v2/subscriptions' \
+  -H 'Content-Type: application/json' \
+  -H 'fiware-service: openiot' \
+  -H 'fiware-servicepath: /' \
+  -d '{
+  "description": "Notify Flink of all context changes",
+  "subject": {
+    "entities": [
+      {
+        "idPattern": "Motion.*"
+      }
+    ]
+  },
+  "notification": {
+    "http": {
+      "url": "http://taskmanger:9001"
+    }
+  }
+}'
+```
+
+<a name="feedback-loop---checking-the-output"></a>
+
+### フィードバック・ループ - 出力の確認
+
+`http://localhost:3000/device/monitor` を開きます
+
+いずれかのストア内で、ドアのロックを解除して待機します。ドアが開いてモーション・センサがトリガーされると、ランプが
+直接オンになります。
+
+<a name="feedback-loop---analyzing-the-code"></a>
+
+### フィードバック・ループ - コードの分析
 
 ```scala
-package org.fiware.cosmos.orion.flink.connector.tutorial.example2
+package org.fiware.cosmos.tutorial
 
 
 import org.apache.flink.streaming.api.scala.{StreamExecutionEnvironment, _}
@@ -506,10 +651,10 @@ import org.apache.flink.streaming.api.windowing.time.Time
 import org.fiware.cosmos.orion.flink.connector._
 
 
-object Example2{
+object Feedback{
   final val CONTENT_TYPE = ContentType.Plain
   final val METHOD = HTTPMethod.POST
-  final val CONTENT = "{\n  \"on\": {\n      \"type\" : \"command\",\n      \"value\" : \"\"\n  }\n}"
+  final val CONTENT = "{  \"on\": {      \"type\" : \"command\",      \"value\" : \"\"  }}"
   final val HEADERS = Map("fiware-service" -> "openiot","fiware-servicepath" -> "/","Accept" -> "*/*")
 
   def main(args: Array[String]): Unit = {
@@ -527,7 +672,7 @@ object Example2{
       .min("id")
 
     // print the results with a single thread, rather than in parallel
-  processedDataStream.print().setParallelism(1)
+  processedDataStream.printToErr().setParallelism(1)
 
     val sinkStream = processedDataStream.map(node => {
       new OrionSinkObject("urn:ngsi-ld:Lamp"+ node.id.takeRight(3)+ "@on","http://${IP}:3001/iot/lamp"+ node.id.takeRight(3),CONTENT_TYPE,METHOD)
@@ -540,154 +685,30 @@ object Example2{
 }
 ```
 
-ご覧のとおり、前の例と似ています。主な違いは、処理されたデータを **`OrionSink`** を介して Context Broker
+ご覧のとおり、コードは以前の例に似ています。主な違いは、処理されたデータを **`OrionSink`** を介して Context Broker
 に書き戻すことです。
-
-```scala
-val sinkStream = processedDataStream.map(node => {
-      new OrionSinkObject(CONTENT, "http://localhost:1026/v2/entities/Lamp:"+node.id.takeRight(3)+"/attrs", CONTENT_TYPE,         METHOD, HEADERS)
-    })
-
-OrionSink.addSink(sinkStream)
-```
 
 **`OrionSinkObject`** の引数は次のとおりです :
 
--   **Message**: `"{\n \"on\": {\n \"type\" : \"command\",\n \"value\" : \"\"\n }\n}"`. 'on' コマンドを送信します
--   **URL**: `"http://localhost:1026/v2/entities/Lamp:"+node.id.takeRight(3)+"/attrs"`. TakeRight(3) は、
-    部屋の数を取得します。例えば '001'
+-   **Message**: `"{ \"on\": { \"type\" : \"command\", \"value\" : \"\" }}"`. 'on' コマンドを送信します
+-   **URL**: `"http://localhost:1026/v2/entities/Lamp:"+node.id.takeRight(3)+"/attrs"`.  TakeRight(3) は部屋の番号を
+    取得します。例 : '001'
 -   **Content Type**: `ContentType.Plain`.
 -   **HTTP Method**: `HTTPMethod.POST`.
--   **Headers**: `Map("fiware-service" -> "openiot","fiware-servicepath" -> "/","Accept" -> "*/*")`.
-    オプションのパラメータ。HTTP リクエストに必要なヘッダを追加します
+-   **Headers**: `Map("fiware-service" -> "openiot","fiware-servicepath" -> "/","Accept" -> "*/*")`. オプション・パラメータ
+    HTTP リクエストに必要なヘッダを追加します。
 
-<a name="setting-up-the-scenario"></a>
+<a name="next-steps"></a>
 
-### シナリオのセットアップ
+# 次のステップ
 
-最初に、前に作成したサブスクリプションを削除する必要があります :
+高度な機能を追加することで、アプリケーションに複雑さを加える方法を知りたいですか？ このシリーズの
+[他のチュートリアル](https://www.letsfiware.jp/fiware-tutorials)を読むことで見つけることができます
 
-```console
-curl -X DELETE   'http://localhost:1026/v2/subscriptions/$subscriptionId'   -H 'fiware-service: openiot'   -H 'fiware-servicepath: /'
-```
+---
 
-`/v2/subscriptions` エンドポイントに対して GET リクエストを実行することにより、サブスクリプションの ID
-を取得できます。
+<a name="licensse"></a>
 
-```console
-curl -X GET   'http://localhost:1026/v2/subscriptions/'   -H 'fiware-service: openiot'   -H 'fiware-servicepath: /'
-```
+## License
 
-次に、モーション・センサが動きを検出したときにのみ通知をトリガーする他のサブスクリプションを作成します。
-前述のように、$MY_IP を docker0 ネットワーク内のマシンの IP アドレスに変更することを忘れないでください。
-
-```console
-curl -iX POST \
-  'http://localhost:1026/v2/subscriptions' \
-  -H 'Content-Type: application/json' \
-  -H 'fiware-service: openiot' \
-  -H 'fiware-servicepath: /' \
-  -d '{
-  "description": "Notify Flink of all context changes",
-  "subject": {
-    "entities": [
-      {
-        "idPattern": "Motion.*"
-      }
-    ]
-  },
-  "notification": {
-    "http": {
-      "url": "http://${MY_IP}:9001/v2/notify"
-    }
-  },
-  "throttling": 5
-}'
-```
-
-ドアを開けると、ランプが点灯します。
-
-<a name="example-3-packaging-the-code-and-submitting-it-to-the-flink-job-manager"></a>
-
-## 例3 : コードをパッケージ化し、Flink Job Manager に送信
-
-前の例では、IntelliJ などの IDE からコネクタを起動して実行する方法を見てきました。実際のシナリオでは、コードを
-パッケージ化し、Flink クラスタに送信して、操作を並行して実行することができます。Flink Dashoard はポート 8081
-でリッスンしています :
-
-![Screenshot](https://fiware.github.io/tutorials.Big-Data-Analysis//img/Tutorial%20FIWARE%20Flink.png)
-
-<a name="subscribing-to-notifications"></a>
-
-### 通知のサブスクライブ
-
-最初に、次のように Flink ノードを指すようにサブスクリプションの通知 URL を変更する必要があります :
-
-```console
-curl -iX POST \
-  'http://localhost:1026/v2/subscriptions' \
-  -H 'Content-Type: application/json' \
-  -H 'fiware-service: openiot' \
-  -H 'fiware-servicepath: /' \
-  -d '{
-  "description": "Notify Flink of all context changes",
-  "subject": {
-    "entities": [
-      {
-        "idPattern": "Motion.*"
-      }
-    ]
-  },
-  "notification": {
-    "http": {
-      "url": "http://taskmanager:9001/notify"
-    }
-  },
-  "throttling": 5
-}'
-```
-
-<a name="changing-the-code"></a>
-
-### コードの変更
-
-orion コンテナのホスト名の例2で localhost を変更する必要があります :
-
--   例2
-
-```scala
-      new OrionSinkObject(CONTENT, "http://localhost:1026/v2/entities/Lamp:"+node.id.takeRight(3)+"/attrs", CONTENT_TYPE, METHOD, HEADERS)
-```
-
--   例3
-
-```scala
-      new OrionSinkObject(CONTENT, "http://orion:1026/v2/entities/Lamp:"+node.id.takeRight(3)+"/attrs", CONTENT_TYPE, METHOD, HEADERS)
-```
-
-<a name="packaging-the-code"></a>
-
-### コードのパッケージ化
-
-例の JAR パッケージをビルドしましょう。その中に、コネクタなど、使用したすべての依存関係を含める必要がありますが、
-環境によって提供される依存関係の一部 (Flink, Scala...) は除外します。これは、`add-dependencies-for-IDEA`
-プロファイルをチェックせずに `maven package` コマンドで実行できます。これにより、
-`target/orion.flink.connector.tutorial-1.0-SNAPSHOT.jar` の下に JAR ファイルが構築されます。
-
-<a name="submitting-the-job"></a>
-
-### ジョブを送信
-
-例3のコードを、デプロイした Flink クラスタに送信しましょう。これを行うには、ブラウザで
-([http://localhost:8081](http://localhost:8081)) にある Flink GUI を開き、左側のメニューで  **Submit new Job**
-セクションを選択します。**Add New** ボタンをクリックして、JAR をアップロードします。アップロードしたら、
-**Uploaded JARs** リストから選択し、実行するクラスを指定します :
-
-```scala
-org.fiware.cosmos.orion.flink.connector.tutorial.example2.Example2
-```
-
-![Screenshot](https://fiware.github.io/tutorials.Big-Data-Analysis//img/submit-flink.png)
-
-このフィールドに入力し、**Submit** ボタンをクリックすると、出力ジョブが実行されていることがわかります。
-これでドアを開けて、ランプが点灯するのを見ることができます。
+[MIT](LICENSE) © 2020 FIWARE Foundation e.V.
