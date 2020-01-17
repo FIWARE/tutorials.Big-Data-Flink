@@ -523,10 +523,7 @@ You can open a door and the lamp will switch on.
 
 #### Example 3: Packaging the code and submitting it to the Flink Job Manager
 In the previous examples, we've seen how to get the connector up and running from an IDE like IntelliJ. In a real case scenario, we might want to package our code and submit it to a Flink cluster in order to run our operations in parallel.
-The Flink Dashoard is listening on port 8081:
-
-![Screenshot](https://raw.githubusercontent.com/sonsoleslp/fiware-cosmos-orion-flink-connector-tutorial/master/img/Tutorial%20FIWARE%20Flink.png)
-
+The Flink Dashoard is listening on port 8081.
 
 ##### Subscribing to notifications
 First, we need to change the notification URL of our subscription to point to our Flink node like so:
@@ -585,7 +582,7 @@ Click the **Add New** button and upload the JAR. Once uploaded, select it from t
 org.fiware.cosmos.orion.flink.connector.tutorial.example2.Example2
 ```
 
-![Screenshot](https://raw.githubusercontent.com/sonsoleslp/fiware-cosmos-orion-flink-connector-tutorial/master/img/submit-flink.png)
+![Screenshot](https://raw.githubusercontent.com/ging/fiware-cosmos-orion-flink-connector-examples/master/files/img/submit_job.png)
 
 
 Once this field is filled in, we can click the **Submit** button and we will see that out job is running.
