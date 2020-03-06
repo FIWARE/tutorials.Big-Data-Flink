@@ -412,6 +412,19 @@ Sensor(Lamp,7)
 Sensor(Motion,6)
 ```
 
+####Example 1 with NGSI-LD:
+
+This example makes use of the NGSILDSource in order to receive notifications from the Orion Context Broker. Instead of NGSI v2 messages now it will log NGSI-LD messages. There are only two changes:
+
+```scala
+...
+import org.fiware.cosmos.orion.flink.connector.NGSILDSource
+...
+val eventStream = env.addSource(new NGSILDSource(9001))
+...
+```scala
+
+
 
 
 #### Example 2:  Receiving data, performing operations and writing back to the Context Broker
