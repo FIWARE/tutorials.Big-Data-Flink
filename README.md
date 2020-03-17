@@ -313,7 +313,7 @@ cd cosmos-examples
 mvn package
 ```
 
-A new JAR file called `cosmos-examples-1.0.jar` will be created within the `cosmos-examples/target` directory.
+A new JAR file called `cosmos-examples-1.1.jar` will be created within the `cosmos-examples/target` directory.
 
 ### Generating a stream of Context Data
 
@@ -340,7 +340,7 @@ Goto `http://localhost:8081/#/submit`
 
 Submit new job
 
--   **Filename:** `cosmos-examples-1.0.jar`
+-   **Filename:** `cosmos-examples-1.1.jar`
 -   **Entry Class:** `org.fiware.cosmos.tutorial.Logger`
 
 ### Logger - Subscribing to context changes
@@ -523,6 +523,19 @@ After the processing, the results are output to the console:
 ```scala
 processedDataStream.print().setParallelism(1)
 ```
+## Logger - NGSI-LD
+
+The same example is provided for data in the NGSI LD format (`LoggerLD.scala`). This example makes use of the NGSILDSource provided by the Orion Flink Connector in order to receive messages in the NGSI LD format. The only part of the code that changes is the declaration of the source:
+You can use 
+
+
+```scala
+...
+import org.fiware.cosmos.orion.flink.connector.NGSILDSource
+...
+val eventStream = env.addSource(new NGSILDSource(9001))
+...
+```
 
 ## Feedback Loop - Persisting Context Data
 
@@ -547,7 +560,7 @@ Thereafter goto `http://localhost:8081/#/submit`
 
 Submit new job
 
--   **Filename:** `cosmos-examples-1.0.jar`
+-   **Filename:** `cosmos-examples-1.1.jar`
 -   **Entry Class:** `org.fiware.cosmos.tutorial.Feedback`
 
 ### Feedback Loop - Subscribing to context changes
@@ -599,31 +612,31 @@ import org.apache.flink.streaming.api.windowing.time.Time
 import org.fiware.cosmos.orion.flink.connector._
 
 
-object Feedback{
-  final val CONTENT_TYPE = ContentType.Plain
-  final val METHOD = HTTPMethod.POST
+object Feedback {
+  final val CONTENT_TYPE = ContentType.JSON
+  final val METHOD = HTTPMethod.PATCH
   final val CONTENT = "{  \"on\": {      \"type\" : \"command\",      \"value\" : \"\"  }}"
   final val HEADERS = Map("fiware-service" -> "openiot","fiware-servicepath" -> "/","Accept" -> "*/*")
 
   def main(args: Array[String]): Unit = {
     val env = StreamExecutionEnvironment.getExecutionEnvironment
-  // Create Orion Source. Receive notifications on port 9001
-  val eventStream = env.addSource(new OrionSource(9001))
+    // Create Orion Source. Receive notifications on port 9001
+    val eventStream = env.addSource(new OrionSource(9001))
 
     // Process event stream
-  val processedDataStream = eventStream
+    val processedDataStream = eventStream
       .flatMap(event => event.entities)
-      .filter(entity=>(entity.attrs("count").value == "1"))
+      .filter(entity => (entity.`type`== "Motion" && entity.attrs("count").value == "1"))
       .map(entity => new Sensor(entity.id))
       .keyBy("id")
-      .timeWindow(Time.seconds(5),Time.seconds(2))
+      .timeWindow(Time.seconds(5), Time.seconds(2))
       .min("id")
 
     // print the results with a single thread, rather than in parallel
-  processedDataStream.printToErr().setParallelism(1)
+    processedDataStream.printToErr().setParallelism(1)
 
     val sinkStream = processedDataStream.map(node => {
-      new OrionSinkObject("urn:ngsi-ld:Lamp"+ node.id.takeRight(3)+ "@on","http://${IP}:3001/iot/lamp"+ node.id.takeRight(3),CONTENT_TYPE,METHOD)
+      new OrionSinkObject(CONTENT, "http://orion:1026/v2/entities/Lamp:"+node.id.takeRight(3)+"/attrs", CONTENT_TYPE, METHOD, HEADERS)
     })
     OrionSink.addSink(sinkStream)
     env.execute("Socket Window NgsiEvent")
