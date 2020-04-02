@@ -25,7 +25,7 @@ object LoggerLD {
       .sum(1)
 
     // print the results with a single thread, rather than in parallel
-    processedDataStream.print().setParallelism(1)
+    processedDataStream.printToErr().setParallelism(1)
     env.execute("Socket Window NgsiLDEvent")
   }
 }

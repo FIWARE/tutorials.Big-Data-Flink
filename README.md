@@ -152,7 +152,6 @@ jobmanager:
     ports:
         - "6123:6123"
         - "8081:8081"
-        - "9001:9001"
     command: jobmanager
     environment:
         - JOB_MANAGER_RPC_ADDRESS=jobmanager
@@ -166,6 +165,7 @@ taskmanager:
     ports:
         - "6121:6121"
         - "6122:6122"
+        - "9001:9001"
     depends_on:
         - jobmanager
     command: taskmanager
@@ -178,12 +178,12 @@ taskmanager:
 The `jobmanager` container is listening on three ports:
 
 -   Port `8081` is exposed so we can see the web frontend of the Apache Flink Dashboard
--   Port `9001` is exposed so that the installation can receive context data subscriptions
 -   Port `6123` is the standard **JobManager** RPC port, used for internal communications
 
 The `taskmanager` container is listening on two ports:
 
 -   Ports `6121` and `6122` are used and RPC ports by the **TaskManager**, used for internal communications
+-   Port `9001` is exposed so that the installation can receive context data subscriptions
 
 The containers within the flink cluster are driven by a single environment variable as shown:
 
@@ -306,10 +306,9 @@ mvn install:install-file \
   -Dpackaging=jar
 ```
 
-Thereafter the source code can be compiled by running the `mvn package` command within the same directory:
+Thereafter the source code can be compiled by running the `mvn package` command within the same directory (`cosmos-examples`):
 
 ```console
-cd cosmos-examples
 mvn package
 ```
 
@@ -375,7 +374,8 @@ curl -iX POST \
   },
   "notification": {
     "http": {
-    "url": "http://jobmanager:9001
+      "url": "http://taskmanager:9001"
+    }
   }
 }'
 ```
@@ -418,7 +418,7 @@ curl -X GET \
             "attrs": [],
             "attrsFormat": "normalized",
             "http": {
-                "url": "http://jobmanager:9001"
+                "url": "http://taskmanager:9001"
             },
             "lastSuccess": "2019-09-09T09:36:33.00Z",
             "lastSuccessCode": 200
@@ -526,7 +526,6 @@ processedDataStream.print().setParallelism(1)
 ## Logger - NGSI-LD
 
 The same example is provided for data in the NGSI LD format (`LoggerLD.scala`). This example makes use of the NGSILDSource provided by the Orion Flink Connector in order to receive messages in the NGSI LD format. The only part of the code that changes is the declaration of the source:
-You can use 
 
 
 ```scala
@@ -535,6 +534,22 @@ import org.fiware.cosmos.orion.flink.connector.NGSILDSource
 ...
 val eventStream = env.addSource(new NGSILDSource(9001))
 ...
+```
+
+You can run the same package you uploaded to the Flink Web UI specifying the class `org.fiware.cosmos.tutorial.LoggerLD`. After a minute you can run again the following command to see the output:
+  
+```console
+docker logs flink-taskmanager -f --until=60s > stdout.log 2>stderr.log
+cat stderr.log
+```
+
+After creating the subscription, the output on the console will be like the following:
+
+```text
+Sensor(Bell,3)
+Sensor(Door,4)
+Sensor(Lamp,7)
+Sensor(Motion,6)
 ```
 
 ## Feedback Loop - Persisting Context Data

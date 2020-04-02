@@ -89,11 +89,14 @@ services:
     ports:
       - "${FLINK_JOB_MANAGER_PORT}:${FLINK_JOB_MANAGER_PORT}"
       - "${FLINK_WEB_APP_PORT}:${FLINK_WEB_APP_PORT}"
-      - "${FLINK_SERVICE_PORT}:${FLINK_SERVICE_PORT}"
     command: jobmanager
     environment:
       - JOB_MANAGER_RPC_ADDRESS=jobmanager
+      - FLINK_LOG_DIR=/opt/flink/log
 
+    volumes:
+      - ./log4j-console.properties:/opt/flink/conf/log4j-console.properties
+      - ./flink-conf.yaml:/opt/flink/conf/flink-conf.yaml
   taskmanager:
     image: flink:${FLINK_VERSION}
     hostname: taskmanager
@@ -101,6 +104,7 @@ services:
     ports:
       - "${FLINK_TASK_MANAGER_PORT_1}:${FLINK_TASK_MANAGER_PORT_1}"
       - "${FLINK_TASK_MANAGER_PORT_2}:${FLINK_TASK_MANAGER_PORT_2}"
+      - "${FLINK_SERVICE_PORT}:${FLINK_SERVICE_PORT}"
     depends_on:
       - jobmanager
     command: taskmanager
@@ -108,7 +112,10 @@ services:
       - "jobmanager:jobmanager"
     environment:
       - JOB_MANAGER_RPC_ADDRESS=jobmanager
-
+      - FLINK_LOG_DIR=/opt/flink/log
+    volumes:
+      - ./log4j-console.properties:/opt/flink/conf/log4j-console.properties
+      - ./flink-conf.yaml:/opt/flink/conf/flink-conf.yaml
   # Database
   mongo-db:
     image: mongo:${MONGO_DB_VERSION}
