@@ -15,7 +15,7 @@ environments, perform computations at in-memory speed and at any scale.
 The tutorial uses [cUrl](https://ec.haxx.se/) commands throughout, but is also available as
 [Postman documentation](https://fiware.github.io/tutorials.Big-Data-Analysis/)
 
-[![Run in Postman](https://run.pstmn.io/button.svg)](https://app.getpostman.com/run-collection/fb0de86dea21e2073054)
+[![Run in Postman](https://run.pstmn.io/button.svg)](https://www.getpostman.com/collections/9a49739f0758b971193d)
 
 -   このチュートリアルは[日本語](README.ja.md)でもご覧いただけます。
 
