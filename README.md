@@ -210,7 +210,7 @@ follow the instructions found [here](https://docs.docker.com/compose/install/)
 
 You can check your current **Docker** and **Docker Compose** versions using the following commands:
 
-```console
+```bash
 docker-compose -v
 docker version
 ```
@@ -279,7 +279,7 @@ This means that to create a streaming data flow we must supply the following:
 -   Business logic to define the transform operations
 -   A mechanism for pushing Context data back to the context broker as a **Sink Operator**
 
-The `orion-flink.connect.jar` offers both **Source** and **Sink** operations. It therefore only remains to write the
+The `orion.flink.connector-1.2.3.jar` offers both **Source** and **Sink** operations. It therefore only remains to write the
 necessary Scala code to connect the streaming dataflow pipeline operations together. The processing code can be complied
 into a JAR file which can be uploaded to the flink cluster. Two examples will be detailed below, all the source code for
 this tutorial can be found within the
@@ -307,7 +307,7 @@ mvn install:install-file \
 
 Thereafter the source code can be compiled by running the `mvn package` command within the same directory (`cosmos-examples`):
 
-```console
+```bash
 mvn package
 ```
 
@@ -349,7 +349,7 @@ This is done by making a POST request to the `/v2/subscription` endpoint of the 
 
 #### :one: Request:
 
-```console
+```bash
 curl -iX POST \
   'http://localhost:1026/v2/subscriptions' \
   -H 'Content-Type: application/json' \
@@ -379,7 +379,7 @@ If a subscription has been created, we can check to see if it is firing by makin
 
 #### :two: Request:
 
-```console
+```bash
 curl -X GET \
 'http://localhost:1026/v2/subscriptions/' \
 -H 'fiware-service: openiot' \
@@ -438,7 +438,7 @@ Finally, check that the `status` of the subscription is `active` - an expired su
 
 Leave the subscription running for **one minute**, then run the following:
 
-```console
+```bash
 docker logs flink-taskmanager -f --until=60s > stdout.log 2>stderr.log
 cat stderr.log
 ```
@@ -530,7 +530,7 @@ val eventStream = env.addSource(new NGSILDSource(9001))
 
 You can run the same package you uploaded to the Flink Web UI specifying the class `org.fiware.cosmos.tutorial.LoggerLD`. After a minute you can run again the following command to see the output:
   
-```console
+```bash
 docker logs flink-taskmanager -f --until=60s > stdout.log 2>stderr.log
 cat stderr.log
 ```
@@ -578,7 +578,7 @@ up to only trigger a notification when a motion sensor detects movement.
 > **Note:** If the previous subscription already exists, this step creating a second narrower Motion-only subscription
 > is unnecessary. There is a filter within the business logic of the scala task itself.
 
-```console
+```bash
 curl -iX POST \
   'http://localhost:1026/v2/subscriptions' \
   -H 'Content-Type: application/json' \
