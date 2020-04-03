@@ -77,7 +77,7 @@ connector allows developers write custom business logic to listen for context da
 the flow of the context data. Flink is able to delegate these actions to other workers where they will be acted upon
 either in sequentiallly or in parallel as required. The data flow processing itself can be arbitrarily complex.
 
-Obviously in reality our existing Supermarket scenario is far too small to require the use of a Big Data solution, but
+Obviously, in reality, our existing Supermarket scenario is far too small to require the use of a Big Data solution, but
 will serve as a basis for demonstrating the type of real-time processing which may be required in a larger solution
 which is processing a continuous stream of context-data events.
 
@@ -236,7 +236,7 @@ Before you start, you should ensure that you have obtained or built the necessar
 the repository and create the necessary images by running the commands shown below. Note that you might need to run some
 of the commands as a privileged user:
 
-```console
+```bash
 git clone https://github.com/FIWARE/tutorials.Big-Data-Analysis.git
 cd tutorials.Big-Data-Analysis
 ./services create
@@ -246,7 +246,7 @@ This command will also import seed data from the previous tutorials and provisio
 
 To start the system, run the following command:
 
-```console
+```bash
 ./services start
 ```
 
@@ -293,10 +293,9 @@ Further Flink processing examples can be found on the
 
 An existing `pom.xml` file has been created which holds the necessary prerequisites to build the examples JAR file
 
-In order to use the Orion Flink Connector we first need to manually install the connector JAR as an artifact using
-Maven:
+In order to use the Orion Flink Connector we first need to manually install the connector JAR as an artifact using Maven:
 
-```console
+```bash
 cd cosmos-examples
 mvn install:install-file \
   -Dfile=./orion.flink.connector-1.2.3.jar \
@@ -316,24 +315,17 @@ A new JAR file called `cosmos-examples-1.1.jar` will be created within the `cosm
 
 ### Generating a stream of Context Data
 
-For the purpose of this tutorial, we must be monitoring a system in which the context is periodically being updated. The
-dummy IoT Sensors can be used to do this. Open the device monitor page at `http://localhost:3000/device/monitor` and
-unlock a **Smart Door** and switch on a **Smart Lamp**. This can be done by selecting an appropriate the command from
-the drop down list and pressing the `send` button. The stream of measurements coming from the devices can then be seen
-on the same page:
+For the purpose of this tutorial, we must be monitoring a system in which the context is periodically being updated. The dummy IoT Sensors can be used to do this. Open the device monitor page at `http://localhost:3000/device/monitor` and unlock a **Smart Door** and switch on a **Smart Lamp**. This can be done by selecting an appropriate the command from the drop down list and pressing the `send` button. The stream of measurements coming from the devices can then be seen on the same page:
 
 ![](https://fiware.github.io/tutorials.Big-Data-Analysis/img/door-open.gif)
 
 ## Logger - Reading Context Data Streams
 
-The first example makes use of the `OrionSource` operator in order to receive notifications from the Orion Context
-Broker. Specifically, the example counts the number notifications that each type of device sends in one minute. You can
-find the source code of the example in
-[org/fiware/cosmos/tutorial/Logger.scala](https://github.com/FIWARE/tutorials.Big-Data-Analysis/blob/master/cosmos-examples/src/main/scala/org/fiware/cosmos/tutorial/Logger.scala)
+The first example makes use of the `OrionSource` operator in order to receive notifications from the Orion Context Broker. Specifically, the example counts the number notifications that each type of device sends in one minute. You can find the source code of the example in [org/fiware/cosmos/tutorial/Logger.scala](https://github.com/FIWARE/tutorials.Big-Data-Analysis/blob/master/cosmos-examples/src/main/scala/org/fiware/cosmos/tutorial/Logger.scala)
 
 ### Logger - Installing the JAR
 
-Goto `http://localhost:8081/#/submit`
+Open the browser and access `http://localhost:8081/#/submit`
 
 ![](https://fiware.github.io/tutorials.Big-Data-Analysis/img/submit-logger.png)
 
@@ -344,7 +336,7 @@ Submit new job
 
 ### Logger - Subscribing to context changes
 
-Once a dynamic context system is up and running (execute `Logger`), we need to inform **Flink** of changes in context.
+Once a dynamic context system is up and running (we have deployed the `Logger` job in the Flink cluster), we need to inform **Flink** of changes in context.
 
 This is done by making a POST request to the `/v2/subscription` endpoint of the Orion Context Broker.
 
@@ -467,7 +459,7 @@ package org.fiware.cosmos.tutorial
 
 import org.apache.flink.streaming.api.scala.{StreamExecutionEnvironment, _}
 import org.apache.flink.streaming.api.windowing.time.Time
-import org.fiware.cosmos.orion.flink.connector.{OrionSource}
+import org.fiware.cosmos.orion.flink.connector.OrionSource
 
 
 object Logger{
