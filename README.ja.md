@@ -1,6 +1,6 @@
 [![FIWARE Banner](https://fiware.github.io/tutorials.Big-Data-Analysis/img/fiware.png)](https://www.fiware.org/developers)
 
-[![FIWARE Context processing, analysis and visualisation](https://nexus.lab.fiware.org/static/badges/chapters/processing.svg)](https://github.com/FIWARE/catalogue/blob/master/processing/README.md)
+[![FIWARE Core Context Management](https://nexus.lab.fiware.org/static/badges/chapters/core.svg)](https://github.com/FIWARE/catalogue/blob/master/core/README.md)
 [![License: MIT](https://img.shields.io/github/license/fiware/tutorials.Big-Data-Analysis.svg)](https://opensource.org/licenses/MIT)
 [![Support badge](https://nexus.lab.fiware.org/repository/raw/public/badges/stackoverflow/fiware.svg)](https://stackoverflow.com/questions/tagged/fiware)
 [![NGSI v2](https://img.shields.io/badge/NGSI-v2-5dc0cf.svg)](https://fiware-ges.github.io/orion/api/v2/stable/) <br/>
