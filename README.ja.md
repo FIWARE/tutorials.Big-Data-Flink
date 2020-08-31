@@ -256,6 +256,8 @@ Docker バージョン18.03 以降および Docker Compose 1.21 以降を使用�
 ```console
 git clone https://github.com/FIWARE/tutorials.Big-Data-Analysis.git
 cd tutorials.Big-Data-Analysis
+git checkout NGSI-v2
+
 ./services create
 ```
 

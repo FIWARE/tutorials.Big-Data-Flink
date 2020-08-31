@@ -239,6 +239,8 @@ of the commands as a privileged user:
 ```console
 git clone https://github.com/FIWARE/tutorials.Big-Data-Analysis.git
 cd tutorials.Big-Data-Analysis
+git checkout NGSI-v2
+
 ./services create
 ```
 
