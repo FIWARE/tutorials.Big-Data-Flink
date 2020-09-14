@@ -120,7 +120,7 @@ Orion Context Broker と IoT Agent はどちらも、オープンソースの [M
 -   3つの**コンテキスト・プロバイダ** :
     -   HTTP 上で実行される
         [Ultralight 2.0](https://fiware-iotagent-ul.readthedocs.io/en/latest/usermanual/index.html#user-programmers-manual)
-        を使用する、[ダミー IoT デバイス](https://github.com/FIWARE/tutorials.IoT-Sensors) のセットとして
+        を使用する、[ダミー IoT デバイス](https://github.com/FIWARE/tutorials.IoT-Sensors/tree/NGSI-v2) のセットとして
         機能する Webサーバ
     -   **在庫管理フロントエンド** は、このチュートリアルでは使用しません。次のことを行います :
         -   ストア情報を表示し、ユーザがダミー IoT デバイスと対話できるようにします
