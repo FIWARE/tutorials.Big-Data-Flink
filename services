@@ -32,8 +32,7 @@ stoppingContainers () {
 
 displayServices () {
 	echo ""
-	docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}" --filter name=fiware-*
-	docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}" --filter name=flink-*
+	docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}" --filter name='[fiware|flink]-*'
 	echo ""
 }
 
