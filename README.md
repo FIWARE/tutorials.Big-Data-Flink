@@ -301,6 +301,7 @@ Maven:
 
 ```console
 cd cosmos-examples
+curl -LO https://github.com/ging/fiware-cosmos-orion-flink-connector/releases/download/FIWARE_7.9/orion.flink.connector-1.2.3.jar
 mvn install:install-file \
   -Dfile=./orion.flink.connector-1.2.3.jar \
   -DgroupId=org.fiware.cosmos \
