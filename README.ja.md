@@ -2,7 +2,7 @@
 [![NGSI v2](https://img.shields.io/badge/NGSI-v2-5dc0cf.svg)](https://fiware-ges.github.io/orion/api/v2/stable/)
 
 [![FIWARE Core Context Management](https://nexus.lab.fiware.org/static/badges/chapters/core.svg)](https://github.com/FIWARE/catalogue/blob/master/core/README.md)
-[![License: MIT](https://img.shields.io/github/license/fiware/tutorials.Big-Data-Analysis.svg)](https://opensource.org/licenses/MIT)
+[![License: MIT](https://img.shields.io/github/license/fiware/tutorials.Big-Data-Flink.svg)](https://opensource.org/licenses/MIT)
 [![Support badge](https://img.shields.io/badge/tag-fiware-orange.svg?logo=stackoverflow)](https://stackoverflow.com/questions/tagged/fiware)
  <br/>
 [![Documentation](https://img.shields.io/readthedocs/fiware-tutorials.svg)](https://fiware-tutorials.rtfd.io)
@@ -215,7 +215,7 @@ Flinki クラスタ内のコンテナは、次のように単一の環境変数�
 -   Linux に Docker をインストールするには、[こちら](https://docs.docker.com/install/)の指示に従ってください
 
 **Docker Compose** は、マルチ・コンテナ Docker アプリケーションを定義および実行するためのツールです。一連の
-[YAML files](https://github.com/FIWARE/tutorials.Big-Data-Analysis/tree/master/docker-compose) は、アプリケーション
+[YAML files](https://github.com/FIWARE/tutorials.Big-Data-Flink/tree/master/docker-compose) は、アプリケーション
 に必要なサービスを構成するために使用されます。これは、すべてのコンテナ・サービスを単一のコマンドで起動できることを
 意味します。Docker Compose は、デフォルトで Docker for Windows および Docker for Mac の一部としてインストール
 されますが、Linux ユーザは[こちら](https://docs.docker.com/compose/install/)にある指示に従う必要があります。
@@ -255,8 +255,8 @@ Docker バージョン18.03 以降および Docker Compose 1.21 以降を使用�
 必要がある場合があることに注意してください :
 
 ```console
-git clone https://github.com/FIWARE/tutorials.Big-Data-Analysis.git
-cd tutorials.Big-Data-Analysis
+git clone https://github.com/FIWARE/tutorials.Big-Data-Flink.git
+cd tutorials.Big-Data-Flink
 git checkout NGSI-v2
 
 ./services create
@@ -304,7 +304,7 @@ git checkout NGSI-v2
 `orion-flink.connect.jar` は **Source** と **Sink** の両方の操作を提供します。 したがって、ストリーミング・データフローの
 パイプライン操作を接続するために必要な Scala コードを記述するだけです。処理コードは、flink クラスターにアップロードできる
 JAR ファイルにコンパイルできます。 以下に2つの例を詳しく説明します。このチュートリアルのすべてのソースコードは、
-[cosmos-examples](https://github.com/FIWARE/tutorials.Big-Data-Analysis/tree/master/cosmos-examples) ディレクトリ内に
+[cosmos-examples](https://github.com/FIWARE/tutorials.Big-Data-Flink/tree/master/cosmos-examples) ディレクトリ内に
 あります。
 
 その他の Flink 処理の例は、
@@ -356,7 +356,7 @@ mvn package
 
 最初の例では、Orion Context Broker から通知を受信するために、`OrionSource` オペレータを使用します。具体的には、
 この例では、各タイプのデバイスが1分で送信する通知の数をカウントします。 サンプルのソースコードは
-[org/fiware/cosmos/tutorial/Logger.scala](https://github.com/FIWARE/tutorials.Big-Data-Analysis/blob/master/cosmos-examples/src/main/scala/org/fiware/cosmos/tutorial/Logger.scala)
+[org/fiware/cosmos/tutorial/Logger.scala](https://github.com/FIWARE/tutorials.Big-Data-Flink/blob/master/cosmos-examples/src/main/scala/org/fiware/cosmos/tutorial/Logger.scala)
 にあります。
 
 <a name="logger---installing-the-jar"></a>
@@ -576,7 +576,7 @@ processedDataStream.print().setParallelism(1)
 データフロー・ストリームは、通知を受信するために `OrionSource` オペレータを使用し、モーション・センサにのみ応答する
 ように入力をフィルタし、`OrionSink` を使用して処理されたコンテキストを Context Broker にプッシュします。サンプルの
 ソースコードは
-[org/fiware/cosmos/tutorial/Feedback.scala](https://github.com/FIWARE/tutorials.Big-Data-Analysis/blob/master/cosmos-examples/src/main/scala/org/fiware/cosmos/tutorial/Feedback.scala)
+[org/fiware/cosmos/tutorial/Feedback.scala](https://github.com/FIWARE/tutorials.Big-Data-Flink/blob/master/cosmos-examples/src/main/scala/org/fiware/cosmos/tutorial/Feedback.scala)
 にあります。
 
 <a name="feedback-loop---installing-the-jar"></a>
