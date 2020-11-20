@@ -1,4 +1,4 @@
-[![FIWARE Banner](https://fiware.github.io/tutorials.Big-Data-Analysis/img/fiware.png)](https://www.fiware.org/developers)
+[![FIWARE Banner](https://fiware.github.io/tutorials.Big-Data-Flink/img/fiware.png)](https://www.fiware.org/developers)
 [![NGSI v2](https://img.shields.io/badge/NGSI-v2-5dc0cf.svg)](https://fiware-ges.github.io/orion/api/v2/stable/)
 
 [![FIWARE Core Context Management](https://nexus.lab.fiware.org/static/badges/chapters/core.svg)](https://github.com/FIWARE/catalogue/blob/master/core/README.md)
@@ -13,7 +13,7 @@ computations both over unbounded and bounded data streams. Flink has been design
 environments, perform computations at in-memory speed and at any scale.
 
 The tutorial uses [cUrl](https://ec.haxx.se/) commands throughout, but is also available as
-[Postman documentation](https://fiware.github.io/tutorials.Big-Data-Analysis/)
+[Postman documentation](https://fiware.github.io/tutorials.Big-Data-Flink/)
 
 [![Run in Postman](https://run.pstmn.io/button.svg)](https://app.getpostman.com/run-collection/fb0de86dea21e2073054)
 
@@ -132,7 +132,7 @@ Therefore the overall architecture will consist of the following elements:
 
 The overall architecture can be seen below:
 
-![](https://fiware.github.io/tutorials.Big-Data-Analysis/img/architecture.png)
+![](https://fiware.github.io/tutorials.Big-Data-Flink/img/architecture.png)
 
 Since all interactions between the elements are initiated by HTTP requests, the entities can be containerized and run
 from exposed ports.
@@ -274,7 +274,7 @@ follows:
 > acyclic graphs (DAGs). Although special forms of cycles are permitted via iteration constructs, for the most part this
 > can be glossed over this for simplicity."
 
-![](https://fiware.github.io/tutorials.Big-Data-Analysis/img/streaming-dataflow.png)
+![](https://fiware.github.io/tutorials.Big-Data-Flink/img/streaming-dataflow.png)
 
 This means that to create a streaming data flow we must supply the following:
 
@@ -326,7 +326,7 @@ unlock a **Smart Door** and switch on a **Smart Lamp**. This can be done by sele
 the drop down list and pressing the `send` button. The stream of measurements coming from the devices can then be seen
 on the same page:
 
-![](https://fiware.github.io/tutorials.Big-Data-Analysis/img/door-open.gif)
+![](https://fiware.github.io/tutorials.Big-Data-Flink/img/door-open.gif)
 
 ## Logger - Reading Context Data Streams
 
@@ -339,7 +339,7 @@ find the source code of the example in
 
 Goto `http://localhost:8081/#/submit`
 
-![](https://fiware.github.io/tutorials.Big-Data-Analysis/img/submit-logger.png)
+![](https://fiware.github.io/tutorials.Big-Data-Flink/img/submit-logger.png)
 
 Submit new job
 
@@ -540,13 +540,13 @@ find the source code of the example in
 
 Goto `http://localhost:8081/#/job/running`
 
-![](https://fiware.github.io/tutorials.Big-Data-Analysis/img/running-jobs.png)
+![](https://fiware.github.io/tutorials.Big-Data-Flink/img/running-jobs.png)
 
 Select the running job (if any) and click on **Cancel Job**
 
 Thereafter goto `http://localhost:8081/#/submit`
 
-![](https://fiware.github.io/tutorials.Big-Data-Analysis/img/submit-feedback.png)
+![](https://fiware.github.io/tutorials.Big-Data-Flink/img/submit-feedback.png)
 
 Submit new job
 

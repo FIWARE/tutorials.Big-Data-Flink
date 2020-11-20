@@ -1,4 +1,4 @@
-[![FIWARE Banner](https://fiware.github.io/tutorials.Big-Data-Analysis/img/fiware.png)](https://www.fiware.org/developers)
+[![FIWARE Banner](https://fiware.github.io/tutorials.Big-Data-Flink/img/fiware.png)](https://www.fiware.org/developers)
 [![NGSI v2](https://img.shields.io/badge/NGSI-v2-5dc0cf.svg)](https://fiware-ges.github.io/orion/api/v2/stable/)
 
 [![FIWARE Core Context Management](https://nexus.lab.fiware.org/static/badges/chapters/core.svg)](https://github.com/FIWARE/catalogue/blob/master/core/README.md)
@@ -14,7 +14,7 @@
 任意の規模で計算を実行するように設計されています。
 
 チュートリアルでは [cUrl](https://ec.haxx.se/) コマンドを使用しますが、
-[Postman ドキュメント](https://fiware.github.io/tutorials.Big-Data-Analysis/) としても利用可能です。
+[Postman ドキュメント](https://fiware.github.io/tutorials.Big-Data-Flink/) としても利用可能です。
 
 [![Run in Postman](https://run.pstmn.io/button.svg)](https://app.getpostman.com/run-collection/fb0de86dea21e2073054)
 
@@ -134,7 +134,7 @@ Orion Context Broker と IoT Agent はどちらも、オープンソースの [M
 
 全体のアーキテクチャを以下に示します :
 
-![](https://fiware.github.io/tutorials.Big-Data-Analysis/img/architecture.png)
+![](https://fiware.github.io/tutorials.Big-Data-Flink/img/architecture.png)
 
 要素間の相互作用はすべて HTTP リクエストによって開始されるため、エンティティはコンテナ化され、公開されたポートから
 実行できます。
@@ -293,7 +293,7 @@ git checkout NGSI-v2
 > グラフ (DAG) に似ています。反復の構造を介して特殊な形式のサイクルが許可されますが、ほとんどの場合、これを単純化するため
 > にこれを変更できます。"
 
-![](https://fiware.github.io/tutorials.Big-Data-Analysis/img/streaming-dataflow.png)
+![](https://fiware.github.io/tutorials.Big-Data-Flink/img/streaming-dataflow.png)
 
 つまり、ストリーミング・データフローを作成するには、次のものを指定する必要があります :
 
@@ -348,7 +348,7 @@ mvn package
 ロックを解除して、**Smart Lamp** をオンにします。 これは、ドロップ・ダウン・リストから適切なコマンドを選択し、`send`
 ボタンを押すことで実行できます。デバイスからの測定値のストリームは、同じページで見ることができます :
 
-![](https://fiware.github.io/tutorials.Big-Data-Analysis/img/door-open.gif)
+![](https://fiware.github.io/tutorials.Big-Data-Flink/img/door-open.gif)
 
 <a name="logger---reading-context-data-streams"></a>
 
@@ -365,7 +365,7 @@ mvn package
 
 `http://localhost:8081/#/submit` を開きます
 
-![](https://fiware.github.io/tutorials.Big-Data-Analysis/img/submit-logger.png)
+![](https://fiware.github.io/tutorials.Big-Data-Flink/img/submit-logger.png)
 
 新しいジョブを設定します
 
@@ -585,13 +585,13 @@ processedDataStream.print().setParallelism(1)
 
 `http://localhost:8081/#/job/running` を開きます
 
-![](https://fiware.github.io/tutorials.Big-Data-Analysis/img/running-jobs.png)
+![](https://fiware.github.io/tutorials.Big-Data-Flink/img/running-jobs.png)
 
 実行中のジョブ (存在する場合) を選択し、**Cancel Job**  をクリックします
 
 その後、`http://localhost:8081/#/submit` を開きます
 
-![](https://fiware.github.io/tutorials.Big-Data-Analysis/img/submit-feedback.png)
+![](https://fiware.github.io/tutorials.Big-Data-Flink/img/submit-feedback.png)
 
 新しいジョブを設定します
 
