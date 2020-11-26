@@ -363,23 +363,23 @@ This is done by making a POST request to the `/v2/subscription` endpoint of the 
 #### :one: Request:
 
 ```console
-curl -iX POST \
-  'http://localhost:1026/v2/subscriptions' \
-  -H 'Content-Type: application/json' \
-  -H 'fiware-service: openiot' \
-  -H 'fiware-servicepath: /' \
-  -d '{
+curl -iX POST 'http://localhost:1026/v2/subscriptions/' \
+-H 'Content-Type: application/json' \
+-H 'fiware-service: openiot' \
+-H 'fiware-servicepath: /' \
+--data-raw '{
   "description": "Notify Flink of all context changes",
   "subject": {
     "entities": [
       {
-      "idPattern": ".*"
+        "idPattern": ".*"
       }
     ]
   },
   "notification": {
     "http": {
-    "url": "http://jobmanager:9001
+      "url": "http://jobmanager:9001"
+    }
   }
 }'
 ```
