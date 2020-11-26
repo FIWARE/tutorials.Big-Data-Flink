@@ -7,19 +7,100 @@
 
 set -e
 
+response=""
+SCORPIO="http://scorpio:9090/scorpio/v1/info/"
+ORION="http://orion:1026/version"
+IOT_AGENT="http://iot-agent:4041/version"
+LINKED_DATA_CONTEXT="http://context-provider:3000/data-models/ngsi-context.jsonld"
+
 if (( $# != 1 )); then
     echo "Illegal number of parameters"
     echo "usage: services [create|start|stop]"
     exit 1
 fi
 
+
+pause(){
+	printf " "
+	count="$1"
+	[ "$count" -gt 59 ] && printf "Waiting one minute " || printf " Waiting a few seconds ";
+	while [ "$count" -gt 0 ]
+	do
+		printf "."
+		sleep 3
+		count=$((count - 3))
+	done
+	echo ""
+}
+
+getHeartbeat(){
+	eval "response=$(docker run --network fiware_default --rm curlimages/curl -s -o /dev/null -w "%{http_code}" "$1")"
+}
+
+waitForContext () {
+	echo -e "\n⏳ Waiting for \033[1m@context\033[0m to be available\n"
+	getHeartbeat "${LINKED_DATA_CONTEXT}"
+	while [ "${response}" -eq 000 ]
+	do
+		echo -e "\n@Context HTTP state: ${response} (waiting for 200)"
+		pause 3
+		getHeartbeat "${LINKED_DATA_CONTEXT}"
+	done
+}
+
+waitForOrion () {
+	echo -e "\n⏳ Waiting for \033[1;34mOrion-LD\033[0m to be available\n"
+	getHeartbeat "${ORION}"
+	while [ "${response}" -eq 000 ]
+	do
+		echo -e "\nContext Broker HTTP state: ${response} (waiting for 200)"
+		pause 6
+		getHeartbeat "${ORION}"
+	done
+}
+
+waitForScorpio () {
+	echo -e "\n⏳ Waiting for \033[1;34mScorpio\033[0m to respond\n"
+	getHeartbeat "${SCORPIO}"
+	while [ "${response}" -eq 000 ]
+	do
+		echo -e "Context Broker HTTP state: ${response} (waiting for 500)"
+		pause 60
+		getHeartbeat "${SCORPIO}"
+	done
+	echo -e "\n⏳ Waiting for all \033[1;34mScorpio\033[0m services to be fully available\n"
+	while [ "$response" -eq 500 ]
+	do
+		echo -e "Context Broker HTTP state: ${response} (waiting for 200)"
+		pause 60
+		getHeartbeat "${SCORPIO}"
+	done
+}
+
+waitForIoTAgent () {
+	echo -e "\n⏳ Waiting for \033[1;36mIoT-Agent\033[0m to be available\n"
+	getHeartbeat "${IOT_AGENT}"
+	while [ "${response}" -eq 000 ]
+	do
+		echo -e "\nContext Broker HTTP state: ${response} (waiting for 200)"
+		pause 6
+		getHeartbeat "${IOT_AGENT}"
+	done
+}
+
 loadData () {
+	export CONTEXT_BROKER="$1" 
+	waitForContext
 	docker run --rm -v $(pwd)/import-data:/import-data \
 		--network fiware_default \
+		-e CONTEXT_BROKER=${CONTEXT_BROKER} \
+		-e TUTORIAL_DATA_MODELS_CONTEXT="http://context-provider:3000/data-models/ngsi-context.jsonld" \
 		--entrypoint /bin/ash curlimages/curl import-data
 	waitForIoTAgent
 	docker run --rm -v $(pwd)/provision-devices:/provision-devices \
 		--network fiware_default \
+		-e CONTEXT_BROKER=${CONTEXT_BROKER} \
+		-e TUTORIAL_DATA_MODELS_CONTEXT="http://context-provider:3000/data-models/ngsi-context.jsonld" \
 		--entrypoint /bin/ash curlimages/curl provision-devices
 	echo ""
 }
@@ -69,24 +150,6 @@ addDatabaseIndex () {
 	echo -e " \033[1;32mdone\033[0m"
 }
 
-waitForOrion () {
-	echo -e "\n⏳ Waiting for \033[1;34mOrion\033[0m to be available\n"
-	while [ `docker run --network fiware_default --rm curlimages/curl -s -o /dev/null -w %{http_code} 'http://orion:1026/version'` -eq 000 ]
-	do 
-	  echo -e "Context Broker HTTP state: " `curl -s -o /dev/null -w %{http_code} 'http://localhost:1026/version'` " (waiting for 200)"
-	  sleep 1
-	done
-}
-
-waitForIoTAgent () {
-	echo -e "\n⏳ Waiting for \033[1;36mIoT-Agent\033[0m to be available\n"
-	while [ `docker run --network fiware_default --rm curlimages/curl -s -o /dev/null -w %{http_code} 'http://iot-agent:4041/version'` -eq 000 ]
-	do 
-	  echo -e "IoT Agent HTTP state: " `curl -s -o /dev/null -w %{http_code} 'http://localhost:4041/version'` " (waiting for 200)"
-	  sleep 1
-	done
-}
-
 command="$1"
 case "${command}" in
 	"help")
@@ -103,7 +166,7 @@ case "${command}" in
 		docker-compose --log-level ERROR -p fiware up -d --remove-orphans
 		addDatabaseIndex
 		waitForOrion
-		loadData
+		loadData orion:1026
 		displayServices
 		echo -e "Now open \033[4mhttp://localhost:3000/device/monitor\033[0m"
 		;;
