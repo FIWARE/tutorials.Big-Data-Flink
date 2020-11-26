@@ -10,9 +10,9 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <flink.version>1.11.2</flink.version>
-        <scala.binary.version>2.12</scala.binary.version>
-        <scala.version>2.12.7</scala.version>
+        <flink.version>1.9.0</flink.version>
+        <scala.binary.version>2.11</scala.binary.version>
+        <scala.version>2.11.12</scala.version>
         <play2.version>2.4.6</play2.version>
     </properties>
 
