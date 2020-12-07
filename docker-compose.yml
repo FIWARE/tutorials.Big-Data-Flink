@@ -87,6 +87,7 @@ services:
     expose:
       - "${FLINK_WEB_APP_PORT}"
       - "${FLINK_JOB_MANAGER_PORT}"
+      - "${FLINK_SERVICE_PORT}"
     ports:
       - "${FLINK_JOB_MANAGER_PORT}:${FLINK_JOB_MANAGER_PORT}"
       - "${FLINK_WEB_APP_PORT}:${FLINK_WEB_APP_PORT}"
