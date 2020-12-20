@@ -279,7 +279,7 @@ This means that to create a streaming data flow we must supply the following:
 -   Business logic to define the transform operations
 -   A mechanism for pushing Context data back to the context broker as a **Sink Operator**
 
-The `orion.flink.connector-1.2.3.jar` offers both **Source** and **Sink** operations. It therefore only remains to write the
+The `orion.flink.connector-1.2.4.jar` offers both **Source** and **Sink** operations. It therefore only remains to write the
 necessary Scala code to connect the streaming dataflow pipeline operations together. The processing code can be complied
 into a JAR file which can be uploaded to the flink cluster. Two examples will be detailed below, all the source code for
 this tutorial can be found within the
@@ -298,10 +298,10 @@ In order to use the Orion Flink Connector we first need to manually install the 
 ```bash
 cd cosmos-examples
 mvn install:install-file \
-  -Dfile=./orion.flink.connector-1.2.3.jar \
+  -Dfile=./orion.flink.connector-1.2.4.jar \
   -DgroupId=org.fiware.cosmos \
   -DartifactId=orion.flink.connector \
-  -Dversion=1.2.3 \
+  -Dversion=1.2.4 \
   -Dpackaging=jar
 ```
 

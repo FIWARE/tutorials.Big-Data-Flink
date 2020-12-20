@@ -320,10 +320,10 @@ Orion Flink Connector を使用するには、最初に Maven を使用してア
 ```console
 cd cosmos-examples
 mvn install:install-file \
-  -Dfile=./orion.flink.connector-1.2.3.jar \
+  -Dfile=./orion.flink.connector-1.2.4.jar \
   -DgroupId=org.fiware.cosmos \
   -DartifactId=orion.flink.connector \
-  -Dversion=1.2.3 \
+  -Dversion=1.2.4 \
   -Dpackaging=jar
 ```
 
