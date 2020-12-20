@@ -1,10 +1,10 @@
-[![FIWARE Banner](https://fiware.github.io/tutorials.Big-Data-Analysis/img/fiware.png)](https://www.fiware.org/developers)
+[![FIWARE Banner](https://fiware.github.io/tutorials.Big-Data-Flink/img/fiware.png)](https://www.fiware.org/developers)
+[![NGSI v2](https://img.shields.io/badge/NGSI-v2-5dc0cf.svg)](https://fiware-ges.github.io/orion/api/v2/stable/)
 
-[![FIWARE Context processing, analysis and visualisation](https://nexus.lab.fiware.org/static/badges/chapters/processing.svg)](https://github.com/FIWARE/catalogue/blob/master/processing/README.md)
-[![License: MIT](https://img.shields.io/github/license/fiware/tutorials.Big-Data-Analysis.svg)](https://opensource.org/licenses/MIT)
-[![Support badge](https://nexus.lab.fiware.org/repository/raw/public/badges/stackoverflow/fiware.svg)](https://stackoverflow.com/questions/tagged/fiware)
-[![NGSI v2](https://img.shields.io/badge/NGSI-v2-blue.svg)](https://fiware-ges.github.io/orion/api/v2/stable/) <br/>
-[![Documentation](https://img.shields.io/readthedocs/fiware-tutorials.svg)](https://fiware-tutorials.rtfd.io)
+[![FIWARE Core Context Management](https://nexus.lab.fiware.org/static/badges/chapters/core.svg)](https://github.com/FIWARE/catalogue/blob/master/core/README.md)
+[![License: MIT](https://img.shields.io/github/license/fiware/tutorials.Big-Data-Flink.svg)](https://opensource.org/licenses/MIT)
+[![Support badge](https://img.shields.io/badge/tag-fiware-orange.svg?logo=stackoverflow)](https://stackoverflow.com/questions/tagged/fiware)
+<br/> [![Documentation](https://img.shields.io/readthedocs/fiware-tutorials.svg)](https://fiware-tutorials.rtfd.io)
 
 This tutorial is an introduction to the [FIWARE Cosmos Orion Flink Connector](http://fiware-cosmos-flink.rtfd.io), which
 facilitates Big Data analysis of context data, through an integration with [Apache Flink](https://flink.apache.org/),
@@ -13,7 +13,7 @@ computations both over unbounded and bounded data streams. Flink has been design
 environments, perform computations at in-memory speed and at any scale.
 
 The tutorial uses [cUrl](https://ec.haxx.se/) commands throughout, but is also available as
-[Postman documentation](https://fiware.github.io/tutorials.Big-Data-Analysis/)
+[Postman documentation](https://fiware.github.io/tutorials.Big-Data-Flink/)
 
 [![Run in Postman](https://run.pstmn.io/button.svg)](https://www.getpostman.com/collections/9a49739f0758b971193d)
 
@@ -100,11 +100,11 @@ Therefore the overall architecture will consist of the following elements:
 
 -   Two **FIWARE Generic Enablers** as independent microservices:
     -   The FIWARE [Orion Context Broker](https://fiware-orion.readthedocs.io/en/latest/) which will receive requests
-        using [NGSI](https://fiware.github.io/specifications/OpenAPI/ngsiv2)
+        using [NGSI-v2](https://fiware.github.io/specifications/OpenAPI/ngsiv2)
     -   The FIWARE [IoT Agent for Ultralight 2.0](https://fiware-iotagent-ul.readthedocs.io/en/latest/) which will
         receive northbound measurements from the dummy IoT devices in
         [Ultralight 2.0](https://fiware-iotagent-ul.readthedocs.io/en/latest/usermanual/index.html#user-programmers-manual)
-        format and convert them to [NGSI](https://fiware.github.io/specifications/OpenAPI/ngsiv2) requests for the
+        format and convert them to [NGSI-v2](https://fiware.github.io/specifications/OpenAPI/ngsiv2) requests for the
         context broker to alter the state of the context entities
 -   An [Apache Flink cluster](https://ci.apache.org/projects/flink/flink-docs-stable/concepts/runtime.html) consisting
     of a single **JobManager** and a single **TaskManager**
@@ -116,7 +116,8 @@ Therefore the overall architecture will consist of the following elements:
         registrations
     -   Used by the **IoT Agent** to hold device information such as device URLs and Keys
 -   Three **Context Providers**:
-    -   A webserver acting as set of [dummy IoT devices](https://github.com/FIWARE/tutorials.IoT-Sensors) using the
+    -   A webserver acting as set of [dummy IoT devices](https://github.com/FIWARE/tutorials.IoT-Sensors/tree/NGSI-v2)
+        using the
         [Ultralight 2.0](https://fiware-iotagent-ul.readthedocs.io/en/latest/usermanual/index.html#user-programmers-manual)
         protocol running over HTTP.
     -   The **Stock Management Frontend** is not used in this tutorial. It does the following:
@@ -124,14 +125,14 @@ Therefore the overall architecture will consist of the following elements:
         -   Show which products can be bought at each store
         -   Allow users to "buy" products and reduce the stock count.
     -   The **Context Provider NGSI** proxy is not used in this tutorial. It does the following:
-        -   receive requests using [NGSI](https://fiware.github.io/specifications/OpenAPI/ngsiv2)
+        -   receive requests using [NGSI-v2](https://fiware.github.io/specifications/OpenAPI/ngsiv2)
         -   makes requests to publicly available data sources using their own APIs in a proprietary format
         -   returns context data back to the Orion Context Broker in
-            [NGSI](https://fiware.github.io/specifications/OpenAPI/ngsiv2) format.
+            [NGSI-v2](https://fiware.github.io/specifications/OpenAPI/ngsiv2) format.
 
 The overall architecture can be seen below:
 
-![](https://fiware.github.io/tutorials.Big-Data-Analysis/img/architecture.png)
+![](https://fiware.github.io/tutorials.Big-Data-Flink/img/architecture.png)
 
 Since all interactions between the elements are initiated by HTTP requests, the entities can be containerized and run
 from exposed ports.
@@ -203,7 +204,7 @@ technology which allows to different components isolated into their respective e
 -   To install Docker on Linux follow the instructions [here](https://docs.docker.com/install/)
 
 **Docker Compose** is a tool for defining and running multi-container Docker applications. A series of
-[YAML files](https://github.com/FIWARE/tutorials.Big-Data-Analysis/tree/master/docker-compose) are used to configure the
+[YAML files](https://github.com/FIWARE/tutorials.Big-Data-Flink/tree/master/docker-compose) are used to configure the
 required services for the application. This means all container services can be brought up in a single command. Docker
 Compose is installed by default as part of Docker for Windows and Docker for Mac, however Linux users will need to
 follow the instructions found [here](https://docs.docker.com/compose/install/)
@@ -236,9 +237,11 @@ Before you start, you should ensure that you have obtained or built the necessar
 the repository and create the necessary images by running the commands shown below. Note that you might need to run some
 of the commands as a privileged user:
 
-```bash
-git clone https://github.com/FIWARE/tutorials.Big-Data-Analysis.git
-cd tutorials.Big-Data-Analysis
+
+```console
+git clone https://github.com/FIWARE/tutorials.Big-Data-Flink.git
+cd tutorials.Big-Data-Flink
+git checkout NGSI-v2
 ./services create
 ```
 
@@ -271,7 +274,7 @@ follows:
 > acyclic graphs (DAGs). Although special forms of cycles are permitted via iteration constructs, for the most part this
 > can be glossed over this for simplicity."
 
-![](https://fiware.github.io/tutorials.Big-Data-Analysis/img/streaming-dataflow.png)
+![](https://fiware.github.io/tutorials.Big-Data-Flink/img/streaming-dataflow.png)
 
 This means that to create a streaming data flow we must supply the following:
 
@@ -283,7 +286,7 @@ The `orion.flink.connector-1.2.4.jar` offers both **Source** and **Sink** operat
 necessary Scala code to connect the streaming dataflow pipeline operations together. The processing code can be complied
 into a JAR file which can be uploaded to the flink cluster. Two examples will be detailed below, all the source code for
 this tutorial can be found within the
-[cosmos-examples](https://github.com/FIWARE/tutorials.Big-Data-Analysis/tree/master/cosmos-examples) directory.
+[cosmos-examples](https://github.com/FIWARE/tutorials.Big-Data-Flink/tree/master/cosmos-examples) directory.
 
 Further Flink processing examples can be found on the
 [Apache Flink site](https://ci.apache.org/projects/flink/flink-docs-release-1.9/getting-started) and
@@ -297,6 +300,7 @@ In order to use the Orion Flink Connector we first need to manually install the 
 
 ```bash
 cd cosmos-examples
+curl -LO https://github.com/ging/fiware-cosmos-orion-flink-connector/releases/download/FIWARE_7.9/orion.flink.connector-1.2.4.jar
 mvn install:install-file \
   -Dfile=./orion.flink.connector-1.2.4.jar \
   -DgroupId=org.fiware.cosmos \
@@ -317,17 +321,21 @@ A new JAR file called `cosmos-examples-1.1.jar` will be created within the `cosm
 
 For the purpose of this tutorial, we must be monitoring a system in which the context is periodically being updated. The dummy IoT Sensors can be used to do this. Open the device monitor page at `http://localhost:3000/device/monitor` and unlock a **Smart Door** and switch on a **Smart Lamp**. This can be done by selecting an appropriate the command from the drop down list and pressing the `send` button. The stream of measurements coming from the devices can then be seen on the same page:
 
-![](https://fiware.github.io/tutorials.Big-Data-Analysis/img/door-open.gif)
+![](https://fiware.github.io/tutorials.Big-Data-Flink/img/door-open.gif)
 
 ## Logger - Reading Context Data Streams
 
-The first example makes use of the `OrionSource` operator in order to receive notifications from the Orion Context Broker. Specifically, the example counts the number notifications that each type of device sends in one minute. You can find the source code of the example in [org/fiware/cosmos/tutorial/Logger.scala](https://github.com/FIWARE/tutorials.Big-Data-Analysis/blob/master/cosmos-examples/src/main/scala/org/fiware/cosmos/tutorial/Logger.scala)
+
+The first example makes use of the `OrionSource` operator in order to receive notifications from the Orion Context
+Broker. Specifically, the example counts the number notifications that each type of device sends in one minute. You can
+find the source code of the example in
+[org/fiware/cosmos/tutorial/Logger.scala](https://github.com/FIWARE/tutorials.Big-Data-Flink/blob/master/cosmos-examples/src/main/scala/org/fiware/cosmos/tutorial/Logger.scala)
 
 ### Logger - Installing the JAR
 
 Open the browser and access `http://localhost:8081/#/submit`
 
-![](https://fiware.github.io/tutorials.Big-Data-Analysis/img/submit-logger.png)
+![](https://fiware.github.io/tutorials.Big-Data-Flink/img/submit-logger.png)
 
 Submit new job
 
@@ -349,24 +357,24 @@ This is done by making a POST request to the `/v2/subscription` endpoint of the 
 
 #### :one: Request:
 
-```bash
-curl -iX POST \
-  'http://localhost:1026/v2/subscriptions' \
-  -H 'Content-Type: application/json' \
-  -H 'fiware-service: openiot' \
-  -H 'fiware-servicepath: /' \
-  -d '{
+
+```console
+curl -iX POST 'http://localhost:1026/v2/subscriptions/' \
+-H 'Content-Type: application/json' \
+-H 'fiware-service: openiot' \
+-H 'fiware-servicepath: /' \
+--data-raw '{
   "description": "Notify Flink of all context changes",
   "subject": {
     "entities": [
       {
-      "idPattern": ".*"
+        "idPattern": ".*"
       }
     ]
   },
   "notification": {
     "http": {
-      "url": "http://taskmanager:9001"
+      "url": "http://jobmanager:9001"
     }
   }
 }'
@@ -551,19 +559,19 @@ The second example switches on a lamp when its motion sensor detects movement.
 The dataflow stream uses the `OrionSource` operator in order to receive notifications and filters the input to only
 respond to motion senseors and then uses the `OrionSink` to push processed context back to the Context Broker. You can
 find the source code of the example in
-[org/fiware/cosmos/tutorial/Feedback.scala](https://github.com/FIWARE/tutorials.Big-Data-Analysis/blob/master/cosmos-examples/src/main/scala/org/fiware/cosmos/tutorial/Feedback.scala)
+[org/fiware/cosmos/tutorial/Feedback.scala](https://github.com/FIWARE/tutorials.Big-Data-Flink/blob/master/cosmos-examples/src/main/scala/org/fiware/cosmos/tutorial/Feedback.scala)
 
 ### Feedback Loop - Installing the JAR
 
 Goto `http://localhost:8081/#/job/running`
 
-![](https://fiware.github.io/tutorials.Big-Data-Analysis/img/running-jobs.png)
+![](https://fiware.github.io/tutorials.Big-Data-Flink/img/running-jobs.png)
 
 Select the running job (if any) and click on **Cancel Job**
 
 Thereafter goto `http://localhost:8081/#/submit`
 
-![](https://fiware.github.io/tutorials.Big-Data-Analysis/img/submit-feedback.png)
+![](https://fiware.github.io/tutorials.Big-Data-Flink/img/submit-feedback.png)
 
 Submit new job
 

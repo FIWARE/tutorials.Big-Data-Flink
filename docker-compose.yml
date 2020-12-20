@@ -64,6 +64,7 @@ services:
       - "${TUTORIAL_APP_PORT}:${TUTORIAL_APP_PORT}" # localhost:3000
       - "${TUTORIAL_DUMMY_DEVICE_PORT}:${TUTORIAL_DUMMY_DEVICE_PORT}" # localhost:3001
     environment:
+      - "MONGO_URL=mongodb://mongo-db:27017"
       - "DEBUG=tutorial:*"
       - "WEB_APP_PORT=${TUTORIAL_APP_PORT}" # Port used by the content provider proxy and web-app for viewing data
       - "IOTA_HTTP_HOST=iot-agent"
@@ -76,8 +77,8 @@ services:
       - "OPENWEATHERMAP_KEY_ID=<ADD_YOUR_KEY_ID>"
       - "TWITTER_CONSUMER_KEY=<ADD_YOUR_CONSUMER_KEY>"
       - "TWITTER_CONSUMER_SECRET=<ADD_YOUR_CONSUMER_SECRET>"
-    healthcheck:
-      test: curl --fail -s http://tutorial:${TUTORIAL_APP_PORT}/version || exit 1
+
+
 
   jobmanager:
     image: flink:${FLINK_VERSION}
@@ -86,6 +87,7 @@ services:
     expose:
       - "${FLINK_WEB_APP_PORT}"
       - "${FLINK_JOB_MANAGER_PORT}"
+      - "${FLINK_SERVICE_PORT}"
     ports:
       - "${FLINK_JOB_MANAGER_PORT}:${FLINK_JOB_MANAGER_PORT}"
       - "${FLINK_WEB_APP_PORT}:${FLINK_WEB_APP_PORT}"
@@ -125,9 +127,13 @@ services:
       - "${MONGO_DB_PORT}:${MONGO_DB_PORT}" # localhost:27017
     networks:
         default: ~
-    command: --bind_ip_all --smallfiles
+
     volumes:
       - mongo-db:/data
+    healthcheck:
+      test: |
+        host=`hostname --ip-address || echo '127.0.0.1'`; 
+        mongo --quiet $host/test --eval 'quit(db.runCommand({ ping: 1 }).ok ? 0 : 2)' && echo 0 || echo 1    
 
 networks:
   default:

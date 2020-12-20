@@ -39,6 +39,7 @@ jspm_packages/
 
 cosmos-examples/target
 cosmos-examples/.idea
+cosmos-examples/orion.flink.connector-*.jar
 /.idea
 *.iml
 stdout.log
