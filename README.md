@@ -300,7 +300,7 @@ In order to use the Orion Flink Connector we first need to manually install the 
 
 ```bash
 cd cosmos-examples
-curl -LO https://github.com/ging/fiware-cosmos-orion-flink-connector/releases/download/FIWARE_7.9/orion.flink.connector-1.2.4.jar
+curl -LO https://github.com/ging/fiware-cosmos-orion-flink-connector/releases/download/FIWARE_7.9.1/orion.flink.connector-1.2.4.jar
 mvn install:install-file \
   -Dfile=./orion.flink.connector-1.2.4.jar \
   -DgroupId=org.fiware.cosmos \
