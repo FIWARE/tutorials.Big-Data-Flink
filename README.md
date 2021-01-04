@@ -15,7 +15,7 @@ environments, perform computations at in-memory speed and at any scale.
 The tutorial uses [cUrl](https://ec.haxx.se/) commands throughout, but is also available as
 [Postman documentation](https://fiware.github.io/tutorials.Big-Data-Flink/)
 
-[![Run in Postman](https://run.pstmn.io/button.svg)](https://www.getpostman.com/collections/9a49739f0758b971193d)
+[![Run in Postman](https://run.pstmn.io/button.svg)](https://app.getpostman.com/run-collection/fb0de86dea21e2073054)
 
 -   このチュートリアルは[日本語](README.ja.md)でもご覧いただけます。
 
@@ -211,7 +211,7 @@ follow the instructions found [here](https://docs.docker.com/compose/install/)
 
 You can check your current **Docker** and **Docker Compose** versions using the following commands:
 
-```bash
+```console
 docker-compose -v
 docker version
 ```
@@ -249,7 +249,7 @@ This command will also import seed data from the previous tutorials and provisio
 
 To start the system, run the following command:
 
-```bash
+```console
 ./services start
 ```
 
@@ -298,7 +298,7 @@ An existing `pom.xml` file has been created which holds the necessary prerequisi
 
 In order to use the Orion Flink Connector we first need to manually install the connector JAR as an artifact using Maven:
 
-```bash
+```console
 cd cosmos-examples
 curl -LO https://github.com/ging/fiware-cosmos-orion-flink-connector/releases/download/FIWARE_7.9.1/orion.flink.connector-1.2.4.jar
 mvn install:install-file \
@@ -311,7 +311,7 @@ mvn install:install-file \
 
 Thereafter the source code can be compiled by running the `mvn package` command within the same directory (`cosmos-examples`):
 
-```bash
+```console
 mvn package
 ```
 
@@ -387,7 +387,7 @@ If a subscription has been created, we can check to see if it is firing by makin
 
 #### :two: Request:
 
-```bash
+```console
 curl -X GET \
 'http://localhost:1026/v2/subscriptions/' \
 -H 'fiware-service: openiot' \
@@ -446,7 +446,7 @@ Finally, check that the `status` of the subscription is `active` - an expired su
 
 Leave the subscription running for **one minute**, then run the following:
 
-```bash
+```console
 docker logs flink-taskmanager -f --until=60s > stdout.log 2>stderr.log
 cat stderr.log
 ```
@@ -537,8 +537,8 @@ val eventStream = env.addSource(new NGSILDSource(9001))
 ```
 
 You can run the same package you uploaded to the Flink Web UI specifying the class `org.fiware.cosmos.tutorial.LoggerLD`. After a minute you can run again the following command to see the output:
-  
-```bash
+
+```console
 docker logs flink-taskmanager -f --until=60s > stdout.log 2>stderr.log
 cat stderr.log
 ```
@@ -586,7 +586,7 @@ up to only trigger a notification when a motion sensor detects movement.
 > **Note:** If the previous subscription already exists, this step creating a second narrower Motion-only subscription
 > is unnecessary. There is a filter within the business logic of the scala task itself.
 
-```bash
+```console
 curl -iX POST \
   'http://localhost:1026/v2/subscriptions' \
   -H 'Content-Type: application/json' \
