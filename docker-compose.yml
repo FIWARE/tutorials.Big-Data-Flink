@@ -91,6 +91,8 @@ services:
     ports:
       - "${FLINK_JOB_MANAGER_PORT}:${FLINK_JOB_MANAGER_PORT}"
       - "${FLINK_WEB_APP_PORT}:${FLINK_WEB_APP_PORT}"
+    networks:
+        default: ~
     command: jobmanager
     environment:
       - JOB_MANAGER_RPC_ADDRESS=jobmanager
@@ -107,6 +109,8 @@ services:
       - "${FLINK_TASK_MANAGER_PORT_1}:${FLINK_TASK_MANAGER_PORT_1}"
       - "${FLINK_TASK_MANAGER_PORT_2}:${FLINK_TASK_MANAGER_PORT_2}"
       - "${FLINK_SERVICE_PORT}:${FLINK_SERVICE_PORT}"
+    networks:
+        default: ~
     depends_on:
       - jobmanager
     command: taskmanager
@@ -125,9 +129,10 @@ services:
     container_name: db-mongo
     ports:
       - "${MONGO_DB_PORT}:${MONGO_DB_PORT}" # localhost:27017
+    expose:
+      - "${MONGO_DB_PORT}"
     networks:
         default: ~
-
     volumes:
       - mongo-db:/data
     healthcheck:
