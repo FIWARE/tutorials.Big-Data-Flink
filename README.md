@@ -237,7 +237,6 @@ Before you start, you should ensure that you have obtained or built the necessar
 the repository and create the necessary images by running the commands shown below. Note that you might need to run some
 of the commands as a privileged user:
 
-
 ```console
 git clone https://github.com/FIWARE/tutorials.Big-Data-Flink.git
 cd tutorials.Big-Data-Flink
@@ -282,10 +281,10 @@ This means that to create a streaming data flow we must supply the following:
 -   Business logic to define the transform operations
 -   A mechanism for pushing Context data back to the context broker as a **Sink Operator**
 
-The `orion.flink.connector-1.2.4.jar` offers both **Source** and **Sink** operations. It therefore only remains to write the
-necessary Scala code to connect the streaming dataflow pipeline operations together. The processing code can be complied
-into a JAR file which can be uploaded to the flink cluster. Two examples will be detailed below, all the source code for
-this tutorial can be found within the
+The `orion.flink.connector-1.2.4.jar` offers both **Source** and **Sink** operations. It therefore only remains to write
+the necessary Scala code to connect the streaming dataflow pipeline operations together. The processing code can be
+complied into a JAR file which can be uploaded to the flink cluster. Two examples will be detailed below, all the source
+code for this tutorial can be found within the
 [cosmos-examples](https://github.com/FIWARE/tutorials.Big-Data-Flink/tree/master/cosmos-examples) directory.
 
 Further Flink processing examples can be found on the
@@ -296,7 +295,8 @@ Further Flink processing examples can be found on the
 
 An existing `pom.xml` file has been created which holds the necessary prerequisites to build the examples JAR file
 
-In order to use the Orion Flink Connector we first need to manually install the connector JAR as an artifact using Maven:
+In order to use the Orion Flink Connector we first need to manually install the connector JAR as an artifact using
+Maven:
 
 ```console
 cd cosmos-examples
@@ -309,7 +309,8 @@ mvn install:install-file \
   -Dpackaging=jar
 ```
 
-Thereafter the source code can be compiled by running the `mvn package` command within the same directory (`cosmos-examples`):
+Thereafter the source code can be compiled by running the `mvn package` command within the same directory
+(`cosmos-examples`):
 
 ```console
 mvn package
@@ -319,12 +320,15 @@ A new JAR file called `cosmos-examples-1.1.jar` will be created within the `cosm
 
 ### Generating a stream of Context Data
 
-For the purpose of this tutorial, we must be monitoring a system in which the context is periodically being updated. The dummy IoT Sensors can be used to do this. Open the device monitor page at `http://localhost:3000/device/monitor` and unlock a **Smart Door** and switch on a **Smart Lamp**. This can be done by selecting an appropriate the command from the drop down list and pressing the `send` button. The stream of measurements coming from the devices can then be seen on the same page:
+For the purpose of this tutorial, we must be monitoring a system in which the context is periodically being updated. The
+dummy IoT Sensors can be used to do this. Open the device monitor page at `http://localhost:3000/device/monitor` and
+unlock a **Smart Door** and switch on a **Smart Lamp**. This can be done by selecting an appropriate the command from
+the drop down list and pressing the `send` button. The stream of measurements coming from the devices can then be seen
+on the same page:
 
 ![](https://fiware.github.io/tutorials.Big-Data-Flink/img/door-open.gif)
 
 ## Logger - Reading Context Data Streams
-
 
 The first example makes use of the `OrionSource` operator in order to receive notifications from the Orion Context
 Broker. Specifically, the example counts the number notifications that each type of device sends in one minute. You can
@@ -344,7 +348,8 @@ Submit new job
 
 ### Logger - Subscribing to context changes
 
-Once a dynamic context system is up and running (we have deployed the `Logger` job in the Flink cluster), we need to inform **Flink** of changes in context.
+Once a dynamic context system is up and running (we have deployed the `Logger` job in the Flink cluster), we need to
+inform **Flink** of changes in context.
 
 This is done by making a POST request to the `/v2/subscription` endpoint of the Orion Context Broker.
 
@@ -356,7 +361,6 @@ This is done by making a POST request to the `/v2/subscription` endpoint of the 
 -   The `throttling` value defines the rate that changes are sampled.
 
 #### :one: Request:
-
 
 ```console
 curl -iX POST 'http://localhost:1026/v2/subscriptions/' \
@@ -523,10 +527,12 @@ After the processing, the results are output to the console:
 ```scala
 processedDataStream.print().setParallelism(1)
 ```
+
 ## Logger - NGSI-LD
 
-The same example is provided for data in the NGSI LD format (`LoggerLD.scala`). This example makes use of the NGSILDSource provided by the Orion Flink Connector in order to receive messages in the NGSI LD format. The only part of the code that changes is the declaration of the source:
-
+The same example is provided for data in the NGSI LD format (`LoggerLD.scala`). This example makes use of the
+NGSILDSource provided by the Orion Flink Connector in order to receive messages in the NGSI LD format. The only part of
+the code that changes is the declaration of the source:
 
 ```scala
 ...
@@ -536,7 +542,8 @@ val eventStream = env.addSource(new NGSILDSource(9001))
 ...
 ```
 
-You can run the same package you uploaded to the Flink Web UI specifying the class `org.fiware.cosmos.tutorial.LoggerLD`. After a minute you can run again the following command to see the output:
+You can run the same package you uploaded to the Flink Web UI specifying the class
+`org.fiware.cosmos.tutorial.LoggerLD`. After a minute you can run again the following command to see the output:
 
 ```console
 docker logs flink-taskmanager -f --until=60s > stdout.log 2>stderr.log
