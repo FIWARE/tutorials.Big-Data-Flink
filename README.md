@@ -346,7 +346,7 @@ Submit new job
 -   **Filename:** `cosmos-examples-1.1.jar`
 -   **Entry Class:** `org.fiware.cosmos.tutorial.Logger`
 
-An alternative would be to use curl on the command line as shown:
+An alternative would be to use curl on the command-line as shown:
 
 ```console
 curl -X POST -H "Expect:" -F "jarfile=@/cosmos-examples-1.1.jar" http://localhost:8081/jars/upload
