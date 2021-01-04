@@ -126,7 +126,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"description\": \"Notify Flink of all motion sensor\",\n  \"subject\": {\n    \"entities\": [\n      {\n        \"idPattern\": \"Motion.*\"\n      }\n    ]\n  },\n  \"notification\": {\n    \"http\": {\n      \"url\": \"http://jobmanager:9001\"\n    }\n  }\n}"
+							"raw": "{\n  \"description\": \"Notify Flink of all motion sensor\",\n  \"subject\": {\n    \"entities\": [\n      {\n        \"idPattern\": \"Motion.*\"\n      }\n    ]\n  },\n  \"notification\": {\n    \"http\": {\n      \"url\": \"http://taskmanager:9001\"\n    }\n  }\n}"
 						},
 						"url": {
 							"raw": "http://{{orion}}/v2/subscriptions/",

@@ -15,7 +15,7 @@ environments, perform computations at in-memory speed and at any scale.
 The tutorial uses [cUrl](https://ec.haxx.se/) commands throughout, but is also available as
 [Postman documentation](https://fiware.github.io/tutorials.Big-Data-Flink/)
 
-[![Run in Postman](https://run.pstmn.io/button.svg)](https://app.getpostman.com/run-collection/fb0de86dea21e2073054)
+[![Run in Postman](https://run.pstmn.io/button.svg)](https://www.getpostman.com/collections/9a49739f0758b971193d)
 
 -   このチュートリアルは[日本語](README.ja.md)でもご覧いただけます。
 
@@ -77,7 +77,7 @@ connector allows developers write custom business logic to listen for context da
 the flow of the context data. Flink is able to delegate these actions to other workers where they will be acted upon
 either in sequentiallly or in parallel as required. The data flow processing itself can be arbitrarily complex.
 
-Obviously in reality our existing Supermarket scenario is far too small to require the use of a Big Data solution, but
+Obviously, in reality, our existing Supermarket scenario is far too small to require the use of a Big Data solution, but
 will serve as a basis for demonstrating the type of real-time processing which may be required in a larger solution
 which is processing a continuous stream of context-data events.
 
@@ -153,7 +153,6 @@ jobmanager:
     ports:
         - "6123:6123"
         - "8081:8081"
-        - "9001:9001"
     command: jobmanager
     environment:
         - JOB_MANAGER_RPC_ADDRESS=jobmanager
@@ -167,6 +166,7 @@ taskmanager:
     ports:
         - "6121:6121"
         - "6122:6122"
+        - "9001:9001"
     depends_on:
         - jobmanager
     command: taskmanager
@@ -179,12 +179,12 @@ taskmanager:
 The `jobmanager` container is listening on three ports:
 
 -   Port `8081` is exposed so we can see the web frontend of the Apache Flink Dashboard
--   Port `9001` is exposed so that the installation can receive context data subscriptions
 -   Port `6123` is the standard **JobManager** RPC port, used for internal communications
 
 The `taskmanager` container is listening on two ports:
 
 -   Ports `6121` and `6122` are used and RPC ports by the **TaskManager**, used for internal communications
+-   Port `9001` is exposed so that the installation can receive context data subscriptions
 
 The containers within the flink cluster are driven by a single environment variable as shown:
 
@@ -211,7 +211,7 @@ follow the instructions found [here](https://docs.docker.com/compose/install/)
 
 You can check your current **Docker** and **Docker Compose** versions using the following commands:
 
-```console
+```bash
 docker-compose -v
 docker version
 ```
@@ -237,11 +237,11 @@ Before you start, you should ensure that you have obtained or built the necessar
 the repository and create the necessary images by running the commands shown below. Note that you might need to run some
 of the commands as a privileged user:
 
+
 ```console
 git clone https://github.com/FIWARE/tutorials.Big-Data-Flink.git
 cd tutorials.Big-Data-Flink
 git checkout NGSI-v2
-
 ./services create
 ```
 
@@ -249,7 +249,7 @@ This command will also import seed data from the previous tutorials and provisio
 
 To start the system, run the following command:
 
-```console
+```bash
 ./services start
 ```
 
@@ -282,7 +282,7 @@ This means that to create a streaming data flow we must supply the following:
 -   Business logic to define the transform operations
 -   A mechanism for pushing Context data back to the context broker as a **Sink Operator**
 
-The `orion-flink.connect.jar` offers both **Source** and **Sink** operations. It therefore only remains to write the
+The `orion.flink.connector-1.2.4.jar` offers both **Source** and **Sink** operations. It therefore only remains to write the
 necessary Scala code to connect the streaming dataflow pipeline operations together. The processing code can be complied
 into a JAR file which can be uploaded to the flink cluster. Two examples will be detailed below, all the source code for
 this tutorial can be found within the
@@ -296,40 +296,35 @@ Further Flink processing examples can be found on the
 
 An existing `pom.xml` file has been created which holds the necessary prerequisites to build the examples JAR file
 
-In order to use the Orion Flink Connector we first need to manually install the connector JAR as an artifact using
-Maven:
+In order to use the Orion Flink Connector we first need to manually install the connector JAR as an artifact using Maven:
 
-```console
+```bash
 cd cosmos-examples
-curl -LO https://github.com/ging/fiware-cosmos-orion-flink-connector/releases/download/FIWARE_7.9/orion.flink.connector-1.2.3.jar
+curl -LO https://github.com/ging/fiware-cosmos-orion-flink-connector/releases/download/FIWARE_7.9.1/orion.flink.connector-1.2.4.jar
 mvn install:install-file \
-  -Dfile=./orion.flink.connector-1.2.3.jar \
+  -Dfile=./orion.flink.connector-1.2.4.jar \
   -DgroupId=org.fiware.cosmos \
   -DartifactId=orion.flink.connector \
-  -Dversion=1.2.3 \
+  -Dversion=1.2.4 \
   -Dpackaging=jar
 ```
 
-Thereafter the source code can be compiled by running the `mvn package` command within the same directory:
+Thereafter the source code can be compiled by running the `mvn package` command within the same directory (`cosmos-examples`):
 
-```console
-cd cosmos-examples
+```bash
 mvn package
 ```
 
-A new JAR file called `cosmos-examples-1.0.jar` will be created within the `cosmos-examples/target` directory.
+A new JAR file called `cosmos-examples-1.1.jar` will be created within the `cosmos-examples/target` directory.
 
 ### Generating a stream of Context Data
 
-For the purpose of this tutorial, we must be monitoring a system in which the context is periodically being updated. The
-dummy IoT Sensors can be used to do this. Open the device monitor page at `http://localhost:3000/device/monitor` and
-unlock a **Smart Door** and switch on a **Smart Lamp**. This can be done by selecting an appropriate the command from
-the drop down list and pressing the `send` button. The stream of measurements coming from the devices can then be seen
-on the same page:
+For the purpose of this tutorial, we must be monitoring a system in which the context is periodically being updated. The dummy IoT Sensors can be used to do this. Open the device monitor page at `http://localhost:3000/device/monitor` and unlock a **Smart Door** and switch on a **Smart Lamp**. This can be done by selecting an appropriate the command from the drop down list and pressing the `send` button. The stream of measurements coming from the devices can then be seen on the same page:
 
 ![](https://fiware.github.io/tutorials.Big-Data-Flink/img/door-open.gif)
 
 ## Logger - Reading Context Data Streams
+
 
 The first example makes use of the `OrionSource` operator in order to receive notifications from the Orion Context
 Broker. Specifically, the example counts the number notifications that each type of device sends in one minute. You can
@@ -338,18 +333,18 @@ find the source code of the example in
 
 ### Logger - Installing the JAR
 
-Goto `http://localhost:8081/#/submit`
+Open the browser and access `http://localhost:8081/#/submit`
 
 ![](https://fiware.github.io/tutorials.Big-Data-Flink/img/submit-logger.png)
 
 Submit new job
 
--   **Filename:** `cosmos-examples-1.0.jar`
+-   **Filename:** `cosmos-examples-1.1.jar`
 -   **Entry Class:** `org.fiware.cosmos.tutorial.Logger`
 
 ### Logger - Subscribing to context changes
 
-Once a dynamic context system is up and running (execute `Logger`), we need to inform **Flink** of changes in context.
+Once a dynamic context system is up and running (we have deployed the `Logger` job in the Flink cluster), we need to inform **Flink** of changes in context.
 
 This is done by making a POST request to the `/v2/subscription` endpoint of the Orion Context Broker.
 
@@ -361,6 +356,7 @@ This is done by making a POST request to the `/v2/subscription` endpoint of the 
 -   The `throttling` value defines the rate that changes are sampled.
 
 #### :one: Request:
+
 
 ```console
 curl -iX POST 'http://localhost:1026/v2/subscriptions/' \
@@ -391,7 +387,7 @@ If a subscription has been created, we can check to see if it is firing by makin
 
 #### :two: Request:
 
-```console
+```bash
 curl -X GET \
 'http://localhost:1026/v2/subscriptions/' \
 -H 'fiware-service: openiot' \
@@ -422,7 +418,7 @@ curl -X GET \
             "attrs": [],
             "attrsFormat": "normalized",
             "http": {
-                "url": "http://jobmanager:9001"
+                "url": "http://taskmanager:9001"
             },
             "lastSuccess": "2019-09-09T09:36:33.00Z",
             "lastSuccessCode": 200
@@ -450,7 +446,7 @@ Finally, check that the `status` of the subscription is `active` - an expired su
 
 Leave the subscription running for **one minute**, then run the following:
 
-```console
+```bash
 docker logs flink-taskmanager -f --until=60s > stdout.log 2>stderr.log
 cat stderr.log
 ```
@@ -471,7 +467,7 @@ package org.fiware.cosmos.tutorial
 
 import org.apache.flink.streaming.api.scala.{StreamExecutionEnvironment, _}
 import org.apache.flink.streaming.api.windowing.time.Time
-import org.fiware.cosmos.orion.flink.connector.{OrionSource}
+import org.fiware.cosmos.orion.flink.connector.OrionSource
 
 
 object Logger{
@@ -527,6 +523,34 @@ After the processing, the results are output to the console:
 ```scala
 processedDataStream.print().setParallelism(1)
 ```
+## Logger - NGSI-LD
+
+The same example is provided for data in the NGSI LD format (`LoggerLD.scala`). This example makes use of the NGSILDSource provided by the Orion Flink Connector in order to receive messages in the NGSI LD format. The only part of the code that changes is the declaration of the source:
+
+
+```scala
+...
+import org.fiware.cosmos.orion.flink.connector.NGSILDSource
+...
+val eventStream = env.addSource(new NGSILDSource(9001))
+...
+```
+
+You can run the same package you uploaded to the Flink Web UI specifying the class `org.fiware.cosmos.tutorial.LoggerLD`. After a minute you can run again the following command to see the output:
+  
+```bash
+docker logs flink-taskmanager -f --until=60s > stdout.log 2>stderr.log
+cat stderr.log
+```
+
+After creating the subscription, the output on the console will be like the following:
+
+```text
+Sensor(Bell,3)
+Sensor(Door,4)
+Sensor(Lamp,7)
+Sensor(Motion,6)
+```
 
 ## Feedback Loop - Persisting Context Data
 
@@ -551,7 +575,7 @@ Thereafter goto `http://localhost:8081/#/submit`
 
 Submit new job
 
--   **Filename:** `cosmos-examples-1.0.jar`
+-   **Filename:** `cosmos-examples-1.1.jar`
 -   **Entry Class:** `org.fiware.cosmos.tutorial.Feedback`
 
 ### Feedback Loop - Subscribing to context changes
@@ -562,7 +586,7 @@ up to only trigger a notification when a motion sensor detects movement.
 > **Note:** If the previous subscription already exists, this step creating a second narrower Motion-only subscription
 > is unnecessary. There is a filter within the business logic of the scala task itself.
 
-```console
+```bash
 curl -iX POST \
   'http://localhost:1026/v2/subscriptions' \
   -H 'Content-Type: application/json' \
@@ -603,31 +627,31 @@ import org.apache.flink.streaming.api.windowing.time.Time
 import org.fiware.cosmos.orion.flink.connector._
 
 
-object Feedback{
-  final val CONTENT_TYPE = ContentType.Plain
-  final val METHOD = HTTPMethod.POST
+object Feedback {
+  final val CONTENT_TYPE = ContentType.JSON
+  final val METHOD = HTTPMethod.PATCH
   final val CONTENT = "{  \"on\": {      \"type\" : \"command\",      \"value\" : \"\"  }}"
   final val HEADERS = Map("fiware-service" -> "openiot","fiware-servicepath" -> "/","Accept" -> "*/*")
 
   def main(args: Array[String]): Unit = {
     val env = StreamExecutionEnvironment.getExecutionEnvironment
-  // Create Orion Source. Receive notifications on port 9001
-  val eventStream = env.addSource(new OrionSource(9001))
+    // Create Orion Source. Receive notifications on port 9001
+    val eventStream = env.addSource(new OrionSource(9001))
 
     // Process event stream
-  val processedDataStream = eventStream
+    val processedDataStream = eventStream
       .flatMap(event => event.entities)
-      .filter(entity=>(entity.attrs("count").value == "1"))
+      .filter(entity => (entity.`type`== "Motion" && entity.attrs("count").value == "1"))
       .map(entity => new Sensor(entity.id))
       .keyBy("id")
-      .timeWindow(Time.seconds(5),Time.seconds(2))
+      .timeWindow(Time.seconds(5), Time.seconds(2))
       .min("id")
 
     // print the results with a single thread, rather than in parallel
-  processedDataStream.printToErr().setParallelism(1)
+    processedDataStream.printToErr().setParallelism(1)
 
     val sinkStream = processedDataStream.map(node => {
-      new OrionSinkObject("urn:ngsi-ld:Lamp"+ node.id.takeRight(3)+ "@on","http://${IP}:3001/iot/lamp"+ node.id.takeRight(3),CONTENT_TYPE,METHOD)
+      new OrionSinkObject(CONTENT, "http://orion:1026/v2/entities/Lamp:"+node.id.takeRight(3)+"/attrs", CONTENT_TYPE, METHOD, HEADERS)
     })
     OrionSink.addSink(sinkStream)
     env.execute("Socket Window NgsiEvent")
