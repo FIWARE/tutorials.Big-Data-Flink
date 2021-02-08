@@ -569,31 +569,26 @@ Submit new job
 ### Feedback Loop - Subscribing to context changes
 
 If the previous example has not been run, a new subscription will need to be set up. A narrower subscription can be set
-up to only trigger a notification when a motion sensor detects movement.
-
-> **Note:** If the previous subscription already exists, this step creating a second narrower Motion-only subscription
-> is unnecessary. There is a filter within the business logic of the scala task itself.
+up to only trigger a notification when a filling sensor detects a level change.
 
 ```console
-curl -iX POST \
-  'http://localhost:1026/v2/subscriptions' \
-  -H 'Content-Type: application/json' \
-  -H 'fiware-service: openiot' \
-  -H 'fiware-servicepath: /' \
-  -d '{
-  "description": "Notify Flink of all context changes",
-  "subject": {
-    "entities": [
-      {
-        "idPattern": "Motion.*"
-      }
-    ]
-  },
+curl -L -X POST 'http://localhost:1026/ngsi-ld/v1/subscriptions/' \
+-H 'Content-Type: application/ld+json' \
+-H 'NGSILD-Tenant: openiot' \
+--data-raw '{
+  "description": "Notify me of all feedstock levels",
+  "type": "Subscription",
+  "entities": [{"type": "FillingSensor"}],
+  "watchedAttributes": ["filling"],
   "notification": {
-    "http": {
-      "url": "http://taskmanger:9001"
+    "attributes": ["filling"],
+    "format": "normalized",
+    "endpoint": {
+      "uri": "http://taskmanager:9001",
+      "accept": "application/json"
     }
-  }
+  },
+   "@context": "http://context-provider:3000/data-models/ngsi-context.jsonld"
 }'
 ```
 
@@ -601,8 +596,7 @@ curl -iX POST \
 
 Go to `http://localhost:3000/device/monitor`
 
-Within any Store, unlock the door and wait. Once the door opens and the Motion sensor is triggered, the lamp will switch
-on directly
+Add or remove some hay from each of the barns to change the filling level and repeat a couple of times.
 
 ### Feedback Loop - Analyzing the Code
 
