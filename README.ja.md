@@ -322,12 +322,12 @@ Orion Flink Connector を使用するには、最初に Maven を使用してア
 
 ```console
 cd cosmos-examples
-curl -LO https://github.com/ging/fiware-cosmos-orion-flink-connector/releases/download/FIWARE_7.9/orion.flink.connector-1.2.3.jar
+curl -LO https://github.com/ging/fiware-cosmos-orion-flink-connector/releases/download/1.2.4/orion.flink.connector-1.2.4.jar
 mvn install:install-file \
-  -Dfile=./orion.flink.connector-1.2.3.jar \
+  -Dfile=./orion.flink.connector-1.2.4.jar \
   -DgroupId=org.fiware.cosmos \
   -DartifactId=orion.flink.connector \
-  -Dversion=1.2.3 \
+  -Dversion=1.2.4 \
   -Dpackaging=jar
 ```
 
@@ -338,7 +338,7 @@ cd cosmos-examples
 mvn package
 ```
 
-`cosmos-examples-1.0.jar` という新しい JAR ファイルが `cosmos-examples/target` ディレクトリ内に作成されます。
+`cosmos-examples-1.2.jar` という新しい JAR ファイルが `cosmos-examples/target` ディレクトリ内に作成されます。
 
 <a name="generating-a-stream-of-context-data"></a>
 
@@ -370,7 +370,7 @@ mvn package
 
 新しいジョブを設定します
 
--   **Filename:** `cosmos-examples-1.0.jar`
+-   **Filename:** `cosmos-examples-1.2.jar`
 -   **Entry Class:** `org.fiware.cosmos.tutorial.Logger`
 
 <a name="logger---subscribing-to-context-changes"></a>
@@ -395,23 +395,23 @@ mvn package
 #### :one: リクエスト :
 
 ```console
-curl -iX POST \
-  'http://localhost:1026/v2/subscriptions' \
-  -H 'Content-Type: application/json' \
-  -H 'fiware-service: openiot' \
-  -H 'fiware-servicepath: /' \
-  -d '{
+curl -iX POST 'http://localhost:1026/v2/subscriptions/' \
+-H 'Content-Type: application/json' \
+-H 'fiware-service: openiot' \
+-H 'fiware-servicepath: /' \
+--data-raw '{
   "description": "Notify Flink of all context changes",
   "subject": {
     "entities": [
       {
-      "idPattern": ".*"
+        "idPattern": ".*"
       }
     ]
   },
   "notification": {
     "http": {
-    "url": "http://jobmanager:9001
+      "url": "http://jobmanager:9001"
+    }
   }
 }'
 ```
@@ -596,7 +596,7 @@ processedDataStream.print().setParallelism(1)
 
 新しいジョブを設定します
 
--   **Filename:** `cosmos-examples-1.0.jar`
+-   **Filename:** `cosmos-examples-1.2.jar`
 -   **Entry Class:** `org.fiware.cosmos.tutorial.Feedback`
 
 <a name="feedback-loop---subscribing-to-context-changes"></a>

@@ -19,7 +19,6 @@ if (( $# != 1 )); then
     exit 1
 fi
 
-
 pause(){
 	printf " "
 	count="$1"
@@ -50,12 +49,12 @@ waitForContext () {
 
 waitForOrion () {
 	echo -e "\n⏳ Waiting for \033[1;34mOrion-LD\033[0m to be available\n"
-	getHeartbeat "${ORION}"
-	while [ "${response}" -eq 000 ]
+
+	while ! [ `docker inspect --format='{{.State.Health.Status}}' fiware-orion` == "healthy" ]
 	do
-		echo -e "\nContext Broker HTTP state: ${response} (waiting for 200)"
-		pause 6
-		getHeartbeat "${ORION}"
+	  	getHeartbeat "${ORION}"
+		echo -e "Context Broker HTTP state: ${response} (waiting for 200)"
+	 	pause 3
 	done
 }
 
@@ -77,30 +76,32 @@ waitForScorpio () {
 	done
 }
 
+
 waitForIoTAgent () {
 	echo -e "\n⏳ Waiting for \033[1;36mIoT-Agent\033[0m to be available\n"
-	getHeartbeat "${IOT_AGENT}"
-	while [ "${response}" -eq 000 ]
-	do
-		echo -e "\nContext Broker HTTP state: ${response} (waiting for 200)"
-		pause 6
-		getHeartbeat "${IOT_AGENT}"
+	while ! [ `docker inspect --format='{{.State.Health.Status}}' fiware-iot-agent` == "healthy" ]
+
+	do 
+	  	getHeartbeat "${IOT_AGENT}"
+		echo -e "IoT Agent state: ${response} (waiting for 200)"
+		pause 3
 	done
 }
 
 loadData () {
 	export CONTEXT_BROKER="$1" 
 	waitForContext
+
 	docker run --rm -v $(pwd)/import-data:/import-data \
 		--network fiware_default \
 		-e CONTEXT_BROKER=${CONTEXT_BROKER} \
-		-e TUTORIAL_DATA_MODELS_CONTEXT="http://context-provider:3000/data-models/ngsi-context.jsonld" \
+		-e TUTORIAL_DATA_MODELS_CONTEXT="${LINKED_DATA_CONTEXT}" \
 		--entrypoint /bin/ash curlimages/curl import-data
 	waitForIoTAgent
 	docker run --rm -v $(pwd)/provision-devices:/provision-devices \
-		--network fiware_default \
 		-e CONTEXT_BROKER=${CONTEXT_BROKER} \
-		-e TUTORIAL_DATA_MODELS_CONTEXT="http://context-provider:3000/data-models/ngsi-context.jsonld" \
+		-e TUTORIAL_DATA_MODELS_CONTEXT="${LINKED_DATA_CONTEXT}" \
+		--network fiware_default \
 		--entrypoint /bin/ash curlimages/curl provision-devices
 	echo ""
 }
@@ -150,6 +151,14 @@ addDatabaseIndex () {
 	echo -e " \033[1;32mdone\033[0m"
 }
 
+waitForMongo () {
+	echo -e "\n⏳ Waiting for \033[1mMongoDB\033[0m to be available\n"
+	while ! [ `docker inspect --format='{{.State.Health.Status}}' db-mongo` == "healthy" ]
+	do 
+		pause 3
+	done
+}
+
 command="$1"
 case "${command}" in
 	"help")
@@ -164,6 +173,7 @@ case "${command}" in
 		echo -e "- \033[1mApache Flink\033[0m is a stream-processing framework"	
 		echo ""
 		docker-compose --log-level ERROR -p fiware up -d --remove-orphans
+		waitForMongo
 		addDatabaseIndex
 		waitForOrion
 		loadData orion:1026
@@ -177,8 +187,8 @@ case "${command}" in
 		echo "Pulling Docker images"
 		docker-compose --log-level ERROR -p fiware pull
 		echo -e "Pulling \033[1;34mCosmos Flink\033[0m connector"
-		curl -LO https://github.com/ging/fiware-cosmos-orion-flink-connector/releases/download/FIWARE_7.9/orion.flink.connector-1.2.3.jar
-		mv orion.flink.connector-1.2.3.jar cosmos-examples/orion.flink.connector-1.2.3.jar
+		curl -LO https://github.com/ging/fiware-cosmos-orion-flink-connector/releases/download/1.2.4/orion.flink.connector-1.2.4.jar
+		mv orion.flink.connector-1.2.4.jar cosmos-examples/orion.flink.connector-1.2.4.jar
 		;;
 	*)
 		echo "Command not Found."

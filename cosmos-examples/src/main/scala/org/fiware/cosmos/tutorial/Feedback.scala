@@ -7,7 +7,7 @@ import org.fiware.cosmos.orion.flink.connector._
 
 
 /**
-  * Example2 Orion Connector
+  * Feedback Example Orion Connector
   * @author @Javierlj
   */
 object Feedback {
