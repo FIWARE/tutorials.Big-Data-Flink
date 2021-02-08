@@ -322,7 +322,7 @@ A new JAR file called `cosmos-examples-1.2.jar` will be created within the `cosm
 
 For the purpose of this tutorial, we must be monitoring a system in which the context is periodically being updated. The
 dummy IoT Sensors can be used to do this. Open the device monitor page at `http://localhost:3000/device/monitor` and
-unlock a **Smart Door** and switch on a **Smart Lamp**. This can be done by selecting an appropriate the command from
+start a tractor moving. This can be done by selecting an appropriate the command from
 the drop down list and pressing the `send` button. The stream of measurements coming from the devices can then be seen
 on the same page:
 
@@ -330,10 +330,10 @@ on the same page:
 
 ## Logger - Reading Context Data Streams
 
-The first example makes use of the `OrionSource` operator in order to receive notifications from the Orion Context
+The first example makes use of the `NGSILDSource` operator in order to receive notifications from the Orion-LD Context
 Broker. Specifically, the example counts the number notifications that each type of device sends in one minute. You can
 find the source code of the example in
-[org/fiware/cosmos/tutorial/Logger.scala](https://github.com/FIWARE/tutorials.Big-Data-Flink/blob/master/cosmos-examples/src/main/scala/org/fiware/cosmos/tutorial/Logger.scala)
+[org/fiware/cosmos/tutorial/LoggerLD.scala](https://github.com/FIWARE/tutorials.Big-Data-Flink/blob/NGSI-LD/cosmos-examples/src/main/scala/org/fiware/cosmos/tutorial/LoggerLD.scala)
 
 ### Logger - Installing the JAR
 
@@ -344,7 +344,7 @@ Open the browser and access `http://localhost:8081/#/submit`
 Submit new job
 
 -   **Filename:** `cosmos-examples-1.2.jar`
--   **Entry Class:** `org.fiware.cosmos.tutorial.Logger`
+-   **Entry Class:** `org.fiware.cosmos.tutorial.LoggerLD`
 
 An alternative would be to use curl on the command-line as shown:
 
@@ -369,24 +369,23 @@ This is done by making a POST request to the `/v2/subscription` endpoint of the 
 #### :one: Request:
 
 ```console
-curl -iX POST 'http://localhost:1026/v2/subscriptions/' \
--H 'Content-Type: application/json' \
--H 'fiware-service: openiot' \
--H 'fiware-servicepath: /' \
+curl -L -X POST 'http://localhost:1026/ngsi-ld/v1/subscriptions/' \
+-H 'Content-Type: application/ld+json' \
+-H 'NGSILD-Tenant: openiot' \
 --data-raw '{
-  "description": "Notify Flink of all context changes",
-  "subject": {
-    "entities": [
-      {
-        "idPattern": ".*"
-      }
-    ]
-  },
+  "description": "Notify me of all animal and farm vehicle movements",
+  "type": "Subscription",
+  "entities": [{"type": "Tractor"}, {"type": "Device"}],
+  "watchedAttributes": ["location"],
   "notification": {
-    "http": {
-      "url": "http://taskmanager:9001"
+    "attributes": ["location"],
+    "format": "normalized",
+    "endpoint": {
+      "uri": "http://taskmanager:9001",
+      "accept": "application/json"
     }
-  }
+  },
+   "@context": "http://context-provider:3000/data-models/ngsi-context.jsonld"
 }'
 ```
 
@@ -399,41 +398,33 @@ If a subscription has been created, we can check to see if it is firing by makin
 
 ```console
 curl -X GET \
-'http://localhost:1026/v2/subscriptions/' \
--H 'fiware-service: openiot' \
--H 'fiware-servicepath: /'
+'http://localhost:1026/ngsi-ld/v1/subscriptions/' \
+-H 'Content-Type: application/ld+json' \
+-H 'NGSILD-Tenant: openiot'
 ```
 
 #### Response:
 
 ```json
 [
-    {
-        "id": "5d76059d14eda92b0686f255",
-        "description": "Notify Flink of all context changes",
-        "status": "active",
-        "subject": {
-            "entities": [
-                {
-                    "idPattern": ".*"
-                }
-            ],
-            "condition": {
-                "attrs": []
-            }
-        },
-        "notification": {
-            "timesSent": 362,
-            "lastNotification": "2019-09-09T09:36:33.00Z",
-            "attrs": [],
-            "attrsFormat": "normalized",
-            "http": {
-                "url": "http://taskmanager:9001"
-            },
-            "lastSuccess": "2019-09-09T09:36:33.00Z",
-            "lastSuccessCode": 200
-        }
-    }
+  {
+    "id": "urn:ngsi-ld:Subscription:60216f404dae3a1f22b705e6",
+    "type": "Subscription",
+    "description": "Notify me of all animal and farm vehicle movements",
+    "entities": [{"type": "Tractor"}, {"type": "Device"}],
+    "watchedAttributes": ["location"],
+    "notification": {
+      "attributes": ["location"],
+      "format": "normalized",
+      "endpoint": {
+        "uri": "http://taskmanager:9001",
+        "accept": "application/json"
+      },
+      "timesSent": 74,
+      "lastNotification": "2021-02-08T17:06:06.043Z"
+    },
+    "@context": "http://context-provider:3000/data-models/ngsi-context.jsonld"
+  }
 ]
 ```
 
@@ -464,10 +455,8 @@ cat stderr.log
 After creating the subscription, the output on the console will be like the following:
 
 ```text
-Sensor(Bell,3)
-Sensor(Door,4)
-Sensor(Lamp,7)
-Sensor(Motion,6)
+Sensor(Tractor,19)
+Sensor(Device,49)
 ```
 
 ### Logger - Analyzing the Code
@@ -475,48 +464,51 @@ Sensor(Motion,6)
 ```scala
 package org.fiware.cosmos.tutorial
 
+
 import org.apache.flink.streaming.api.scala.{StreamExecutionEnvironment, _}
 import org.apache.flink.streaming.api.windowing.time.Time
-import org.fiware.cosmos.orion.flink.connector.OrionSource
+import org.fiware.cosmos.orion.flink.connector.{NGSILDSource}
 
-
-object Logger{
+/**
+  * Logger Example NGSI-LD Orion Connector
+  * @author @Javierlj
+  */
+object LoggerLD {
 
   def main(args: Array[String]): Unit = {
-
     val env = StreamExecutionEnvironment.getExecutionEnvironment
     // Create Orion Source. Receive notifications on port 9001
-    val eventStream = env.addSource(new OrionSource(9001))
+    val eventStream = env.addSource(new NGSILDSource(9001))
 
     // Process event stream
     val processedDataStream = eventStream
-    .flatMap(event => event.entities)
-    .map(entity => new Sensor(entity.`type`,1))
-    .keyBy("device")
-    .timeWindow(Time.seconds(60))
-    .sum(1)
+      .flatMap(event => event.entities)
+      .map(entity => new Sensor(entity.`type`, 1))
+      .keyBy("device")
+      .timeWindow(Time.seconds(60))
+      .sum(1)
 
     // print the results with a single thread, rather than in parallel
-    processedDataStream.print().setParallelism(1)
-    env.execute("Socket Window NgsiEvent")
+    processedDataStream.printToErr().setParallelism(1)
+    env.execute("Socket Window NgsiLDEvent")
   }
-  case class Sensor(device: String, sum: Int)
 }
+case class Sensor(device: String, sum: Int)
 ```
 
 The first lines of the program are aimed at importing the necessary dependencies, including the connector. The next step
-is to create an instance of the `OrionSource` using the class provided by the connector and to add it to the environment
+is to create an instance of the `NGSILDSource` using the class provided by the connector and to add it to the environment
 provided by Flink.
 
-The `OrionSource` constructor accepts a port number (`9001`) as a parameter. This port is used to listen to the
-subscription notifications coming from Orion and converted to a `DataStream` of `NgsiEvent` objects. The definition of
+The `NGSILDSource` constructor accepts a port number (`9001`) as a parameter. This port is used to listen to the
+subscription notifications coming from the context broker and converted to a `DataStream` of `NgsiEventLD` objects. The definition of
 these objects can be found within the
-[Orion-Flink Connector documentation](https://github.com/ging/fiware-cosmos-orion-flink-connector/blob/master/README.md#orionsource).
+[Orion-Flink Connector documentation](https://github.com/ging/fiware-cosmos-orion-flink-connector/blob/master/README.md#NGSILDSource).
 
 The stream processing consists of five separate steps. The first step (`flatMap()`) is performed in order to put
-together the entity objects of all the NGSI Events received in a period of time. Thereafter the code iterates over them
-(with the `map()` operation) and extracts the desired attributes. In this case, we are interested in the sensor `type`
-(`Door`, `Motion`, `Bell` or `Lamp`).
+together the entity objects of all the NGSI-LD Events received in a period of time. Thereafter the code iterates over them
+(with the `map()` operation) and extracts the desired attributes. In this case, we are interested in the entity `type`
+(`Device`  or `Tractor`).
 
 Within each iteration, we create a custom object with the properties we need: the sensor `type` and the increment of
 each notification. For this purpose, we can define a case class as shown:
@@ -548,28 +540,11 @@ val eventStream = env.addSource(new NGSILDSource(9001))
 ...
 ```
 
-You can run the same package you uploaded to the Flink Web UI specifying the class
-`org.fiware.cosmos.tutorial.LoggerLD`. After a minute you can run again the following command to see the output:
-
-```console
-docker logs flink-taskmanager -f --until=60s > stdout.log 2>stderr.log
-cat stderr.log
-```
-
-After creating the subscription, the output on the console will be like the following:
-
-```text
-Sensor(Bell,3)
-Sensor(Door,4)
-Sensor(Lamp,7)
-Sensor(Motion,6)
-```
-
 ## Feedback Loop - Persisting Context Data
 
 The second example switches on a lamp when its motion sensor detects movement.
 
-The dataflow stream uses the `OrionSource` operator in order to receive notifications and filters the input to only
+The dataflow stream uses the `NGSILDSource` operator in order to receive notifications and filters the input to only
 respond to motion senseors and then uses the `OrionSink` to push processed context back to the Context Broker. You can
 find the source code of the example in
 [org/fiware/cosmos/tutorial/Feedback.scala](https://github.com/FIWARE/tutorials.Big-Data-Flink/blob/master/cosmos-examples/src/main/scala/org/fiware/cosmos/tutorial/Feedback.scala)
@@ -649,7 +624,7 @@ object Feedback {
   def main(args: Array[String]): Unit = {
     val env = StreamExecutionEnvironment.getExecutionEnvironment
     // Create Orion Source. Receive notifications on port 9001
-    val eventStream = env.addSource(new OrionSource(9001))
+    val eventStream = env.addSource(new NGSILDSource(9001))
 
     // Process event stream
     val processedDataStream = eventStream
