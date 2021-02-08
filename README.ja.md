@@ -322,7 +322,7 @@ Orion Flink Connector を使用するには、最初に Maven を使用してア
 
 ```console
 cd cosmos-examples
-curl -LO https://github.com/ging/fiware-cosmos-orion-flink-connector/releases/download/FIWARE_7.9.1/orion.flink.connector-1.2.4.jar
+curl -LO https://github.com/ging/fiware-cosmos-orion-flink-connector/releases/download/1.2.4/orion.flink.connector-1.2.4.jar
 mvn install:install-file \
   -Dfile=./orion.flink.connector-1.2.4.jar \
   -DgroupId=org.fiware.cosmos \
@@ -338,7 +338,7 @@ cd cosmos-examples
 mvn package
 ```
 
-`cosmos-examples-1.0.jar` という新しい JAR ファイルが `cosmos-examples/target` ディレクトリ内に作成されます。
+`cosmos-examples-1.2.jar` という新しい JAR ファイルが `cosmos-examples/target` ディレクトリ内に作成されます。
 
 <a name="generating-a-stream-of-context-data"></a>
 
@@ -370,7 +370,7 @@ mvn package
 
 新しいジョブを設定します
 
--   **Filename:** `cosmos-examples-1.0.jar`
+-   **Filename:** `cosmos-examples-1.2.jar`
 -   **Entry Class:** `org.fiware.cosmos.tutorial.Logger`
 
 <a name="logger---subscribing-to-context-changes"></a>
@@ -596,7 +596,7 @@ processedDataStream.print().setParallelism(1)
 
 新しいジョブを設定します
 
--   **Filename:** `cosmos-examples-1.0.jar`
+-   **Filename:** `cosmos-examples-1.2.jar`
 -   **Entry Class:** `org.fiware.cosmos.tutorial.Feedback`
 
 <a name="feedback-loop---subscribing-to-context-changes"></a>

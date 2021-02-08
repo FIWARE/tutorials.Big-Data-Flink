@@ -300,7 +300,7 @@ Maven:
 
 ```console
 cd cosmos-examples
-curl -LO https://github.com/ging/fiware-cosmos-orion-flink-connector/releases/download/FIWARE_7.9.1/orion.flink.connector-1.2.4.jar
+curl -LO https://github.com/ging/fiware-cosmos-orion-flink-connector/releases/download/1.2.4/orion.flink.connector-1.2.4.jar
 mvn install:install-file \
   -Dfile=./orion.flink.connector-1.2.4.jar \
   -DgroupId=org.fiware.cosmos \
@@ -316,7 +316,7 @@ Thereafter the source code can be compiled by running the `mvn package` command 
 mvn package
 ```
 
-A new JAR file called `cosmos-examples-1.1.jar` will be created within the `cosmos-examples/target` directory.
+A new JAR file called `cosmos-examples-1.2.jar` will be created within the `cosmos-examples/target` directory.
 
 ### Generating a stream of Context Data
 
@@ -343,13 +343,13 @@ Open the browser and access `http://localhost:8081/#/submit`
 
 Submit new job
 
--   **Filename:** `cosmos-examples-1.1.jar`
+-   **Filename:** `cosmos-examples-1.2.jar`
 -   **Entry Class:** `org.fiware.cosmos.tutorial.Logger`
 
 An alternative would be to use curl on the command-line as shown:
 
 ```console
-curl -X POST -H "Expect:" -F "jarfile=@/cosmos-examples-1.1.jar" http://localhost:8081/jars/upload
+curl -X POST -H "Expect:" -F "jarfile=@/cosmos-examples-1.2.jar" http://localhost:8081/jars/upload
 ```
 
 ### Logger - Subscribing to context changes
@@ -384,7 +384,7 @@ curl -iX POST 'http://localhost:1026/v2/subscriptions/' \
   },
   "notification": {
     "http": {
-      "url": "http://jobmanager:9001"
+      "url": "http://taskmanager:9001"
     }
   }
 }'
@@ -588,7 +588,7 @@ Thereafter goto `http://localhost:8081/#/submit`
 
 Submit new job
 
--   **Filename:** `cosmos-examples-1.1.jar`
+-   **Filename:** `cosmos-examples-1.2.jar`
 -   **Entry Class:** `org.fiware.cosmos.tutorial.Feedback`
 
 ### Feedback Loop - Subscribing to context changes
