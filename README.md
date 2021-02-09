@@ -99,13 +99,14 @@ keep persistence of the information they hold. We will also be using the dummy I
 Therefore the overall architecture will consist of the following elements:
 
 -   Two **FIWARE Generic Enablers** as independent microservices:
-    -   The FIWARE [Orion Context Broker](https://fiware-orion.readthedocs.io/en/latest/) which will receive requests
-        using [NGSI-v2](https://fiware.github.io/specifications/OpenAPI/ngsiv2)
-    -   The FIWARE [IoT Agent for Ultralight 2.0](https://fiware-iotagent-ul.readthedocs.io/en/latest/) which will
-        receive northbound measurements from the dummy IoT devices in
-        [Ultralight 2.0](https://fiware-iotagent-ul.readthedocs.io/en/latest/usermanual/index.html#user-programmers-manual)
-        format and convert them to [NGSI-v2](https://fiware.github.io/specifications/OpenAPI/ngsiv2) requests for the
-        context broker to alter the state of the context entities
+    -   The [Orion Context Broker](https://fiware-orion.readthedocs.io/en/latest/) which will receive requests using
+        [NGSI-LD](https://forge.etsi.org/swagger/ui/?url=https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/spec/updated/full_api.json)
+    -   The FIWARE [IoT Agent for UltraLight 2.0](https://fiware-iotagent-ul.readthedocs.io/en/latest/) which will
+        receive southbound requests using
+        [NGSI-LD](https://forge.etsi.org/swagger/ui/?url=https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/spec/updated/full_api.json)
+        and convert them to
+        [UltraLight 2.0](https://fiware-iotagent-ul.readthedocs.io/en/latest/usermanual/index.html#user-programmers-manual)
+        commands for the devices
 -   An [Apache Flink cluster](https://ci.apache.org/projects/flink/flink-docs-stable/concepts/runtime.html) consisting
     of a single **JobManager** and a single **TaskManager**
     -   The FIWARE [Cosmos Orion Flink Connector](https://fiware-cosmos-flink.readthedocs.io/en/latest/) will be
@@ -115,20 +116,12 @@ Therefore the overall architecture will consist of the following elements:
     -   Used by the **Orion Context Broker** to hold context data information such as data entities, subscriptions and
         registrations
     -   Used by the **IoT Agent** to hold device information such as device URLs and Keys
--   Three **Context Providers**:
-    -   A webserver acting as set of [dummy IoT devices](https://github.com/FIWARE/tutorials.IoT-Sensors/tree/NGSI-v2)
+-   The **Tutorial Application** does the following:
+    -   Offers static `@context` files defining the context entities within the system.
+    -   Acts as set of dummy [agricultural IoT devices](https://github.com/FIWARE/tutorials.IoT-Sensors/tree/NGSI-LD)
         using the
-        [Ultralight 2.0](https://fiware-iotagent-ul.readthedocs.io/en/latest/usermanual/index.html#user-programmers-manual)
+        [UltraLight 2.0](https://fiware-iotagent-ul.readthedocs.io/en/latest/usermanual/index.html#user-programmers-manual)
         protocol running over HTTP.
-    -   The **Stock Management Frontend** is not used in this tutorial. It does the following:
-        -   Display store information and allow users to interact with the dummy IoT devices
-        -   Show which products can be bought at each store
-        -   Allow users to "buy" products and reduce the stock count.
-    -   The **Context Provider NGSI** proxy is not used in this tutorial. It does the following:
-        -   receive requests using [NGSI-v2](https://fiware.github.io/specifications/OpenAPI/ngsiv2)
-        -   makes requests to publicly available data sources using their own APIs in a proprietary format
-        -   returns context data back to the Orion Context Broker in
-            [NGSI-v2](https://fiware.github.io/specifications/OpenAPI/ngsiv2) format.
 
 The overall architecture can be seen below:
 
@@ -326,7 +319,7 @@ start a tractor moving. This can be done by selecting an appropriate the command
 the drop down list and pressing the `send` button. The stream of measurements coming from the devices can then be seen
 on the same page:
 
-![](https://fiware.github.io/tutorials.Big-Data-Flink/img/door-open.gif)
+![](https://fiware.github.io/tutorials.Big-Data-Flink/img/farm-devices.gif)
 
 ## Logger - Reading Context Data Streams
 
@@ -357,12 +350,12 @@ curl -X POST -H "Expect:" -F "jarfile=@/cosmos-examples-1.2.jar" http://localhos
 Once a dynamic context system is up and running (we have deployed the `Logger` job in the Flink cluster), we need to
 inform **Flink** of changes in context.
 
-This is done by making a POST request to the `/v2/subscription` endpoint of the Orion Context Broker.
+This is done by making a POST request to the `/ngsi-ld/v1/subscriptions` endpoint of the Orion Context Broker.
 
--   The `fiware-service` and `fiware-servicepath` headers are used to filter the subscription to only listen to
+-   The `NGSILD-Tenant` header is used to filter the subscription to only listen to
     measurements from the attached IoT Sensors, since they had been provisioned using these settings
 
--   The notification `url` must match the one our Flink program is listening to.
+-   The notification `uri` must match the one our Flink program is listening to.
 
 -   The `throttling` value defines the rate that changes are sampled.
 
@@ -373,7 +366,7 @@ curl -L -X POST 'http://localhost:1026/ngsi-ld/v1/subscriptions/' \
 -H 'Content-Type: application/ld+json' \
 -H 'NGSILD-Tenant: openiot' \
 --data-raw '{
-  "description": "Notify me of all animal and farm vehicle movements",
+  "description": "Notify Flink of all animal and farm vehicle movements",
   "type": "Subscription",
   "entities": [{"type": "Tractor"}, {"type": "Device"}],
   "watchedAttributes": ["location"],
@@ -392,15 +385,15 @@ curl -L -X POST 'http://localhost:1026/ngsi-ld/v1/subscriptions/' \
 The response will be `**201 - Created**`
 
 If a subscription has been created, we can check to see if it is firing by making a GET request to the
-`/v2/subscriptions` endpoint.
+`/ngsi-ld/v1/subscriptions/` endpoint.
 
 #### :two: Request:
 
 ```console
 curl -X GET \
-'http://localhost:1026/ngsi-ld/v1/subscriptions/' \
--H 'Content-Type: application/ld+json' \
--H 'NGSILD-Tenant: openiot'
+'http://localhost:1026/v2/subscriptions/' \
+-H 'fiware-service: openiot' \
+-H 'fiware-servicepath: /'
 ```
 
 #### Response:
@@ -410,7 +403,7 @@ curl -X GET \
   {
     "id": "urn:ngsi-ld:Subscription:60216f404dae3a1f22b705e6",
     "type": "Subscription",
-    "description": "Notify me of all animal and farm vehicle movements",
+    "description": "Notify Flink of all animal and farm vehicle movements",
     "entities": [{"type": "Tractor"}, {"type": "Device"}],
     "watchedAttributes": ["location"],
     "notification": {
@@ -436,7 +429,7 @@ that the `subject` of the subscription is incorrect or the subscription has crea
 or `fiware-service` header
 
 The `lastNotification` should be a recent timestamp - if this is not the case, then the devices are not regularly
-sending data. Remember to unlock the **Smart Door** and switch on the **Smart Lamp**
+sending data. Remember to activate the smart farm by moving a **Tractor**
 
 The `lastSuccess` should match the `lastNotification` date - if this is not the case then **Cosmos** is not receiving
 the subscription properly. Check that the hostname and port are correct.
@@ -526,28 +519,14 @@ After the processing, the results are output to the console:
 processedDataStream.print().setParallelism(1)
 ```
 
-## Logger - NGSI-LD
-
-The same example is provided for data in the NGSI LD format (`LoggerLD.scala`). This example makes use of the
-NGSILDSource provided by the Orion Flink Connector in order to receive messages in the NGSI LD format. The only part of
-the code that changes is the declaration of the source:
-
-```scala
-...
-import org.fiware.cosmos.orion.flink.connector.NGSILDSource
-...
-val eventStream = env.addSource(new NGSILDSource(9001))
-...
-```
-
 ## Feedback Loop - Persisting Context Data
 
 The second example switches on a lamp when its motion sensor detects movement.
 
 The dataflow stream uses the `NGSILDSource` operator in order to receive notifications and filters the input to only
-respond to motion senseors and then uses the `OrionSink` to push processed context back to the Context Broker. You can
+respond to motion senseors and then uses the `NGSILDSink` to push processed context back to the Context Broker. You can
 find the source code of the example in
-[org/fiware/cosmos/tutorial/Feedback.scala](https://github.com/FIWARE/tutorials.Big-Data-Flink/blob/master/cosmos-examples/src/main/scala/org/fiware/cosmos/tutorial/Feedback.scala)
+[org/fiware/cosmos/tutorial/FeedbackLD.scala](https://github.com/FIWARE/tutorials.Big-Data-Flink/blob/master/cosmos-examples/src/main/scala/org/fiware/cosmos/tutorial/FeedbackLD.scala)
 
 ### Feedback Loop - Installing the JAR
 
@@ -665,4 +644,4 @@ the other [tutorials in this series](https://fiware-tutorials.rtfd.io)
 
 ## License
 
-[MIT](LICENSE) © 2020 FIWARE Foundation e.V.
+[MIT](LICENSE) © 2021 FIWARE Foundation e.V.
