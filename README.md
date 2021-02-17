@@ -12,9 +12,9 @@ computations both over unbounded and bounded data streams. Flink has been design
 environments, perform computations at in-memory speed and at any scale.
 
 The tutorial uses [cUrl](https://ec.haxx.se/) commands throughout, but is also available as
-[Postman documentation](https://fiware.github.io/tutorials.Big-Data-Flink/)
+[Postman documentation](https://fiware.github.io/tutorials.Big-Data-Flink/ngsi-ld.html)
 
-[![Run in Postman](https://run.pstmn.io/button.svg)](https://app.getpostman.com/run-collection/fb0de86dea21e2073054)
+[![Run in Postman](https://run.pstmn.io/button.svg)](https://app.getpostman.com/run-collection/0a602cbb6bbf9351efc2)
 
 -   このチュートリアルは[日本語](README.ja.md)でもご覧いただけます。
 
@@ -232,7 +232,7 @@ of the commands as a privileged user:
 ```console
 git clone https://github.com/FIWARE/tutorials.Big-Data-Flink.git
 cd tutorials.Big-Data-Flink
-git checkout NGSI-v2
+git checkout NGSI-LD
 ./services create
 ```
 
@@ -318,7 +318,7 @@ start a tractor moving. This can be done by selecting an appropriate the command
 the drop down list and pressing the `send` button. The stream of measurements coming from the devices can then be seen
 on the same page:
 
-![](https://fiware.github.io/tutorials.Big-Data-Flink/img/farm-devices.gif)
+![](https://fiware.github.io/tutorials.Big-Data-Flink/img/farm-devices.png)
 
 ## Logger - Reading Context Data Streams
 
@@ -390,9 +390,8 @@ If a subscription has been created, we can check to see if it is firing by makin
 
 ```console
 curl -X GET \
-'http://localhost:1026/v2/subscriptions/' \
--H 'fiware-service: openiot' \
--H 'fiware-servicepath: /'
+'http://localhost:1026/ngsi-ld/v1/subscriptions/' \
+-H 'NGSILD-Tenant: openiot'
 ```
 
 #### Response:
@@ -540,15 +539,16 @@ Submit new job
 
 ### Feedback Loop - Subscribing to context changes
 
-A new subscription needs to be set up to run this example.
+A new subscription needs to be set up to run this example. The subscription is listening to changes of context on the soil humidity sensor.
 
+#### :three: Request:
 
 ```console
 curl -L -X POST 'http://localhost:1026/ngsi-ld/v1/subscriptions/' \
 -H 'Content-Type: application/ld+json' \
 -H 'NGSILD-Tenant: openiot' \
 --data-raw '{
-  "description": "Notify Flink of all animal and farm vehicle movements",
+  "description": "Notify Flink of changes of Soil Humidity",
   "type": "Subscription",
   "entities": [{"type": "SoilSensor"}],
   "watchedAttributes": ["humidity"],
@@ -564,11 +564,24 @@ curl -L -X POST 'http://localhost:1026/ngsi-ld/v1/subscriptions/' \
 }'
 ```
 
+If a subscription has been created, we can check to see if it is firing by making a GET request to the
+`/ngsi-ld/v1/subscriptions/` endpoint.
+
+#### :four: Request:
+
+```console
+curl -X GET \
+'http://localhost:1026/ngsi-ld/v1/subscriptions/' \
+-H 'NGSILD-Tenant: openiot'
+```
+
+
+
 ### Feedback Loop - Checking the Output
 
 Go to `http://localhost:3000/device/monitor`
 
-Raise the temperature in Farm001 until the humidity value is below 35, then the water faucet will be automatically turned on to increase the soil humidity. When the temperature raises above 50, the water faucet will be turned off automatically as well. 
+Raise the temperature in Farm001 until the humidity value is below 35, then the water faucet will be automatically turned on to increase the soil humidity. When the temperature raises above 50, the water faucet will be turned off automatically as well.
 
 ### Feedback Loop - Analyzing the Code
 
@@ -635,12 +648,12 @@ As you can see, it is similar to the previous example. The main difference is th
 
 The arguments of the **`OrionSinkObject`** are:
 
--   **Message**: `"{\n  \"type\" : \"Property\",\n  \"value\" : \" \" \n}"`. 
+-   **Message**: `"{\n  \"type\" : \"Property\",\n  \"value\" : \" \" \n}"`.
 -   **URL**: `"http://orion:1026/ngsi-ld/v1/entities/urn:ngsi-ld:Device:water"+sensor._1.takeRight(3)+"/attrs/on"` or `"http://orion:1026/ngsi-ld/v1/entities/urn:ngsi-ld:Device:water"+sensor._1.takeRight(3)+"/attrs/off"`, depending on whether we are turning on or off the water faucet. TakeRight(3) gets the number of
     the sensor, for example '001'.
 -   **Content Type**: `ContentType.JSON`.
 -   **HTTP Method**: `HTTPMethod.PATCH`.
--   **Headers**: `Map("NGSILD-Tenant" -> "openiot", "Link" -> "<http://context-provider:3000/data-models/ngsi-context.jsonld>; rel=\"http://www.w3.org/ns/json-ld#context\"; type=\"application/ld+json\"" )`. 
+-   **Headers**: `Map("NGSILD-Tenant" -> "openiot", "Link" -> "<http://context-provider:3000/data-models/ngsi-context.jsonld>; rel=\"http://www.w3.org/ns/json-ld#context\"; type=\"application/ld+json\"" )`.
     We add the headers we need in the HTTP Request.
 
 # Next Steps
