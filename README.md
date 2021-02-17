@@ -462,10 +462,6 @@ import org.apache.flink.streaming.api.scala.{StreamExecutionEnvironment, _}
 import org.apache.flink.streaming.api.windowing.time.Time
 import org.fiware.cosmos.orion.flink.connector.{NGSILDSource}
 
-/**
-  * Logger Example NGSI-LD Orion Connector
-  * @author @Javierlj
-  */
 object LoggerLD {
 
   def main(args: Array[String]): Unit = {
@@ -521,11 +517,9 @@ processedDataStream.print().setParallelism(1)
 
 ## Feedback Loop - Persisting Context Data
 
-The second example switches on a lamp when its motion sensor detects movement.
+The second example turns on a water faucet when the soil humidity is too low and turns it back off it when the soil humidity it is back to normal levels. This way, the soil humidity is always kept at an adequate level.
 
-The dataflow stream uses the `NGSILDSource` operator in order to receive notifications and filters the input to only
-respond to motion senseors and then uses the `NGSILDSink` to push processed context back to the Context Broker. You can
-find the source code of the example in
+The dataflow stream uses the `NGSILDSource` operator in order to receive notifications and filters the input to only respond to motion senseors and then uses the `NGSILDSink` to push processed context back to the Context Broker. You can find the source code of the example in
 [org/fiware/cosmos/tutorial/FeedbackLD.scala](https://github.com/FIWARE/tutorials.Big-Data-Flink/blob/master/cosmos-examples/src/main/scala/org/fiware/cosmos/tutorial/FeedbackLD.scala)
 
 ### Feedback Loop - Installing the JAR
@@ -543,27 +537,27 @@ Thereafter goto `http://localhost:8081/#/submit`
 Submit new job
 
 -   **Filename:** `cosmos-examples-1.2.jar`
--   **Entry Class:** `org.fiware.cosmos.tutorial.Feedback`
+-   **Entry Class:** `org.fiware.cosmos.tutorial.FeedbackLD`
 
 ### Feedback Loop - Subscribing to context changes
 
-If the previous example has not been run, a new subscription will need to be set up. A narrower subscription can be set
-up to only trigger a notification when a filling sensor detects a level change.
+A new subscription needs to be set up to run this example.
+
 
 ```console
 curl -L -X POST 'http://localhost:1026/ngsi-ld/v1/subscriptions/' \
 -H 'Content-Type: application/ld+json' \
 -H 'NGSILD-Tenant: openiot' \
 --data-raw '{
-  "description": "Notify me of all feedstock levels",
+  "description": "Notify Flink of all animal and farm vehicle movements",
   "type": "Subscription",
-  "entities": [{"type": "FillingSensor"}],
-  "watchedAttributes": ["filling"],
+  "entities": [{"type": "SoilSensor"}],
+  "watchedAttributes": ["humidity"],
   "notification": {
-    "attributes": ["filling"],
+    "attributes": ["humidity"],
     "format": "normalized",
     "endpoint": {
-      "uri": "http://taskmanager:9001",
+      "uri": "http://flink-taskmanager:9001",
       "accept": "application/json"
     }
   },
@@ -575,7 +569,7 @@ curl -L -X POST 'http://localhost:1026/ngsi-ld/v1/subscriptions/' \
 
 Go to `http://localhost:3000/device/monitor`
 
-Add or remove some hay from each of the barns to change the filling level and repeat a couple of times.
+Raise the temperature in Farm001 until the humidity value is below 35, then the water faucet will be automatically turned on to increase the soil humidity. When the temperature raises above 50, the water faucet will be turned off automatically as well. 
 
 ### Feedback Loop - Analyzing the Code
 
@@ -584,37 +578,53 @@ package org.fiware.cosmos.tutorial
 
 
 import org.apache.flink.streaming.api.scala.{StreamExecutionEnvironment, _}
-import org.apache.flink.streaming.api.windowing.time.Time
 import org.fiware.cosmos.orion.flink.connector._
 
-
-object Feedback {
+object FeedbackLD {
   final val CONTENT_TYPE = ContentType.JSON
   final val METHOD = HTTPMethod.PATCH
-  final val CONTENT = "{  \"on\": {      \"type\" : \"command\",      \"value\" : \"\"  }}"
-  final val HEADERS = Map("fiware-service" -> "openiot","fiware-servicepath" -> "/","Accept" -> "*/*")
+  final val CONTENT = "{\n  \"type\" : \"Property\",\n  \"value\" : \" \" \n}"
+  final val HEADERS = Map(
+    "NGSILD-Tenant" -> "openiot",
+    "Link" -> "<http://context-provider:3000/data-models/ngsi-context.jsonld>; rel=\"http://www.w3.org/ns/json-ld#context\"; type=\"application/ld+json\""
+  )
+  final val LOW_THRESHOLD = 35
+  final val HIGH_THRESHOLD = 50
 
   def main(args: Array[String]): Unit = {
     val env = StreamExecutionEnvironment.getExecutionEnvironment
     // Create Orion Source. Receive notifications on port 9001
     val eventStream = env.addSource(new NGSILDSource(9001))
-
     // Process event stream
-    val processedDataStream = eventStream
-      .flatMap(event => event.entities)
-      .filter(entity => (entity.`type`== "Motion" && entity.attrs("count").value == "1"))
-      .map(entity => new Sensor(entity.id))
-      .keyBy("id")
-      .timeWindow(Time.seconds(5), Time.seconds(2))
-      .min("id")
+    val processedDataStream = eventStream.flatMap(event => event.entities)
+      .filter(ent => ent.`type` == "SoilSensor")
 
-    // print the results with a single thread, rather than in parallel
-    processedDataStream.printToErr().setParallelism(1)
+    /* High humidity */
 
-    val sinkStream = processedDataStream.map(node => {
-      new OrionSinkObject(CONTENT, "http://orion:1026/v2/entities/Lamp:"+node.id.takeRight(3)+"/attrs", CONTENT_TYPE, METHOD, HEADERS)
+    val highHumidity = processedDataStream
+      .filter(ent =>  (ent.attrs("humidity") != null) && (ent.attrs("humidity")("value").asInstanceOf[BigInt] > HIGH_THRESHOLD))
+      .map(ent => (ent.id,ent.attrs("humidity")("value")))
+
+    val highSinkStream= highHumidity.map(sensor => {
+      OrionSinkObject(CONTENT,"http://orion:1026/ngsi-ld/v1/entities/urn:ngsi-ld:Device:water"+sensor._1.takeRight(3)+"/attrs/off",CONTENT_TYPE,METHOD,HEADERS)
     })
-    OrionSink.addSink(sinkStream)
+
+    highHumidity.map(sensor => "Sensor" + sensor._1 + " has detected a humidity level above " + HIGH_THRESHOLD + ". Turning off water faucet!").print()
+    OrionSink.addSink( highSinkStream )
+
+
+    /* Low humidity */
+    val lowHumidity = processedDataStream
+      .filter(ent => (ent.attrs("humidity") != null) && (ent.attrs("humidity")("value").asInstanceOf[BigInt] < LOW_THRESHOLD))
+      .map(ent => (ent.id,ent.attrs("humidity")("value")))
+
+    val lowSinkStream= lowHumidity.map(sensor => {
+      OrionSinkObject(CONTENT,"http://orion:1026/ngsi-ld/v1/entities/urn:ngsi-ld:Device:water"+sensor._1.takeRight(3)+"/attrs/on",CONTENT_TYPE,METHOD,HEADERS)
+    })
+
+    lowHumidity.map(sensor => "Sensor" + sensor._1 + " has detected a humidity level below " + LOW_THRESHOLD + ". Turning on water faucet!").print()
+    OrionSink.addSink( lowSinkStream )
+
     env.execute("Socket Window NgsiEvent")
   }
 
@@ -622,17 +632,16 @@ object Feedback {
 }
 ```
 
-As you can see, the code is similar to the previous example. The main difference is that it writes the processed data
-back in the Context Broker through the **`OrionSink`**.
+As you can see, it is similar to the previous example. The main difference is that it writes the processed data back in the Context Broker through the **`OrionSink`**.
 
-The arguments of the **`OrionSinkObject`** are as follows:
+The arguments of the **`OrionSinkObject`** are:
 
--   **Message**: `"{ \"on\": { \"type\" : \"command\", \"value\" : \"\" }}"`. We send 'on' command
--   **URL**: `"http://localhost:1026/v2/entities/Lamp:"+node.id.takeRight(3)+"/attrs"`. TakeRight(3) gets the number of
-    the room, for example '001')
--   **Content Type**: `ContentType.Plain`.
--   **HTTP Method**: `HTTPMethod.POST`.
--   **Headers**: `Map("fiware-service" -> "openiot","fiware-servicepath" -> "/","Accept" -> "*/*")`. Optional parameter.
+-   **Message**: `"{\n  \"type\" : \"Property\",\n  \"value\" : \" \" \n}"`. 
+-   **URL**: `"http://orion:1026/ngsi-ld/v1/entities/urn:ngsi-ld:Device:water"+sensor._1.takeRight(3)+"/attrs/on"` or `"http://orion:1026/ngsi-ld/v1/entities/urn:ngsi-ld:Device:water"+sensor._1.takeRight(3)+"/attrs/off"`, depending on whether we are turning on or off the water faucet. TakeRight(3) gets the number of
+    the sensor, for example '001'.
+-   **Content Type**: `ContentType.JSON`.
+-   **HTTP Method**: `HTTPMethod.PATCH`.
+-   **Headers**: `Map("NGSILD-Tenant" -> "openiot", "Link" -> "<http://context-provider:3000/data-models/ngsi-context.jsonld>; rel=\"http://www.w3.org/ns/json-ld#context\"; type=\"application/ld+json\"" )`. 
     We add the headers we need in the HTTP Request.
 
 # Next Steps
