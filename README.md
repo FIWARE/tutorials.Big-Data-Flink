@@ -581,7 +581,7 @@ curl -X GET \
 
 Go to `http://localhost:3000/device/monitor`
 
-Raise the temperature in Farm001 until the humidity value is below 35, then the water faucet will be automatically turned on to increase the soil humidity. When the temperature raises above 50, the water faucet will be turned off automatically as well.
+Raise the temperature in Farm001 and wait until the humidity value is below 35, then the water faucet will be automatically turned on to increase the soil humidity. When the humidity rises above 50, the water faucet will be turned off automatically as well.
 
 ### Feedback Loop - Analyzing the Code
 
