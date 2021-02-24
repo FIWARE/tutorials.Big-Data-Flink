@@ -1,3 +1,5 @@
+# Big Data Analysis (Flink)[<img src="https://img.shields.io/badge/NGSI-LD-d6604d.svg" width="90"  align="left" />]("https://www.etsi.org/deliver/etsi_gs/CIM/001_099/009/01.03.01_60/gs_cim009v010301p.pdf)[<img src="https://fiware.github.io/tutorials.Big-Data-Flink/img/fiware.png" align="left" width="162">](https://www.fiware.org/)<br/>
+
 [![FIWARE Banner](https://fiware.github.io/tutorials.Big-Data-Flink/img/fiware.png)](https://www.fiware.org/developers)
 [![NGSI LD](https://img.shields.io/badge/NGSI-LD-d6604d.svg)](https://www.etsi.org/deliver/etsi_gs/CIM/001_099/009/01.03.01_60/gs_cim009v010301p.pdf)
 
@@ -14,9 +16,9 @@
 任意の規模で計算を実行するように設計されています。
 
 チュートリアルでは [cUrl](https://ec.haxx.se/) コマンドを使用しますが、
-[Postman ドキュメント](https://fiware.github.io/tutorials.Big-Data-Flink/) としても利用可能です。
+[Postman ドキュメント](https://fiware.github.io/tutorials.Big-Data-Flink/ngsi-ld.html) としても利用可能です。
 
-[![Run in Postman](https://run.pstmn.io/button.svg)](https://app.getpostman.com/run-collection/fb0de86dea21e2073054)
+[![Run in Postman](https://run.pstmn.io/button.svg)](https://app.getpostman.com/run-collection/0a602cbb6bbf9351efc2)
 
 
 ## コンテンツ
@@ -103,11 +105,14 @@ Orion Context Broker と IoT Agent はどちらも、オープンソースの [M
 
 -   独立したマイクロサービスとしての2つの **FIWARE Generic Enablers** :
     -   FIWARE [Orion Context Broker](https://fiware-orion.readthedocs.io/en/latest/)は、
-        [NGSI-v2](https://fiware.github.io/specifications/OpenAPI/ngsiv2) を使用してリクエストを受信します
-    -   FIWARE [IoT Agent for Ultralight 2.0](https://fiware-iotagent-ul.readthedocs.io/en/latest/) は、ダミー IoT
-        デバイスから Ultralight 2.0 形式のノースバウンド測定値を受信し、Context Broker の
-        [NGSI-v2](https://fiware.github.io/specifications/OpenAPI/ngsiv2) リクエストに変換して、コンテキスト・
-        エンティティの状態を変更します
+        [NGSI-LD](https://forge.etsi.org/swagger/ui/?url=https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/spec/updated/full_api.json)
+        を使用してリクエストを受信します
+    -   FIWARE [IoT Agent for UltraLight 2.0](https://fiware-iotagent-ul.readthedocs.io/en/latest/) は、
+        [NGSI-LD](https://forge.etsi.org/swagger/ui/?url=https://forge.etsi.org/gitlab/NGSI-LD/NGSI-LD/raw/master/spec/updated/full_api.json)
+        を使用してサウスバウンド・リクエストを受信し、それらをデバイス用の
+        [UltraLight 2.0](https://fiware-iotagent-ul.readthedocs.io/en/latest/usermanual/index.html#user-programmers-manual)
+        コマンドに変換します
+
 -   [Apache Flink cluster](https://ci.apache.org/projects/flink/flink-docs-stable/concepts/runtime.html) は、
     単一の **JobManager** と単一の **TaskManager ** で構成されます
     -   FIWARE [Cosmos Orion Flink Connector](https://fiware-cosmos-flink.readthedocs.io/en/latest/) は、
@@ -117,20 +122,11 @@ Orion Context Broker と IoT Agent はどちらも、オープンソースの [M
     -   **Orion Context Broker** がデータ・エンティティ、サブスクリプション、レジストレーションなどの
         コンテキスト・データ情報を保持するために使用します
     -   **IoT Agent** がデバイスの URL やキーなどのデバイス情報を保持するために使用します
--   3つの**コンテキスト・プロバイダ** :
-    -   HTTP 上で実行される
-        [Ultralight 2.0](https://fiware-iotagent-ul.readthedocs.io/en/latest/usermanual/index.html#user-programmers-manual)
-        を使用する、[ダミー IoT デバイス](https://github.com/FIWARE/tutorials.IoT-Sensors/tree/NGSI-v2) のセットとして
-        機能する Webサーバ
-    -   **在庫管理フロントエンド** は、このチュートリアルでは使用しません。次のことを行います :
-        -   ストア情報を表示し、ユーザがダミー IoT デバイスと対話できるようにします
-        -   各ストアで購入できる製品を表示します
-        -   ユーザが製品を "購入" して在庫数を減らすことを許可します
-    -   **Context Provider NGSI** プロキシは、このチュートリアルでは使用しません。次のことを行います :
-        -   [NGSI-v2](https://fiware.github.io/specifications/OpenAPI/ngsiv2) を使用してリクエストを受信します
-        -   独自形式の独自 API を使用して、公開されているデータソースへのリクエストを行います
-        -   コンテキスト・データを[NGSI-v2](https://fiware.github.io/specifications/OpenAPI/ngsiv2) 形式で
-            Orion Context Broker に返します
+-   **チュートリアル・アプリケーション** は次のことを行います:
+    -   システム内のコンテキスト・エンティティを定義する静的な @context ファイルを提供します
+    -   [UltraLight 2.0](https://fiware-iotagent-ul.readthedocs.io/en/latest/usermanual/index.html#user-programmers-manual)
+        を使用してダミーの[農業用 IoT デバイス](https://github.com/FIWARE/tutorials.IoT-Sensors/tree/NGSI-LD)
+        のセットとして機能します
 
 全体のアーキテクチャを以下に示します :
 
@@ -157,7 +153,6 @@ jobmanager:
     ports:
         - "6123:6123"
         - "8081:8081"
-        - "9001:9001"
     command: jobmanager
     environment:
         - JOB_MANAGER_RPC_ADDRESS=jobmanager
@@ -171,6 +166,7 @@ taskmanager:
     ports:
         - "6121:6121"
         - "6122:6122"
+        - "9001:9001"
     depends_on:
         - jobmanager
     command: taskmanager
@@ -334,7 +330,6 @@ mvn install:install-file \
 その後、同じディレクトリ内で `mvn package` コマンドを実行することでソースコードをコンパイルできます :
 
 ```console
-cd cosmos-examples
 mvn package
 ```
 
@@ -344,20 +339,20 @@ mvn package
 
 ### コンテキスト・データのストリームの生成
 
-このチュートリアルでは、コンテキストが定期的に更新されるシステムを監視する必要があります。これを行うには、ダミー IoT
-センサーを使用できます。`http://localhost:3000/device/monitor` のデバイス・モニターのページを開き、**Smart Door** の
-ロックを解除して、**Smart Lamp** をオンにします。 これは、ドロップ・ダウン・リストから適切なコマンドを選択し、`send`
-ボタンを押すことで実行できます。デバイスからの測定値のストリームは、同じページで見ることができます :
+このチュートリアルでは、コンテキストが定期的に更新されているシステムを監視する必要があります。 ダミー IoT センサを
+使用してこれを行うことができます。`http://localhost:3000/device/monitor` でデバイス・モニタ・ページを開き、
+**Tractor** の移動を開始します。これは、ドロップ・ダウン・リストから適切なコマンドを選択して `send` ボタンを押すことで
+実行できます。デバイスからの測定値の流れは、同じページに表示されます:
 
-![](https://fiware.github.io/tutorials.Big-Data-Flink/img/door-open.gif)
+![](https://fiware.github.io/tutorials.Big-Data-Flink/img/farm-devices.png)
 
 <a name="logger---reading-context-data-streams"></a>
 
 ## ロガー - コンテキスト・データのストリームの読み取り
 
-最初の例では、Orion Context Broker から通知を受信するために、`OrionSource` オペレータを使用します。具体的には、
+最初の例では、Orion-LD Context Broker から通知を受信するために、`NGSILDSource` オペレータを使用します。具体的には、
 この例では、各タイプのデバイスが1分で送信する通知の数をカウントします。 サンプルのソースコードは
-[org/fiware/cosmos/tutorial/Logger.scala](https://github.com/FIWARE/tutorials.Big-Data-Flink/blob/master/cosmos-examples/src/main/scala/org/fiware/cosmos/tutorial/Logger.scala)
+[org/fiware/cosmos/tutorial/LoggerLD.scala](https://github.com/FIWARE/tutorials.Big-Data-Flink/blob/NGSI-LD/cosmos-examples/src/main/scala/org/fiware/cosmos/tutorial/LoggerLD.scala)
 にあります。
 
 <a name="logger---installing-the-jar"></a>
@@ -371,7 +366,13 @@ mvn package
 新しいジョブを設定します
 
 -   **Filename:** `cosmos-examples-1.2.jar`
--   **Entry Class:** `org.fiware.cosmos.tutorial.Logger`
+-   **Entry Class:** `org.fiware.cosmos.tutorial.LoggerLD`
+
+別の方法は、次のようにコマンドラインで curl を使用することです:
+
+```console
+curl -X POST -H "Expect:" -F "jarfile=@/cosmos-examples-1.2.jar" http://localhost:8081/jars/upload
+```
 
 <a name="logger---subscribing-to-context-changes"></a>
 
@@ -380,39 +381,35 @@ mvn package
 動的コンテキスト・システムが起動して実行されると (`Logger` を実行)、**Flink** にコンテキストの変更を通知する
 必要があります。
 
-これは、Orion Context Broker の `/v2/subscription` エンドポイントに POST リクエストを行うことで実行できます。
+これは、Orion Context Broker の `/ngsi-ld/v1/subscriptions` エンドポイントに POST リクエストを行うことで実行できます。
 
--   `fiware-service` および `fiware-servicepath` ヘッダは、これらの設定を使用してプロビジョニングされている
-    ため、接続された IoT センサからの測定値のみをリッスンするようにサブスクリプションをフィルター処理する
-    ために使用されます
+-   `NGSILD-Tenant` ヘッダは、これらの設定を使用してプロビジョニングされているため、接続された IoT センサからの
+    測定値のみをリッスンするようにサブスクリプションをフィルター処理するために使用されます
 
--   通知 URL は、Flink プログラムがリッスンしている URL と一致する必要があります
+-   通知 `uri` は、Flink プログラムがリッスンしている URL と一致する必要があります
 
 -   `throttling` 値は、変更がサンプリングされるレートを定義します
-
-<a name="one-request"></a>
 
 #### :one: リクエスト :
 
 ```console
-curl -iX POST 'http://localhost:1026/v2/subscriptions/' \
--H 'Content-Type: application/json' \
--H 'fiware-service: openiot' \
--H 'fiware-servicepath: /' \
+curl -L -X POST 'http://localhost:1026/ngsi-ld/v1/subscriptions/' \
+-H 'Content-Type: application/ld+json' \
+-H 'NGSILD-Tenant: openiot' \
 --data-raw '{
-  "description": "Notify Flink of all context changes",
-  "subject": {
-    "entities": [
-      {
-        "idPattern": ".*"
-      }
-    ]
-  },
+  "description": "Notify Flink of all animal and farm vehicle movements",
+  "type": "Subscription",
+  "entities": [{"type": "Tractor"}, {"type": "Device"}],
+  "watchedAttributes": ["location"],
   "notification": {
-    "http": {
-      "url": "http://jobmanager:9001"
+    "attributes": ["location"],
+    "format": "normalized",
+    "endpoint": {
+      "uri": "http://taskmanager:9001",
+      "accept": "application/json"
     }
-  }
+  },
+   "@context": "http://context-provider:3000/data-models/ngsi-context.jsonld"
 }'
 ```
 
@@ -421,49 +418,36 @@ curl -iX POST 'http://localhost:1026/v2/subscriptions/' \
 サブスクリプションが作成されている場合、`/v2/subscriptions` エンドポイントに対して GET リクエストを行うことで、
 サブスクリプションが起動しているかどうかを確認できます。
 
-<a name="two-request"></a>
-
 #### :two: リクエスト :
 
 ```console
 curl -X GET \
-'http://localhost:1026/v2/subscriptions/' \
--H 'fiware-service: openiot' \
--H 'fiware-servicepath: /'
+'http://localhost:1026/ngsi-ld/v1/subscriptions/' \
+-H 'NGSILD-Tenant: openiot'
 ```
-
-<a name="response"></a>
 
 #### レスポンス :
 
 ```json
 [
-    {
-        "id": "5d76059d14eda92b0686f255",
-        "description": "Notify Flink of all context changes",
-        "status": "active",
-        "subject": {
-            "entities": [
-                {
-                    "idPattern": ".*"
-                }
-            ],
-            "condition": {
-                "attrs": []
-            }
-        },
-        "notification": {
-            "timesSent": 362,
-            "lastNotification": "2019-09-09T09:36:33.00Z",
-            "attrs": [],
-            "attrsFormat": "normalized",
-            "http": {
-                "url": "http://jobmanager:9001"
-            },
-            "lastSuccess": "2019-09-09T09:36:33.00Z",
-            "lastSuccessCode": 200
-        }
-    }
+  {
+    "id": "urn:ngsi-ld:Subscription:60216f404dae3a1f22b705e6",
+    "type": "Subscription",
+    "description": "Notify Flink of all animal and farm vehicle movements",
+    "entities": [{"type": "Tractor"}, {"type": "Device"}],
+    "watchedAttributes": ["location"],
+    "notification": {
+      "attributes": ["location"],
+      "format": "normalized",
+      "endpoint": {
+        "uri": "http://taskmanager:9001",
+        "accept": "application/json"
+      },
+      "timesSent": 74,
+      "lastNotification": "2021-02-08T17:06:06.043Z"
+    },
+    "@context": "http://context-provider:3000/data-models/ngsi-context.jsonld"
+  }
 ]
 ```
 
@@ -471,11 +455,11 @@ curl -X GET \
 を確認できます
 
 サブスクリプションの基準が満たされている場合、`timesSent` は `0` より大きくなければなりません。ゼロの値は、
-サブスクリプションの `subject` が正しくないか、サブスクリプションが間違った `fiware-service-path` または
-`fiware-service` ヘッダで作成されたことを示します。
+サブスクリプションの `subject` が正しくないか、サブスクリプションが間違った `NGSILD-Tenant`
+ ヘッダで作成されたことを示します。
 
 `lastNotification` は最新のタイムスタンプである必要があります。そうでない場合、デバイスは定期的にデータを
-送信していません。**Smart Door** のロックを解除し、**Smart Lamp** をオンにしてください。
+送信していません。**Tractor** を動かしてスマート・ファームをアクティブ化することを忘れないでください。
 
 `lastSuccess` は `lastNotification` の日付と一致する必要があります-そうでない場合、**Cosmos** はサブスクリプション
 を適切に受信していません。ホスト名とポートが正しいことを確認してください。
@@ -497,10 +481,8 @@ cat stderr.log
 サブスクリプションを作成すると、コンソールの出力は次のようになります :
 
 ```
-Sensor(Bell,3)
-Sensor(Door,4)
-Sensor(Lamp,7)
-Sensor(Motion,6)
+Sensor(Tractor,19)
+Sensor(Device,49)
 ```
 
 <a name="logger---analyzing-the-code"></a>
@@ -513,44 +495,43 @@ package org.fiware.cosmos.tutorial
 
 import org.apache.flink.streaming.api.scala.{StreamExecutionEnvironment, _}
 import org.apache.flink.streaming.api.windowing.time.Time
-import org.fiware.cosmos.orion.flink.connector.{OrionSource}
+import org.fiware.cosmos.orion.flink.connector.{NGSILDSource}
 
-object Logger{
+object LoggerLD {
 
   def main(args: Array[String]): Unit = {
     val env = StreamExecutionEnvironment.getExecutionEnvironment
     // Create Orion Source. Receive notifications on port 9001
-    val eventStream = env.addSource(new OrionSource(9001))
+    val eventStream = env.addSource(new NGSILDSource(9001))
 
     // Process event stream
-
     val processedDataStream = eventStream
-    .flatMap(event => event.entities)
-    .map(entity => new Sensor(entity.`type`,1))
-    .keyBy("device")
-    .timeWindow(Time.seconds(60))
-    .sum(1)
+      .flatMap(event => event.entities)
+      .map(entity => new Sensor(entity.`type`, 1))
+      .keyBy("device")
+      .timeWindow(Time.seconds(60))
+      .sum(1)
 
     // print the results with a single thread, rather than in parallel
-    processedDataStream.print().setParallelism(1)
-    env.execute("Socket Window NgsiEvent")
+    processedDataStream.printToErr().setParallelism(1)
+    env.execute("Socket Window NgsiLDEvent")
   }
-  case class Sensor(device: String, sum: Int)
 }
+case class Sensor(device: String, sum: Int)
 ```
 
 プログラムの最初の行は、コネクタを含む必要な依存関係をインポートすることを目的としています。次のステップは、コネクタが
-提供するクラスを使用して `OrionSource` のインスタンスを作成し、Flink が提供する環境に追加することです。
+提供するクラスを使用して `NGDILDSource` のインスタンスを作成し、Flink が提供する環境に追加することです。
 
-`OrionSource` コンストラクタはパラメータとしてポート番号 (`9001`) を受け入れます。このポートは、Orion からの
-サブスクリプション通知をリッスンするために使用され、`NgsiEvent` オブジェクトの `DataStream` に変換されます。これらの
+`NGSILDSource` コンストラクタはパラメータとしてポート番号 (`9001`) を受け入れます。このポートは、Orion からの
+サブスクリプション通知をリッスンするために使用され、`NgsiEventLD` オブジェクトの `DataStream` に変換されます。これらの
 オブジェクトの定義は、
-[Orion-Flink Connector ドキュメント](https://github.com/ging/fiware-cosmos-orion-flink-connector/blob/master/README.md#orionsource)
+[Orion-Flink Connector ドキュメント](https://github.com/ging/fiware-cosmos-orion-flink-connector/blob/master/README.md#NGSILDSource)
 に記載されています。
 
 ストリーム処理は、5つの個別のステップで構成されています。最初のステップ (`flatMap()`) は、一定期間内に受信したすべての
-NGSI イベントのエンティティ・オブジェクトをまとめるために実行されます。その後、コードはそれらを `map()` 操作で繰り返し、
-目的の属性を抽出します。この場合、センサの `type` (`Door`, `Motion`, `Bell` or `Lamp`) に関心があります。
+NGSI-LD イベントのエンティティ・オブジェクトをまとめるために実行されます。その後、コードはそれらを `map()` 操作で繰り返し、
+目的の属性を抽出します。この場合、センサの `type` (`Device`  or `Tractor`) に関心があります。
 
 各反復内で、必要なプロパティを持つカスタム・オブジェクトを作成します : センサの `type` と各通知の増分。このために、
 次のようにケース・クラスを定義できます :
@@ -572,12 +553,13 @@ processedDataStream.print().setParallelism(1)
 
 ## フィードバック・ループ - コンテキスト・データの永続化
 
-2番目の例では、モーション・センサが動きを検出するとランプをオンにします。
+2番目の例では、土壌湿度が低すぎる場合に水栓をオンにし、土壌湿度が通常のレベルに戻ったときに水栓をオフに戻します。
+このようにして、土壌の湿度は常に適切なレベルに保たれます。
 
-データフロー・ストリームは、通知を受信するために `OrionSource` オペレータを使用し、モーション・センサにのみ応答する
-ように入力をフィルタし、`OrionSink` を使用して処理されたコンテキストを Context Broker にプッシュします。サンプルの
+データフロー・ストリームは、通知を受信するために `NGSILDSource` オペレータを使用し、モーション・センサにのみ応答する
+ように入力をフィルタし、`NGSILDSink` を使用して処理されたコンテキストを Context Broker にプッシュします。サンプルの
 ソースコードは
-[org/fiware/cosmos/tutorial/Feedback.scala](https://github.com/FIWARE/tutorials.Big-Data-Flink/blob/master/cosmos-examples/src/main/scala/org/fiware/cosmos/tutorial/Feedback.scala)
+[org/fiware/cosmos/tutorial/Feedback.scala](https://github.com/FIWARE/tutorials.Big-Data-Flink/blob/master/cosmos-examples/src/main/scala/org/fiware/cosmos/tutorial/FeedbackLD.scala)
 にあります。
 
 <a name="feedback-loop---installing-the-jar"></a>
@@ -597,40 +579,47 @@ processedDataStream.print().setParallelism(1)
 新しいジョブを設定します
 
 -   **Filename:** `cosmos-examples-1.2.jar`
--   **Entry Class:** `org.fiware.cosmos.tutorial.Feedback`
+-   **Entry Class:** `org.fiware.cosmos.tutorial.FeedbackLD`
 
 <a name="feedback-loop---subscribing-to-context-changes"></a>
 
 ### フィードバック・ループ - コンテキスト変更のサブスクライブ
 
-以前の例を実行していない場合は、新しいサブスクリプションを設定する必要があります。モーション・センサが動きを検出した
-ときにのみ通知をトリガーするように、より限定したサブスクリプションを設定できます。
+この例を実行するには、新しいサブスクリプションを設定する必要があります。 サブスクリプションは、土壌湿度センサの
+コンテキストの変化をリッスンしています。
 
-> **注 :** 以前のサブスクリプションが既に存在する場合、2番目のより限定した Motion のみのサブスクリプションを作成する
-> この手順は不要です。Scala タスク自体のビジネスロジック内にフィルタがあります。
-
+#### :three: リクエスト:
 
 ```console
-curl -iX POST \
-  'http://localhost:1026/v2/subscriptions' \
-  -H 'Content-Type: application/json' \
-  -H 'fiware-service: openiot' \
-  -H 'fiware-servicepath: /' \
-  -d '{
-  "description": "Notify Flink of all context changes",
-  "subject": {
-    "entities": [
-      {
-        "idPattern": "Motion.*"
-      }
-    ]
-  },
+curl -L -X POST 'http://localhost:1026/ngsi-ld/v1/subscriptions/' \
+-H 'Content-Type: application/ld+json' \
+-H 'NGSILD-Tenant: openiot' \
+--data-raw '{
+  "description": "Notify Flink of changes of Soil Humidity",
+  "type": "Subscription",
+  "entities": [{"type": "SoilSensor"}],
+  "watchedAttributes": ["humidity"],
   "notification": {
-    "http": {
-      "url": "http://taskmanger:9001"
+    "attributes": ["humidity"],
+    "format": "normalized",
+    "endpoint": {
+      "uri": "http://flink-taskmanager:9001",
+      "accept": "application/json"
     }
-  }
+  },
+   "@context": "http://context-provider:3000/data-models/ngsi-context.jsonld"
 }'
+```
+
+サブスクリプションが作成されている場合は、`/ngsi-ld/v1/subscriptions/` エンドポイントに GET
+リクエストを送信することで、サブスクリプションが起動しているかどうかを確認できます。
+
+#### :four: リクエスト:
+
+```console
+curl -X GET \
+'http://localhost:1026/ngsi-ld/v1/subscriptions/' \
+-H 'NGSILD-Tenant: openiot'
 ```
 
 <a name="feedback-loop---checking-the-output"></a>
@@ -639,8 +628,8 @@ curl -iX POST \
 
 `http://localhost:3000/device/monitor` を開きます
 
-いずれかのストア内で、ドアのロックを解除して待機します。ドアが開いてモーション・センサがトリガーされると、ランプが
-直接オンになります。
+Farm001の温度を上げ、湿度値が35を下回るまで待ちます。そうすると、水栓が自動的にオンになり、
+土壌の湿度が上がります。湿度が50を超えると、水栓も自動的にオフになります。
 
 <a name="feedback-loop---analyzing-the-code"></a>
 
@@ -651,37 +640,53 @@ package org.fiware.cosmos.tutorial
 
 
 import org.apache.flink.streaming.api.scala.{StreamExecutionEnvironment, _}
-import org.apache.flink.streaming.api.windowing.time.Time
 import org.fiware.cosmos.orion.flink.connector._
 
-
-object Feedback{
-  final val CONTENT_TYPE = ContentType.Plain
-  final val METHOD = HTTPMethod.POST
-  final val CONTENT = "{  \"on\": {      \"type\" : \"command\",      \"value\" : \"\"  }}"
-  final val HEADERS = Map("fiware-service" -> "openiot","fiware-servicepath" -> "/","Accept" -> "*/*")
+object FeedbackLD {
+  final val CONTENT_TYPE = ContentType.JSON
+  final val METHOD = HTTPMethod.PATCH
+  final val CONTENT = "{\n  \"type\" : \"Property\",\n  \"value\" : \" \" \n}"
+  final val HEADERS = Map(
+    "NGSILD-Tenant" -> "openiot",
+    "Link" -> "<http://context-provider:3000/data-models/ngsi-context.jsonld>; rel=\"http://www.w3.org/ns/json-ld#context\"; type=\"application/ld+json\""
+  )
+  final val LOW_THRESHOLD = 35
+  final val HIGH_THRESHOLD = 50
 
   def main(args: Array[String]): Unit = {
     val env = StreamExecutionEnvironment.getExecutionEnvironment
-  // Create Orion Source. Receive notifications on port 9001
-  val eventStream = env.addSource(new OrionSource(9001))
-
+    // Create Orion Source. Receive notifications on port 9001
+    val eventStream = env.addSource(new NGSILDSource(9001))
     // Process event stream
-  val processedDataStream = eventStream
-      .flatMap(event => event.entities)
-      .filter(entity=>(entity.attrs("count").value == "1"))
-      .map(entity => new Sensor(entity.id))
-      .keyBy("id")
-      .timeWindow(Time.seconds(5),Time.seconds(2))
-      .min("id")
+    val processedDataStream = eventStream.flatMap(event => event.entities)
+      .filter(ent => ent.`type` == "SoilSensor")
 
-    // print the results with a single thread, rather than in parallel
-  processedDataStream.printToErr().setParallelism(1)
+    /* High humidity */
 
-    val sinkStream = processedDataStream.map(node => {
-      new OrionSinkObject("urn:ngsi-ld:Lamp"+ node.id.takeRight(3)+ "@on","http://${IP}:3001/iot/lamp"+ node.id.takeRight(3),CONTENT_TYPE,METHOD)
+    val highHumidity = processedDataStream
+      .filter(ent =>  (ent.attrs("humidity") != null) && (ent.attrs("humidity")("value").asInstanceOf[BigInt] > HIGH_THRESHOLD))
+      .map(ent => (ent.id,ent.attrs("humidity")("value")))
+
+    val highSinkStream= highHumidity.map(sensor => {
+      OrionSinkObject(CONTENT,"http://orion:1026/ngsi-ld/v1/entities/urn:ngsi-ld:Device:water"+sensor._1.takeRight(3)+"/attrs/off",CONTENT_TYPE,METHOD,HEADERS)
     })
-    OrionSink.addSink(sinkStream)
+
+    highHumidity.map(sensor => "Sensor" + sensor._1 + " has detected a humidity level above " + HIGH_THRESHOLD + ". Turning off water faucet!").print()
+    OrionSink.addSink( highSinkStream )
+
+
+    /* Low humidity */
+    val lowHumidity = processedDataStream
+      .filter(ent => (ent.attrs("humidity") != null) && (ent.attrs("humidity")("value").asInstanceOf[BigInt] < LOW_THRESHOLD))
+      .map(ent => (ent.id,ent.attrs("humidity")("value")))
+
+    val lowSinkStream= lowHumidity.map(sensor => {
+      OrionSinkObject(CONTENT,"http://orion:1026/ngsi-ld/v1/entities/urn:ngsi-ld:Device:water"+sensor._1.takeRight(3)+"/attrs/on",CONTENT_TYPE,METHOD,HEADERS)
+    })
+
+    lowHumidity.map(sensor => "Sensor" + sensor._1 + " has detected a humidity level below " + LOW_THRESHOLD + ". Turning on water faucet!").print()
+    OrionSink.addSink( lowSinkStream )
+
     env.execute("Socket Window NgsiEvent")
   }
 
@@ -689,18 +694,18 @@ object Feedback{
 }
 ```
 
-ご覧のとおり、コードは以前の例に似ています。主な違いは、処理されたデータを **`OrionSink`** を介して Context Broker
+ご覧のとおり、以前の例に似ています。主な違いは、処理されたデータを **`OrionSink`** を介して Context Broker
 に書き戻すことです。
 
 **`OrionSinkObject`** の引数は次のとおりです :
 
--   **Message**: `"{ \"on\": { \"type\" : \"command\", \"value\" : \"\" }}"`. 'on' コマンドを送信します
--   **URL**: `"http://localhost:1026/v2/entities/Lamp:"+node.id.takeRight(3)+"/attrs"`.  TakeRight(3) は部屋の番号を
-    取得します。例 : '001'
+-   **Message**: `"{\n  \"type\" : \"Property\",\n  \"value\" : \" \" \n}"`.
+-   **URL**: `"http://orion:1026/ngsi-ld/v1/entities/urn:ngsi-ld:Device:water"+sensor._1.takeRight(3)+"/attrs/on"` or `"http://orion:1026/ngsi-ld/v1/entities/urn:ngsi-ld:Device:water"+sensor._1.takeRight(3)+"/attrs/off"`, depending on whether we are turning on or off the water faucet. TakeRight(3) gets the number of
+    the sensor, for example '001'.
 -   **Content Type**: `ContentType.Plain`.
--   **HTTP Method**: `HTTPMethod.POST`.
--   **Headers**: `Map("fiware-service" -> "openiot","fiware-servicepath" -> "/","Accept" -> "*/*")`. オプション・パラメータ
-    HTTP リクエストに必要なヘッダを追加します。
+-   **HTTP Method**: `HTTPMethod.PATCH`.
+-   **Headers**:  `Map("NGSILD-Tenant" -> "openiot", "Link" -> "<http://context-provider:3000/data-models/ngsi-context.jsonld>; rel=\"http://www.w3.org/ns/json-ld#context\"; type=\"application/ld+json\"" )`.
+    オプション・パラメータ HTTP リクエストに必要なヘッダを追加します。
 
 <a name="next-steps"></a>
 
@@ -715,4 +720,4 @@ object Feedback{
 
 ## License
 
-[MIT](LICENSE) © 2020 FIWARE Foundation e.V.
+[MIT](LICENSE) © 2021 FIWARE Foundation e.V.
