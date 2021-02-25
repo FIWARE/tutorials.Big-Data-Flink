@@ -196,7 +196,7 @@ technology which allows to different components isolated into their respective e
 -   To install Docker on Linux follow the instructions [here](https://docs.docker.com/install/)
 
 **Docker Compose** is a tool for defining and running multi-container Docker applications. A series of
-[YAML files](https://github.com/FIWARE/tutorials.Big-Data-Flink/tree/master/docker-compose) are used to configure the
+[YAML files](https://github.com/FIWARE/tutorials.Big-Data-Flink/blob/NGSI-LD/docker-compose.yml) are used to configure the
 required services for the application. This means all container services can be brought up in a single command. Docker
 Compose is installed by default as part of Docker for Windows and Docker for Mac, however Linux users will need to
 follow the instructions found [here](https://docs.docker.com/compose/install/)
@@ -314,7 +314,7 @@ A new JAR file called `cosmos-examples-1.2.jar` will be created within the `cosm
 
 For the purpose of this tutorial, we must be monitoring a system in which the context is periodically being updated. The
 dummy IoT Sensors can be used to do this. Open the device monitor page at `http://localhost:3000/device/monitor` and
-start a tractor moving. This can be done by selecting an appropriate the command from
+start a **Tractor** moving. This can be done by selecting an appropriate the command from
 the drop down list and pressing the `send` button. The stream of measurements coming from the devices can then be seen
 on the same page:
 
@@ -420,11 +420,11 @@ curl -X GET \
 ```
 
 Within the `notification` section of the response, you can see several additional `attributes` which describe the health
-of the subscription
+of the subscription.
 
 If the criteria of the subscription have been met, `timesSent` should be greater than `0`. A zero value would indicate
-that the `subject` of the subscription is incorrect or the subscription has created with the wrong `fiware-service-path`
-or `fiware-service` header
+that the `subject` of the subscription is incorrect or the subscription has created with the wrong `NGSILD-Tenant`
+header.
 
 The `lastNotification` should be a recent timestamp - if this is not the case, then the devices are not regularly
 sending data. Remember to activate the smart farm by moving a **Tractor**
