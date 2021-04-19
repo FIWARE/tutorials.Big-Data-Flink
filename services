@@ -132,6 +132,7 @@ case "${command}" in
 	"create")
 		export $(cat .env | grep "#" -v)
 		echo "Pulling Docker images"
+		docker pull curlimages/curl
 		docker-compose --log-level ERROR -p fiware pull
 		echo -e "Pulling \033[1;34mCosmos Flink\033[0m connector"
 		curl -LO https://github.com/ging/fiware-cosmos-orion-flink-connector/releases/download/1.2.4/orion.flink.connector-1.2.4.jar
