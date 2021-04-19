@@ -16,10 +16,16 @@ fi
 loadData () {
 	docker run --rm -v $(pwd)/import-data:/import-data \
 		--network fiware_default \
+		-e ORION_PORT="${ORION_PORT}" \
+		-e TUTORIAL_APP_PORT="${TUTORIAL_APP_PORT}" \
 		--entrypoint /bin/ash curlimages/curl import-data
 	waitForIoTAgent
 	docker run --rm -v $(pwd)/provision-devices:/provision-devices \
 		--network fiware_default \
+		-e ORION_PORT="${ORION_PORT}" \
+		-e TUTORIAL_APP_PORT="${TUTORIAL_APP_PORT}" \
+		-e TUTORIAL_DUMMY_DEVICE_PORT="${TUTORIAL_DUMMY_DEVICE_PORT}" \
+		-e IOTA_NORTH_PORT="${IOTA_NORTH_PORT}" \
 		--entrypoint /bin/ash curlimages/curl provision-devices
 	echo ""
 }
