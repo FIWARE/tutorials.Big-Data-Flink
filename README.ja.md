@@ -409,7 +409,7 @@ curl -L -X POST 'http://localhost:1026/ngsi-ld/v1/subscriptions/' \
       "accept": "application/json"
     }
   },
-   "@context": "http://context-provider:3000/data-models/ngsi-context.jsonld"
+   "@context": "http://context/ngsi-context.jsonld"
 }'
 ```
 
@@ -446,7 +446,7 @@ curl -X GET \
       "timesSent": 74,
       "lastNotification": "2021-02-08T17:06:06.043Z"
     },
-    "@context": "http://context-provider:3000/data-models/ngsi-context.jsonld"
+    "@context": "http://context/ngsi-context.jsonld"
   }
 ]
 ```
@@ -607,7 +607,7 @@ curl -L -X POST 'http://localhost:1026/ngsi-ld/v1/subscriptions/' \
       "accept": "application/json"
     }
   },
-   "@context": "http://context-provider:3000/data-models/ngsi-context.jsonld"
+   "@context": "http://context/ngsi-context.jsonld"
 }'
 ```
 
@@ -648,7 +648,7 @@ object FeedbackLD {
   final val CONTENT = "{\n  \"type\" : \"Property\",\n  \"value\" : \" \" \n}"
   final val HEADERS = Map(
     "NGSILD-Tenant" -> "openiot",
-    "Link" -> "<http://context-provider:3000/data-models/ngsi-context.jsonld>; rel=\"http://www.w3.org/ns/json-ld#context\"; type=\"application/ld+json\""
+    "Link" -> "<http://context/ngsi-context.jsonld>; rel=\"http://www.w3.org/ns/json-ld#context\"; type=\"application/ld+json\""
   )
   final val LOW_THRESHOLD = 35
   final val HIGH_THRESHOLD = 50
@@ -704,7 +704,7 @@ object FeedbackLD {
     the sensor, for example '001'.
 -   **Content Type**: `ContentType.Plain`.
 -   **HTTP Method**: `HTTPMethod.PATCH`.
--   **Headers**:  `Map("NGSILD-Tenant" -> "openiot", "Link" -> "<http://context-provider:3000/data-models/ngsi-context.jsonld>; rel=\"http://www.w3.org/ns/json-ld#context\"; type=\"application/ld+json\"" )`.
+-   **Headers**:  `Map("NGSILD-Tenant" -> "openiot", "Link" -> "<http://context/ngsi-context.jsonld>; rel=\"http://www.w3.org/ns/json-ld#context\"; type=\"application/ld+json\"" )`.
     オプション・パラメータ HTTP リクエストに必要なヘッダを追加します。
 
 <a name="next-steps"></a>
