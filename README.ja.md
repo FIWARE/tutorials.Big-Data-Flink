@@ -227,7 +227,7 @@ docker-compose -v
 docker version
 ```
 
-Docker バージョン18.03 以降および Docker Compose 1.21 以降を使用していることを確認し、必要に応じてアップグレード
+Docker バージョン18.03 以降および Docker Compose 1.29 以降を使用していることを確認し、必要に応じてアップグレード
 してください。
 
 <a name="maven"></a>
