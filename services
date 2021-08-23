@@ -2,7 +2,7 @@
 #
 #  Command Line Interface to start all services associated with the Getting-Started Tutorial
 #
-#  For this tutorial the commands are merely a convenience script to run docker-compose
+#  For this tutorial the commands are merely a convenience script to run docker compose
 #
 
 set -e
@@ -13,7 +13,12 @@ ORION="http://orion:1026/version"
 IOT_AGENT="http://iot-agent:4041/version"
 LINKED_DATA_CONTEXT="http://context/ngsi-context.jsonld"
 
-if (( $# != 1 )); then
+dockerCmd="docker compose"
+if (( $# == 2 )); then
+    dockerCmd="docker-compose"
+fi
+
+if (( $# < 1 )); then
     echo "Illegal number of parameters"
     echo "usage: services [create|start|stop]"
     exit 1
@@ -108,7 +113,7 @@ loadData () {
 
 stoppingContainers () {
 	echo "Stopping containers"
-	docker-compose --log-level ERROR -p fiware down -v --remove-orphans
+	${dockerCmd} down -v --remove-orphans
 }
 
 
@@ -173,7 +178,7 @@ case "${command}" in
 		echo -e "- \033[1mTutorial\033[0m acts as a series of dummy IoT Sensors over HTTP"
 		echo -e "- \033[1mApache Flink\033[0m is a stream-processing framework"	
 		echo ""
-		docker-compose --log-level ERROR -p fiware up -d --remove-orphans
+		${dockerCmd} up -d --remove-orphans
 		waitForMongo
 		addDatabaseIndex
 		waitForOrion
@@ -189,7 +194,7 @@ case "${command}" in
 		export $(cat .env | grep "#" -v)
 		echo "Pulling Docker images"
 		docker pull curlimages/curl
-		docker-compose --log-level ERROR -p fiware pull
+		${dockerCmd} pull
 		echo -e "Pulling \033[1;34mCosmos Flink\033[0m connector"
 		curl -LO https://github.com/ging/fiware-cosmos-orion-flink-connector/releases/download/1.2.4/orion.flink.connector-1.2.4.jar
 		mv orion.flink.connector-1.2.4.jar cosmos-examples/orion.flink.connector-1.2.4.jar
