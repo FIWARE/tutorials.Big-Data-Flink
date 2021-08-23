@@ -2,13 +2,16 @@
 #
 #  Command Line Interface to start all services associated with the Getting-Started Tutorial
 #
-#  For this tutorial the commands are merely a convenience script to run docker-compose
-#
+#  For this tutorial the commands are merely a convenience script to run ${dockerCmd}#
 
 set -e
 
-if (( $# != 1 )); then
-    echo "Illegal number of parameters"
+dockerCmd="docker compose"
+if (( $# == 2 )); then
+    dockerCmd="docker-compose"
+fi
+
+if (( $# < 1 )); then    echo "Illegal number of parameters"
     echo "usage: services [create|start|stop]"
     exit 1
 fi
@@ -32,7 +35,7 @@ loadData () {
 
 stoppingContainers () {
 	echo "Stopping running containers"
-	docker-compose down -v --remove-orphans
+	${dockerCmd} down -v --remove-orphans
 }
 
 
@@ -117,7 +120,7 @@ case "${command}" in
 		echo -e "- \033[1mTutorial\033[0m acts as a series of dummy IoT Sensors over HTTP"
 		echo -e "- \033[1mApache Flink\033[0m is a stream-processing framework"	
 		echo ""
-		docker-compose up -d --remove-orphans
+		${dockerCmd} up -d --remove-orphans
 		waitForMongo
 		addDatabaseIndex
 		waitForOrion
@@ -133,7 +136,7 @@ case "${command}" in
 		export $(cat .env | grep "#" -v)
 		echo "Pulling Docker images"
 		docker pull curlimages/curl
-		docker-compose pull
+		${dockerCmd} pull 
 		echo -e "Pulling \033[1;34mCosmos Flink\033[0m connector"
 		curl -LO https://github.com/ging/fiware-cosmos-orion-flink-connector/releases/download/1.2.4/orion.flink.connector-1.2.4.jar
 		mv orion.flink.connector-1.2.4.jar cosmos-examples/orion.flink.connector-1.2.4.jar
