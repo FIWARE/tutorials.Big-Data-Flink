@@ -63,12 +63,12 @@ services:
   # Tutorial acts as a series of dummy IoT Sensors over HTTP
   tutorial:
     image: fiware/tutorials.ngsi-ld
-    hostname: tutorial
+    hostname: iot-sensors
     container_name: fiware-tutorial
     networks:
       default:
         aliases:
-          - iot-sensors
+          - tutorial
           - context-provider
     expose:
       - "${TUTORIAL_APP_PORT}"
