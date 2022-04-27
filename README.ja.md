@@ -122,8 +122,8 @@ Orion Context Broker と IoT Agent はどちらも、オープンソースの [M
     -   **Orion Context Broker** がデータ・エンティティ、サブスクリプション、レジストレーションなどの
         コンテキスト・データ情報を保持するために使用します
     -   **IoT Agent** がデバイスの URL やキーなどのデバイス情報を保持するために使用します
+-   HTTP **Web-Server** は、システム内のコンテキスト・エンティティを定義する静的な `@context` ファイルを提供します
 -   **チュートリアル・アプリケーション** は次のことを行います:
-    -   システム内のコンテキスト・エンティティを定義する静的な @context ファイルを提供します
     -   [UltraLight 2.0](https://fiware-iotagent-ul.readthedocs.io/en/latest/usermanual/index.html#user-programmers-manual)
         を使用してダミーの[農業用 IoT デバイス](https://github.com/FIWARE/tutorials.IoT-Sensors/tree/NGSI-LD)
         のセットとして機能します
@@ -223,7 +223,7 @@ docker-compose -v
 docker version
 ```
 
-Docker バージョン18.03 以降および Docker Compose 1.21 以降を使用していることを確認し、必要に応じてアップグレード
+Docker バージョン 20.10 以降および Docker Compose 1.29 以降を使用していることを確認し、必要に応じてアップグレード
 してください。
 
 <a name="maven"></a>
@@ -430,24 +430,24 @@ curl -X GET \
 
 ```json
 [
-  {
-    "id": "urn:ngsi-ld:Subscription:60216f404dae3a1f22b705e6",
-    "type": "Subscription",
-    "description": "Notify Flink of all animal and farm vehicle movements",
-    "entities": [{"type": "Tractor"}, {"type": "Device"}],
-    "watchedAttributes": ["location"],
-    "notification": {
-      "attributes": ["location"],
-      "format": "normalized",
-      "endpoint": {
-        "uri": "http://taskmanager:9001",
-        "accept": "application/json"
-      },
-      "timesSent": 74,
-      "lastNotification": "2021-02-08T17:06:06.043Z"
-    },
-    "@context": "http://context/ngsi-context.jsonld"
-  }
+    {
+        "id": "urn:ngsi-ld:Subscription:60216f404dae3a1f22b705e6",
+        "type": "Subscription",
+        "description": "Notify Flink of all animal and farm vehicle movements",
+        "entities": [{ "type": "Tractor" }, { "type": "Device" }],
+        "watchedAttributes": ["location"],
+        "notification": {
+            "attributes": ["location"],
+            "format": "normalized",
+            "endpoint": {
+                "uri": "http://taskmanager:9001",
+                "accept": "application/json"
+            },
+            "timesSent": 74,
+            "lastNotification": "2021-02-08T17:06:06.043Z"
+        },
+        "@context": "http://context/ngsi-context.jsonld"
+    }
 ]
 ```
 
@@ -531,7 +531,7 @@ case class Sensor(device: String, sum: Int)
 
 ストリーム処理は、5つの個別のステップで構成されています。最初のステップ (`flatMap()`) は、一定期間内に受信したすべての
 NGSI-LD イベントのエンティティ・オブジェクトをまとめるために実行されます。その後、コードはそれらを `map()` 操作で繰り返し、
-目的の属性を抽出します。この場合、センサの `type` (`Device`  or `Tractor`) に関心があります。
+目的の属性を抽出します。この場合、センサの `type` (`Device` or `Tractor`) に関心があります。
 
 各反復内で、必要なプロパティを持つカスタム・オブジェクトを作成します : センサの `type` と各通知の増分。このために、
 次のようにケース・クラスを定義できます :
@@ -700,11 +700,13 @@ object FeedbackLD {
 **`OrionSinkObject`** の引数は次のとおりです :
 
 -   **Message**: `"{\n  \"type\" : \"Property\",\n  \"value\" : \" \" \n}"`.
--   **URL**: `"http://orion:1026/ngsi-ld/v1/entities/urn:ngsi-ld:Device:water"+sensor._1.takeRight(3)+"/attrs/on"` or `"http://orion:1026/ngsi-ld/v1/entities/urn:ngsi-ld:Device:water"+sensor._1.takeRight(3)+"/attrs/off"`, depending on whether we are turning on or off the water faucet. TakeRight(3) gets the number of
-    the sensor, for example '001'.
+-   **URL**: `"http://orion:1026/ngsi-ld/v1/entities/urn:ngsi-ld:Device:water"+sensor._1.takeRight(3)+"/attrs/on"` または
+    `"http://orion:1026/ngsi-ld/v1/entities/urn:ngsi-ld:Device:water"+sensor._1.takeRight(3)+"/attrs/off"`。
+    これは、水栓をオンにするかオフにするかによって異なります。TakeRight(3) は、センサの番号 (たとえば、'001') を取得します。
 -   **Content Type**: `ContentType.Plain`.
 -   **HTTP Method**: `HTTPMethod.PATCH`.
--   **Headers**:  `Map("NGSILD-Tenant" -> "openiot", "Link" -> "<http://context/ngsi-context.jsonld>; rel=\"http://www.w3.org/ns/json-ld#context\"; type=\"application/ld+json\"" )`.
+-   **Headers**:
+    `Map("NGSILD-Tenant" -> "openiot", "Link" -> "<http://context/ngsi-context.jsonld>; rel=\"http://www.w3.org/ns/json-ld#context\"; type=\"application/ld+json\"" )`.
     オプション・パラメータ HTTP リクエストに必要なヘッダを追加します。
 
 <a name="next-steps"></a>
