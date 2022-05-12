@@ -4,8 +4,7 @@
 [![FIWARE Core Context Management](https://nexus.lab.fiware.org/static/badges/chapters/core.svg)](https://github.com/FIWARE/catalogue/blob/master/core/README.md)
 [![License: MIT](https://img.shields.io/github/license/fiware/tutorials.Big-Data-Flink.svg)](https://opensource.org/licenses/MIT)
 [![Support badge](https://img.shields.io/badge/tag-fiware-orange.svg?logo=stackoverflow)](https://stackoverflow.com/questions/tagged/fiware)
- <br/>
-[![Documentation](https://img.shields.io/readthedocs/fiware-tutorials.svg)](https://fiware-tutorials.rtfd.io)
+<br/> [![Documentation](https://img.shields.io/readthedocs/fiware-tutorials.svg)](https://fiware-tutorials.rtfd.io)
 
 このチュートリアルは [FIWARE Cosmos Orion Flink Connector](http://fiware-cosmos-flink.rtfd.io) の紹介です。これは、最も
 人気のあるビッグデータ・プラットフォームの1つである [Apache Flink](https://flink.apache.org/) との統合により、コンテキスト
@@ -41,6 +40,7 @@
         -   [ロガー - コンテキスト変更のサブスクライブ](#logger---subscribing-to-context-changes)
         -   [ロガー - 出力の確認](#logger---checking-the-output)
         -   [ロガー - コードの分析](#logger---analyzing-the-code)
+    -   [ロガー - NGSI-LD](#logger-ngsi-ld)
     -   [フィードバック・ループ - コンテキスト・データの永続化](#feedback-loop---persisting-context-data)
         -   [フィードバック・ループ - JAR のインストール](#feedback-loop---installing-the-jar)
         -   [フィードバック・ループ - コンテキスト変更のサブスクライブ](#feedback-loop---subscribing-to-context-changes)
@@ -157,7 +157,6 @@ jobmanager:
     ports:
         - "6123:6123"
         - "8081:8081"
-        - "9001:9001"
     command: jobmanager
     environment:
         - JOB_MANAGER_RPC_ADDRESS=jobmanager
@@ -171,6 +170,7 @@ taskmanager:
     ports:
         - "6121:6121"
         - "6122:6122"
+        - "9001:9001"
     depends_on:
         - jobmanager
     command: taskmanager
@@ -180,16 +180,16 @@ taskmanager:
         - JOB_MANAGER_RPC_ADDRESS=jobmanager
 ```
 
-`jobmanager` コンテナは3つのポートでリッスンしています :
+`jobmanager` コンテナは2つのポートでリッスンしています :
 
 -   ポート `8081` が公開されているため、Apache Flink ダッシュボードの Web フロントエンドを確認できます
--   ポート `9001` が公開されていまため、インストレーションがコンテキスト・データのサブスクリプションを
-    受信できます
 -   ポート `6123` は標準の **JobManager** RPC ポートで、内部通信に使用されます
 
-`taskmanager` コンテナは2つのポートでリッスンしています :
+`taskmanager` コンテナは3つのポートでリッスンしています :
 
 -   ポート `6121` と `6122` が使用され、RPC ポートは **TaskManager** によって、内部通信に使用されます
+-   ポート `9001` が公開されていまため、インストレーションがコンテキスト・データのサブスクリプションを
+    受信できます
 
 Flinki クラスタ内のコンテナは、次のように単一の環境変数によって駆動されます。
 
@@ -227,7 +227,7 @@ docker-compose -v
 docker version
 ```
 
-Docker バージョン18.03 以降および Docker Compose 1.29 以降を使用していることを確認し、必要に応じてアップグレード
+Docker バージョン20.10 以降および Docker Compose 1.29 以降を使用していることを確認し、必要に応じてアップグレード
 してください。
 
 <a name="maven"></a>
@@ -301,7 +301,7 @@ git checkout NGSI-v2
 -   変換操作を定義するビジネスロジック
 -   **Sink Operator**としてコンテキスト・データを Context Broker にプッシュバックするメカニズム
 
-`orion-flink.connect.jar` は **Source** と **Sink** の両方の操作を提供します。 したがって、ストリーミング・データフローの
+`orion.flink.connector-1.2.4.jar` は **Source** と **Sink** の両方の操作を提供します。 したがって、ストリーミング・データフローの
 パイプライン操作を接続するために必要な Scala コードを記述するだけです。処理コードは、flink クラスターにアップロードできる
 JAR ファイルにコンパイルできます。 以下に2つの例を詳しく説明します。このチュートリアルのすべてのソースコードは、
 [cosmos-examples](https://github.com/FIWARE/tutorials.Big-Data-Flink/tree/master/cosmos-examples) ディレクトリ内に
@@ -364,7 +364,7 @@ mvn package
 
 ### ロガー - JAR のインストール
 
-`http://localhost:8081/#/submit` を開きます
+ブラウザを立ち上げて、`http://localhost:8081/#/submit` を開きます
 
 ![](https://fiware.github.io/tutorials.Big-Data-Flink/img/submit-logger.png)
 
@@ -373,12 +373,18 @@ mvn package
 -   **Filename:** `cosmos-examples-1.2.jar`
 -   **Entry Class:** `org.fiware.cosmos.tutorial.Logger`
 
+別の方法は、以下に示されているようにコマンドラインで curl を使用することです:
+
+```console
+curl -X POST -H "Expect:" -F "jarfile=@/cosmos-examples-1.2.jar" http://localhost:8081/jars/upload
+```
+
 <a name="logger---subscribing-to-context-changes"></a>
 
 ### ロガー - コンテキスト変更のサブスクライブ
 
-動的コンテキスト・システムが起動して実行されると (`Logger` を実行)、**Flink** にコンテキストの変更を通知する
-必要があります。
+動的コンテキスト・システムが起動して実行されると (Flink クラスタ に `Logger` ジョブをデプロイしました)、
+**Flink** にコンテキストの変更を通知する必要があります。
 
 これは、Orion Context Broker の `/v2/subscription` エンドポイントに POST リクエストを行うことで実行できます。
 
@@ -410,7 +416,7 @@ curl -iX POST 'http://localhost:1026/v2/subscriptions/' \
   },
   "notification": {
     "http": {
-      "url": "http://jobmanager:9001"
+      "url": "http://taskmanager:9001"
     }
   }
 }'
@@ -458,7 +464,7 @@ curl -X GET \
             "attrs": [],
             "attrsFormat": "normalized",
             "http": {
-                "url": "http://jobmanager:9001"
+                "url": "http://taskmanager:9001"
             },
             "lastSuccess": "2019-09-09T09:36:33.00Z",
             "lastSuccessCode": 200
@@ -513,7 +519,7 @@ package org.fiware.cosmos.tutorial
 
 import org.apache.flink.streaming.api.scala.{StreamExecutionEnvironment, _}
 import org.apache.flink.streaming.api.windowing.time.Time
-import org.fiware.cosmos.orion.flink.connector.{OrionSource}
+import org.fiware.cosmos.orion.flink.connector.OrionSource
 
 object Logger{
 
@@ -566,6 +572,39 @@ case class Sensor(device: String, sum: Int)
 
 ```scala
 processedDataStream.print().setParallelism(1)
+```
+
+<a name="logger-ngsi-ld"></a>
+
+## ロガー - NGSI-LD
+
+同じ例が、NGSI-LD 形式 (`LoggerLD.scala`) のデータにも提供されています。この例では、NGSI-LD 形式でメッセージを受信する
+ために、Orion Flink Connector によって提供される NGSILDSource を利用します。変更されるコードの唯一の部分は、ソースの
+宣言です:
+
+```scala
+...
+import org.fiware.cosmos.orion.flink.connector.NGSILDSource
+...
+val eventStream = env.addSource(new NGSILDSource(9001))
+...
+```
+
+クラス `org.fiware.cosmos.tutorial.LoggerLD` を指定して、Flink Web UI にアップロードしたものと同じパッケージを
+実行できます。 1分後、次のコマンドを再度実行して、出力を確認できます:
+
+```console
+docker logs flink-taskmanager -f --until=60s > stdout.log 2>stderr.log
+cat stderr.log
+```
+
+サブスクリプションを作成すると、コンソールの出力は次のようになります:
+
+```text
+Sensor(Bell,3)
+Sensor(Door,4)
+Sensor(Lamp,7)
+Sensor(Motion,6)
 ```
 
 <a name="feedback-loop---persisting-context-data"></a>
@@ -655,31 +694,31 @@ import org.apache.flink.streaming.api.windowing.time.Time
 import org.fiware.cosmos.orion.flink.connector._
 
 
-object Feedback{
-  final val CONTENT_TYPE = ContentType.Plain
-  final val METHOD = HTTPMethod.POST
+object Feedback {
+  final val CONTENT_TYPE = ContentType.JSON
+  final val METHOD = HTTPMethod.PATCH
   final val CONTENT = "{  \"on\": {      \"type\" : \"command\",      \"value\" : \"\"  }}"
   final val HEADERS = Map("fiware-service" -> "openiot","fiware-servicepath" -> "/","Accept" -> "*/*")
 
   def main(args: Array[String]): Unit = {
     val env = StreamExecutionEnvironment.getExecutionEnvironment
-  // Create Orion Source. Receive notifications on port 9001
-  val eventStream = env.addSource(new OrionSource(9001))
+    // Create Orion Source. Receive notifications on port 9001
+    val eventStream = env.addSource(new OrionSource(9001))
 
     // Process event stream
-  val processedDataStream = eventStream
+    val processedDataStream = eventStream
       .flatMap(event => event.entities)
-      .filter(entity=>(entity.attrs("count").value == "1"))
+      .filter(entity => (entity.`type`== "Motion" && entity.attrs("count").value == "1"))
       .map(entity => new Sensor(entity.id))
       .keyBy("id")
-      .timeWindow(Time.seconds(5),Time.seconds(2))
+      .timeWindow(Time.seconds(5), Time.seconds(2))
       .min("id")
 
     // print the results with a single thread, rather than in parallel
-  processedDataStream.printToErr().setParallelism(1)
+    processedDataStream.printToErr().setParallelism(1)
 
     val sinkStream = processedDataStream.map(node => {
-      new OrionSinkObject("urn:ngsi-ld:Lamp"+ node.id.takeRight(3)+ "@on","http://${IP}:3001/iot/lamp"+ node.id.takeRight(3),CONTENT_TYPE,METHOD)
+      new OrionSinkObject(CONTENT, "http://orion:1026/v2/entities/Lamp:"+node.id.takeRight(3)+"/attrs", CONTENT_TYPE, METHOD, HEADERS)
     })
     OrionSink.addSink(sinkStream)
     env.execute("Socket Window NgsiEvent")
@@ -715,4 +754,4 @@ object Feedback{
 
 ## License
 
-[MIT](LICENSE) © 2020 FIWARE Foundation e.V.
+[MIT](LICENSE) © 2020-2022 FIWARE Foundation e.V.
