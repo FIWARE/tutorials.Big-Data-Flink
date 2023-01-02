@@ -19,6 +19,7 @@
 [Postman ドキュメント](https://fiware.github.io/tutorials.Big-Data-Flink/ngsi-ld.html) としても利用可能です。
 
 [![Run in Postman](https://run.pstmn.io/button.svg)](https://app.getpostman.com/run-collection/0a602cbb6bbf9351efc2)
+[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/FIWARE/tutorials.Big-Data-Flink/tree/NGSI-LD)
 
 
 ## コンテンツ
