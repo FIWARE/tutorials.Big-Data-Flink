@@ -20,7 +20,8 @@ STELLIO="http://stellio:8080/actuator/health"
 SCORPIO="http://scorpio:9090/scorpio/"
 ORION="http://orion:1026/version"
 IOT_AGENT="http://iot-agent:4041/version"
-LINKED_DATA_CONTEXT="http://context/ngsi-context.jsonld"
+CONTEXT="http://context/ngsi-context.jsonld"
+CORE_CONTEXT="https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld"
 
 dockerCmd="docker compose"
 if (( $# == 2 )); then
@@ -50,14 +51,25 @@ getHeartbeat(){
 	eval "response=$(docker run --network fiware_default --rm curlimages/curl -s -o /dev/null -w "%{http_code}" "$1")"
 }
 
-waitForContext () {
-	echo -e "\n⏳ Waiting for \033[1m@context\033[0m to be available\n"
-	getHeartbeat "${LINKED_DATA_CONTEXT}"
+waitForCoreContext () {
+	echo -e "\n⏳ Checking availability of \033[1m core @context\033[0m from ETSI\n"
+	eval "response=$(docker run --rm curlimages/curl -s -o /dev/null -w "%{http_code}" "$CORE_CONTEXT")"
 	while [ "${response}" -eq 000 ]
 	do
-		echo -e "\n@Context HTTP state: ${response} (waiting for 200)"
+		echo -e "\n@context HTTP state: ${response} (waiting for 200)"
 		pause 3
-		getHeartbeat "${LINKED_DATA_CONTEXT}"
+		eval "response=$(docker run --rm curlimages/curl -s -o /dev/null -w "%{http_code}" "$CORE_CONTEXT")"
+	done
+}
+
+waitForUserContext () {
+	echo -e "\n⏳ Waiting for user \033[1m@context\033[0m to be available\n"
+	getHeartbeat "${CONTEXT}"
+	while [ "${response}" -eq 000 ]
+	do
+		echo -e "\n@context HTTP state: ${response} (waiting for 200)"
+		pause 3
+		getHeartbeat "${CONTEXT}"
 	done
 }
 
@@ -96,18 +108,18 @@ waitForIoTAgent () {
 }
 
 loadData () {
-	export CONTEXT_BROKER="$1" 
-	waitForContext
+	waitForUserContext
 
+	export CONTEXT_BROKER="$1" 
 	docker run --rm -v $(pwd)/import-data:/import-data \
 		--network fiware_default \
 		-e CONTEXT_BROKER=${CONTEXT_BROKER} \
-		-e TUTORIAL_DATA_MODELS_CONTEXT="${LINKED_DATA_CONTEXT}" \
+		-e TUTORIAL_DATA_MODELS_CONTEXT="${CONTEXT}" \
 		--entrypoint /bin/ash curlimages/curl import-data
 	waitForIoTAgent
 	docker run --rm -v $(pwd)/provision-devices:/provision-devices \
 		-e CONTEXT_BROKER=${CONTEXT_BROKER} \
-		-e TUTORIAL_DATA_MODELS_CONTEXT="${LINKED_DATA_CONTEXT}" \
+		-e TUTORIAL_DATA_MODELS_CONTEXT="${CONTEXT}" \
 		--network fiware_default \
 		--entrypoint /bin/ash curlimages/curl provision-devices
 	echo ""
@@ -203,17 +215,18 @@ case "${command}" in
 	"orion")
 		export $(cat .env | grep "#" -v)
 		stoppingContainers
+		waitForCoreContext
 		echo -e "Starting containers:  \033[1;34mOrion\033[0m, \033[1;36mIoT-Agent\033[0m, two \033[1mFlink\033[0m instances (jobmanager taskmanager)  and a \033[1mTutorial\033[0m, a linked data \033[1mContext\033[0m and \033[1mMongoDB\033[0m database."
 		echo -e "- \033[1;34mOrion\033[0m is the context broker"
 		echo -e "- \033[1;36mIoT-Agent\033[0m is configured for the UltraLight Protocol"
 		echo -e "- \033[1mTutorial\033[0m acts as a series of dummy IoT Sensors over HTTP"
 		echo -e "- \033[1mApache Flink\033[0m is a stream-processing framework"
-
+		echo -e "- Data models \033[1m@context\033[0m (Smart Farm) is supplied externally"
 		echo ""
 		${dockerCmd} -f docker-compose/common.yml -f docker-compose/orion-ld.yml -p fiware up -d --renew-anon-volumes
 		waitForMongo
 		addDatabaseIndex
-		waitForContext
+		waitForUserContext
 		waitForOrion
 		loadData orion:1026
 		displayServices
@@ -223,16 +236,18 @@ case "${command}" in
 	"scorpio")
 		export $(cat .env | grep "#" -v)
 		stoppingContainers
+		waitForCoreContext
 		echo -e "Starting containers:  \033[1;34mScorpio\033[0m, \033[1mKafka\033[0m, \033[1mZookeeper\033[0m and a \033[1mPostgres\033[0m database, \033[1;36mIoT-Agent\033[0m, two \033[1mFlink\033[0m instances (jobmanager taskmanager)  and a \033[1mTutorial\033[0m, a linked data \033[1mContext\033[0m and \033[1mMongoDB\033[0m database."
 		echo -e "- \033[1;Scorpio\033[0m is the context broker"
 		echo -e "- \033[1;36mIoT-Agent\033[0m is configured for the UltraLight Protocol"
 		echo -e "- \033[1mTutorial\033[0m acts as a series of dummy IoT Sensors over HTTP"
 		echo -e "- \033[1mApache Flink\033[0m is a stream-processing framework"
+		echo -e "- Data models \033[1m@context\033[0m (Smart Farm) is supplied externally"
 		echo ""
 		${dockerCmd} -f docker-compose/common.yml -f docker-compose/scorpio-aaio.yml -p fiware up -d --remove-orphans --renew-anon-volumes
 		waitForMongo
 		addIoTDatabaseIndex
-		waitForContext
+		waitForUserContext
 		waitForScorpio
 		loadData scorpio:9090
 		displayServices
@@ -241,16 +256,18 @@ case "${command}" in
 	"stellio")
 		export $(cat .env | grep "#" -v)
 		stoppingContainers
+		waitForCoreContext
 		echo -e "Starting containers:  \033[1;34mStellio\033[0m, \033[1mKafka\033[0m, \033[1mZookeeper\033[0m and a \033[1mPostgres\033[0m database and a \033[1mNeo4J\033[0m database, \033[1;36mIoT-Agent\033[0m, two \033[1mFlink\033[0m instances (jobmanager taskmanager)  and a \033[1mTutorial\033[0m, a linked data \033[1mContext\033[0m and \033[1mMongoDB\033[0m database."
 		echo -e "- \033[1;Stellio\033[0m is the context broker"
 		echo -e "- \033[1;36mIoT-Agent\033[0m is configured for the UltraLight Protocol"
 		echo -e "- \033[1mTutorial\033[0m acts as a series of dummy IoT Sensors over HTTP"
 		echo -e "- \033[1mApache Flink\033[0m is a stream-processing framework"
+		echo -e "- Data models \033[1m@context\033[0m (Smart Farm) is supplied externally"
 		echo ""
 		${dockerCmd} -f docker-compose/common.yml -f docker-compose/stellio.yml -p fiware up -d --remove-orphans --renew-anon-volumes
 		waitForMongo
 		addIoTDatabaseIndex
-		waitForContext
+		waitForUserContext
 		waitForStellio
 		loadData stellio:8080
 		displayServices
