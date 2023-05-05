@@ -58,7 +58,7 @@ services:
   iot-agent:
     labels:
       org.fiware: 'tutorial'
-    iiotagent-ul:${ULTRALIGHT_VERSION}
+    image: quay.io/fiware/iotagent-ul:${ULTRALIGHT_VERSION}
     hostname: iot-agent
     container_name: fiware-iot-agent
     depends_on:
@@ -91,7 +91,7 @@ services:
   tutorial:
     labels:
       org.fiware: 'tutorial'
-    itutorials.ngsi-ld
+    image: quay.io/fiware/tutorials.ngsi-ld
     hostname: iot-sensors
     container_name: fiware-tutorial
     depends_on:
@@ -124,6 +124,7 @@ services:
 
   jobmanager:
     image: flink:${FLINK_VERSION}
+    platform: linux/amd64
     labels:
       org.fiware: 'tutorial'
     hostname: jobmanager
@@ -147,6 +148,7 @@ services:
       - ${PWD}/flink/flink-conf.yaml:/opt/flink/conf/flink-conf.yaml
   taskmanager:
     image: flink:${FLINK_VERSION}
+    platform: linux/amd64
     labels:
       org.fiware: 'tutorial'
     hostname: taskmanager
