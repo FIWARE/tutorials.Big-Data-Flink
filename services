@@ -133,7 +133,7 @@ loadData () {
 		--network fiware_default \
 		-e CONTEXT_BROKER=${CONTEXT_BROKER} \
 		-e TUTORIAL_DATA_MODELS_CONTEXT="${CONTEXT}" \
-		--entrypoint /bin/ash quay.io/curl/curl import-data
+		--entrypoint /bin/ash quay.io/curl/curl /import-data
 	waitForIoTAgent
 	docker run --rm -v $(pwd)/provision-devices:/provision-devices \
 		-e CONTEXT_BROKER=${CONTEXT_BROKER} \
