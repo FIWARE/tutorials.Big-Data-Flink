@@ -139,7 +139,7 @@ loadData () {
 		-e CONTEXT_BROKER=${CONTEXT_BROKER} \
 		-e TUTORIAL_DATA_MODELS_CONTEXT="${CONTEXT}" \
 		--network fiware_default \
-		--entrypoint /bin/ash quay.io/curl/curl provision-devices
+		--entrypoint /bin/ash quay.io/curl/curl /provision-devices
 	echo ""
 }
 
