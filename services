@@ -159,8 +159,8 @@ case "${command}" in
 	"create")
 		export $(cat .env | grep "#" -v)
 		echo "Pulling Docker images"
-		docker pull quay.io/curl/curl
-		${dockerCmd} pull 
+		docker pull -q quay.io/curl/curl
+		${dockerCmd} pull --ignore-pull-failures
 		echo -e "Pulling \033[1;34mCosmos Flink\033[0m connector"
 		curl -LO https://github.com/ging/fiware-cosmos-orion-flink-connector/releases/download/1.2.4/orion.flink.connector-1.2.4.jar
 		mv orion.flink.connector-1.2.4.jar cosmos-examples/orion.flink.connector-1.2.4.jar
