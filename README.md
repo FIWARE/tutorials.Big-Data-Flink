@@ -367,7 +367,7 @@ This is done by making a POST request to the `/v2/subscription` endpoint of the 
 
 -   The `throttling` value defines the rate that changes are sampled.
 
-#### :one: Request:
+#### 1️⃣ Request:
 
 ```console
 curl -iX POST 'http://localhost:1026/v2/subscriptions/' \
@@ -396,7 +396,7 @@ The response will be `**201 - Created**`
 If a subscription has been created, we can check to see if it is firing by making a GET request to the
 `/v2/subscriptions` endpoint.
 
-#### :two: Request:
+#### 2️⃣ Request:
 
 ```console
 curl -X GET \

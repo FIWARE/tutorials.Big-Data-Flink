@@ -399,7 +399,7 @@ curl -X POST -H "Expect:" -F "jarfile=@/cosmos-examples-1.2.jar" http://localhos
 
 <a name="one-request"></a>
 
-#### :one: リクエスト :
+#### 1️⃣ リクエスト :
 
 ```console
 curl -iX POST 'http://localhost:1026/v2/subscriptions/' \
@@ -430,7 +430,7 @@ curl -iX POST 'http://localhost:1026/v2/subscriptions/' \
 
 <a name="two-request"></a>
 
-#### :two: リクエスト :
+#### 2️⃣ リクエスト :
 
 ```console
 curl -X GET \
