@@ -391,7 +391,7 @@ curl -X POST -H "Expect:" -F "jarfile=@/cosmos-examples-1.2.jar" http://localhos
 
 -   `throttling` 値は、変更がサンプリングされるレートを定義します
 
-#### :one: リクエスト :
+#### 1️⃣ リクエスト :
 
 ```console
 curl -L -X POST 'http://localhost:1026/ngsi-ld/v1/subscriptions/' \
@@ -419,7 +419,7 @@ curl -L -X POST 'http://localhost:1026/ngsi-ld/v1/subscriptions/' \
 サブスクリプションが作成されている場合、`/v2/subscriptions` エンドポイントに対して GET リクエストを行うことで、
 サブスクリプションが起動しているかどうかを確認できます。
 
-#### :two: リクエスト :
+#### 2️⃣ リクエスト :
 
 ```console
 curl -X GET \
@@ -589,7 +589,7 @@ processedDataStream.print().setParallelism(1)
 この例を実行するには、新しいサブスクリプションを設定する必要があります。 サブスクリプションは、土壌湿度センサの
 コンテキストの変化をリッスンしています。
 
-#### :three: リクエスト:
+#### 3️⃣ リクエスト:
 
 ```console
 curl -L -X POST 'http://localhost:1026/ngsi-ld/v1/subscriptions/' \
@@ -615,7 +615,7 @@ curl -L -X POST 'http://localhost:1026/ngsi-ld/v1/subscriptions/' \
 サブスクリプションが作成されている場合は、`/ngsi-ld/v1/subscriptions/` エンドポイントに GET
 リクエストを送信することで、サブスクリプションが起動しているかどうかを確認できます。
 
-#### :four: リクエスト:
+#### 4️⃣ リクエスト:
 
 ```console
 curl -X GET \

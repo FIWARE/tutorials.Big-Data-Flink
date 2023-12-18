@@ -245,7 +245,8 @@ To start the system, run the following command:
 ./services [orion|scorpio|stellio]
 ```
 
-> :information_source: **Note:** If you want to clean up and start over again you can do so with the following command:
+> [!NOTE]
+> If you want to clean up and start over again you can do so with the following command:
 >
 > ```
 > ./services stop
@@ -358,7 +359,7 @@ This is done by making a POST request to the `/ngsi-ld/v1/subscriptions` endpoin
 
 -   The `throttling` value defines the rate that changes are sampled.
 
-#### :one: Request:
+#### 1️⃣ Request:
 
 ```console
 curl -L -X POST 'http://localhost:1026/ngsi-ld/v1/subscriptions/' \
@@ -386,7 +387,7 @@ The response will be `**201 - Created**`
 If a subscription has been created, we can check to see if it is firing by making a GET request to the
 `/ngsi-ld/v1/subscriptions/` endpoint.
 
-#### :two: Request:
+#### 2️⃣ Request:
 
 ```console
 curl -X GET \
@@ -545,7 +546,7 @@ Submit new job
 A new subscription needs to be set up to run this example. The subscription is listening to changes of context on the
 soil humidity sensor.
 
-#### :three: Request:
+#### 3️⃣ Request:
 
 ```console
 curl -L -X POST 'http://localhost:1026/ngsi-ld/v1/subscriptions/' \
@@ -571,7 +572,7 @@ curl -L -X POST 'http://localhost:1026/ngsi-ld/v1/subscriptions/' \
 If a subscription has been created, we can check to see if it is firing by making a GET request to the
 `/ngsi-ld/v1/subscriptions/` endpoint.
 
-#### :four: Request:
+#### 4️⃣ Request:
 
 ```console
 curl -X GET \
