@@ -6,6 +6,7 @@ services:
     labels:
       org.fiware: 'tutorial'
     image: quay.io/fiware/orion:${ORION_VERSION}
+    platform: linux/amd64
     hostname: orion
     container_name: fiware-orion
     depends_on:
@@ -58,6 +59,7 @@ services:
     labels:
       org.fiware: 'tutorial'
     image: quay.io/fiware/tutorials.context-provider
+    platform: linux/amd64
     hostname: iot-sensors
     container_name: fiware-tutorial
     networks:
@@ -92,6 +94,7 @@ services:
     labels:
       org.fiware: 'tutorial'
     image: flink:${FLINK_VERSION}
+    platform: linux/amd64
     hostname: jobmanager
     container_name: flink-jobmanager
     expose:
@@ -115,6 +118,7 @@ services:
     labels:
       org.fiware: 'tutorial'
     image: flink:${FLINK_VERSION}
+    platform: linux/amd64
     hostname: taskmanager
     container_name: flink-taskmanager
     ports:
@@ -150,10 +154,11 @@ services:
     volumes:
       - mongo-db:/data
     healthcheck:
-      test: |
-        host=`hostname --ip-address || echo '127.0.0.1'`; 
-        mongo --quiet $host/test --eval 'quit(db.runCommand({ ping: 1 }).ok ? 0 : 2)' && echo 0 || echo 1
+      test: ["CMD","mongosh", "--eval", "db.adminCommand('ping')"]
       interval: 5s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
     
 
 networks:
