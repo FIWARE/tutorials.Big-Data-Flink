@@ -13,7 +13,7 @@ computations both over unbounded and bounded data streams. Flink has been design
 environments, perform computations at in-memory speed and at any scale.
 
 The tutorial uses [cUrl](https://ec.haxx.se/) commands throughout, but is also available as
-[Postman documentation](https://fiware.github.io/tutorials.Big-Data-Flink/)
+[Postman documentation](https://www.postman.com/downloads/)
 
 # Start-Up
 
