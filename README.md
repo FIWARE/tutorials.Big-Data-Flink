@@ -6,7 +6,7 @@
 [![License: MIT](https://img.shields.io/github/license/fiware/tutorials.Big-Data-Flink.svg)](https://opensource.org/licenses/MIT)
 [![Support badge](https://img.shields.io/badge/tag-fiware-orange.svg?logo=stackoverflow)](https://stackoverflow.com/questions/tagged/fiware)
 
-This tutorial is an introduction to the [FIWARE Cosmos Orion Flink Connector](http://fiware-cosmos-flink.rtfd.io), which
+These tutorials are an introduction to the [FIWARE Cosmos Orion Flink Connector](http://fiware-cosmos-flink.rtfd.io), which
 facilitates Big Data analysis of context data, through an integration with [Apache Flink](https://flink.apache.org/),
 one of the most popular Big Data platforms. Apache Flink is a framework and distributed processing engine for stateful
 computations both over unbounded and bounded data streams. Flink has been designed to run in all common cluster
@@ -18,7 +18,6 @@ The tutorial uses [cUrl](https://ec.haxx.se/) commands throughout, but is also a
 # Start-Up
 
 ## NGSI-v2 Smart Supermarket
-
 
 **NGSI-v2** offers JSON based interoperability used in individual Smart Systems. To run this tutorial with **NGSI-v2**, use the `NGSI-v2` branch.
 
