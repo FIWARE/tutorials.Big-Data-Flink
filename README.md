@@ -31,7 +31,7 @@ git checkout NGSI-v2
 ./services start
 ```
 
-| ![NGSI v2](https://img.shields.io/badge/NGSI-v2-5dc0cf.svg)[Documentation](https://fiware-tutorials.readthedocs.io/en/latest/big-data-flink.html) |
+| ![NGSI v2](https://img.shields.io/badge/NGSI-v2-5dc0cf.svg) [Documentation](https://github.com/FIWARE/tutorials.Big-Data-Flink/tree/NGSI-LD) |
 | --- |
 
 ## NGSI-LD Smart Farm
@@ -48,7 +48,7 @@ git checkout NGSI-LD
 ```
 
 
-| ![NGSI LD](https://img.shields.io/badge/NGSI-LD-d6604d.svg) [Documentation](https://ngsi-ld-tutorials.readthedocs.io/en/latest/big-data-flink.html) |
+| ![NGSI LD](https://img.shields.io/badge/NGSI-LD-d6604d.svg) [Documentation](https://github.com/FIWARE/tutorials.Big-Data-Flink/tree/NGSI-LD) |
 | --- |
 
 ---
