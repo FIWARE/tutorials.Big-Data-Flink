@@ -5,7 +5,6 @@
 [![FIWARE Core Context Management](https://nexus.lab.fiware.org/static/badges/chapters/core.svg)](https://github.com/FIWARE/catalogue/blob/master/core/README.md)
 [![License: MIT](https://img.shields.io/github/license/fiware/tutorials.Big-Data-Flink.svg)](https://opensource.org/licenses/MIT)
 [![Support badge](https://img.shields.io/badge/tag-fiware-orange.svg?logo=stackoverflow)](https://stackoverflow.com/questions/tagged/fiware)
-<br/> [![Documentation](https://img.shields.io/readthedocs/fiware-tutorials.svg)](https://fiware-tutorials.rtfd.io)
 
 This tutorial is an introduction to the [FIWARE Cosmos Orion Flink Connector](http://fiware-cosmos-flink.rtfd.io), which
 facilitates Big Data analysis of context data, through an integration with [Apache Flink](https://flink.apache.org/),
@@ -18,17 +17,7 @@ The tutorial uses [cUrl](https://ec.haxx.se/) commands throughout, but is also a
 
 # Start-Up
 
-**NGSI-v2** offers JSON based interoperability used in individual Smart Systems. To run this tutorial with **NGSI-v2**, use the `NGSI-v2` branch.
-
-```console
-git clone https://github.com/FIWARE/tutorials.Big-Data-Flink.git
-cd tutorials.Big-Data-Flink
-git checkout NGSI-v2
-
-./services create
-./services start
-```
-
+## NGSI-v2 Smart Supermarket
 
 **NGSI-v2** offers JSON based interoperability used in individual Smart Systems. To run this tutorial with **NGSI-v2**, use the `NGSI-v2` branch.
 
@@ -40,6 +29,8 @@ git checkout NGSI-v2
 ./services create
 ./services start
 ```
+
+## NGSI-LD Smart Farm
 
 **NGSI-LD** offers JSON-LD based interoperability used for Federations and Data Spaces. To run this tutorial with **NGSI-LD**, use the `NGSI-LD` branch.
 
