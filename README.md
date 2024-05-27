@@ -31,8 +31,8 @@ git checkout NGSI-v2
 ./services start
 ```
 
-| ![NGSI v2](https://img.shields.io/badge/NGSI-v2-5dc0cf.svg) [Documentation](https://github.com/FIWARE/tutorials.Big-Data-Flink/tree/NGSI-LD) |
-| --- |
+| ![NGSI v2](https://img.shields.io/badge/NGSI-v2-5dc0cf.svg) | :books: [Documentation](https://github.com/FIWARE/tutorials.Big-Data-Flink/tree/NGSI-LD) | <img src="https://cdn.jsdelivr.net/npm/simple-icons@v3/icons/postman.svg" height="15" width="15"> [Postman Collection](https://fiware.github.io/tutorials.Big-Data-Flink/) |
+| --- | --- | --- |
 
 ## NGSI-LD Smart Farm
 
@@ -48,8 +48,9 @@ git checkout NGSI-LD
 ```
 
 
-| ![NGSI LD](https://img.shields.io/badge/NGSI-LD-d6604d.svg) [Documentation](https://github.com/FIWARE/tutorials.Big-Data-Flink/tree/NGSI-LD) |
-| --- |
+| ![NGSI LD](https://img.shields.io/badge/NGSI-LD-d6604d.svg) | :books: [Documentation](https://github.com/FIWARE/tutorials.Big-Data-Flink/tree/NGSI-LD) | <img  src="https://cdn.jsdelivr.net/npm/simple-icons@v3/icons/postman.svg" height="15" width="15"> [Postman Collection](https://fiware.github.io/tutorials.Big-Data-Flink/ngsi-ld.html) |
+| --- | --- | --- |
+
 
 ---
 
