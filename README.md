@@ -19,6 +19,9 @@ The tutorial uses [cUrl](https://ec.haxx.se/) commands throughout, but is also a
 
 ## NGSI-v2 Smart Supermarket
 
+| :books: [Documentation](https://fiware-tutorials.readthedocs.io/en/latest/big-data-flink.html) |
+| --- |
+
 **NGSI-v2** offers JSON based interoperability used in individual Smart Systems. To run this tutorial with **NGSI-v2**, use the `NGSI-v2` branch.
 
 ```console
@@ -31,6 +34,9 @@ git checkout NGSI-v2
 ```
 
 ## NGSI-LD Smart Farm
+
+| :books: [Documentation](https://ngsi-ld-tutorials.readthedocs.io/en/latest/big-data-flink.html) |
+| --- |
 
 **NGSI-LD** offers JSON-LD based interoperability used for Federations and Data Spaces. To run this tutorial with **NGSI-LD**, use the `NGSI-LD` branch.
 
