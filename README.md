@@ -1,5 +1,9 @@
-[![FIWARE Banner](https://fiware.github.io/tutorials.Big-Data-Flink/img/fiware.png)](https://www.fiware.org/developers)
-[![NGSI v2](https://img.shields.io/badge/NGSI-v2-5dc0cf.svg)](https://fiware-ges.github.io/orion/api/v2/stable/)
+<h1  align="center">
+    <img src="https://fiware.github.io/tutorials.Step-by-Step/img/fiware-supermarket.png" />
+    <img src="https://img.shields.io/badge/NGSI-v2-5dc0cf.svg" width="90"/>
+</h1>
+
+## Big Data (Flink)
 
 [![FIWARE Core Context Management](https://nexus.lab.fiware.org/static/badges/chapters/core.svg)](https://github.com/FIWARE/catalogue/blob/master/core/README.md)
 [![License: MIT](https://img.shields.io/github/license/fiware/tutorials.Big-Data-Flink.svg)](https://opensource.org/licenses/MIT)
