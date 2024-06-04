@@ -34,7 +34,7 @@
 -   [前提条件](#prerequisites)
     -   [Docker および Docker Compose](#docker-and-docker-compose)
     -   [Maven](#maven)
-    -   [Cygwin for Windows](#cygwin-for-windows)
+    -   [WSL](#wsl)
 -   [起動](#start-up)
 -   [リアルタイム・プロセシング・オペレーション](#real-time-processing-operations)
     -   [Flink 用の JAR ファイルのコンパイル](#compiling-a-jar-file-for-flink)
@@ -236,11 +236,9 @@ Docker バージョン 20.10 以降および Docker Compose 1.29 以降を使用
 ドキュメントを管理できます。Maven を使用して、依存関係を定義およびダウンロードし、コードをビルドして JAR ファイルに
 パッケージ化します。
 
-<a name="cygwin-for-windows"></a>
+## WSL
 
-## Cygwin for Windows
-
-簡単な Bash スクリプトを使用してサービスを開始します。Windows ユーザは、[cygwin](http://www.cygwin.com/) を
+簡単な Bash スクリプトを使用してサービスを開始します。Windows ユーザは、[を使用して Windows に Linux をインストールする方法](https://learn.microsoft.com/ja-jp/windows/wsl/install) を
 ダウンロードして、Windows 上の Linux ディストリビューションに類似したコマンドライン機能を提供する必要があります。
 
 <a name="start-up"></a>
