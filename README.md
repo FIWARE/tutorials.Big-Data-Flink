@@ -36,7 +36,7 @@ The tutorial uses [cUrl](https://ec.haxx.se/) commands throughout, but is also a
 -   [Prerequisites](#prerequisites)
     -   [Docker and Docker Compose](#docker-and-docker-compose)
     -   [Maven](#maven)
-    -   [Cygwin for Windows](#cygwin-for-windows)
+    -   [WSL](#wsl)
 -   [Start Up](#start-up)
 -   [Real-time Processing Operations](#real-time-processing-operations)
     -   [Compiling a JAR file for Flink](#compiling-a-jar-file-for-flink)
@@ -231,10 +231,11 @@ the concept of a project object model (POM), Maven can manage a project's build,
 central piece of information. We will use Maven to define and download our dependencies and to build and package our
 code into a JAR file.
 
-## Cygwin for Windows
+## WSL
 
-We will start up our services using a simple Bash script. Windows users should download [cygwin](http://www.cygwin.com/)
-to provide a command-line functionality similar to a Linux distribution on Windows.
+We will start up our services using a simple Bash script. Windows users should download the
+[Windows Subsystem for Linux](https://learn.microsoft.com/en-us/windows/wsl/install) to provide a command-line
+functionality similar to a Linux distribution on Windows.
 
 # Start Up
 
