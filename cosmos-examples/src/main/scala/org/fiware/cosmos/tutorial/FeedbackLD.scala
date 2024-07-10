@@ -15,7 +15,7 @@ object FeedbackLD {
   final val CONTENT = "{\n  \"type\" : \"Property\",\n  \"value\" : \" \" \n}"
   final val HEADERS = Map(
     "NGSILD-Tenant" -> "openiot",
-    "Link" -> "<http://context/ngsi-context.jsonld>; rel=\"http://www.w3.org/ns/json-ld#context\"; type=\"application/ld+json\""
+    "Link" -> "<http://context/user-context.jsonld>; rel=\"http://www.w3.org/ns/json-ld#context\"; type=\"application/ld+json\""
   )
   final val LOW_THRESHOLD = 35
   final val HIGH_THRESHOLD = 50

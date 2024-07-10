@@ -387,7 +387,7 @@ curl -L -X POST 'http://localhost:1026/ngsi-ld/v1/subscriptions/' \
       "accept": "application/json"
     }
   },
-   "@context": "http://context/ngsi-context.jsonld"
+   "@context": "http://context/user-context.jsonld"
 }'
 ```
 
@@ -401,6 +401,8 @@ If a subscription has been created, we can check to see if it is firing by makin
 ```console
 curl -X GET \
 'http://localhost:1026/ngsi-ld/v1/subscriptions/' \
+-H 'Link: <http://context/user-context.jsonld>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"' \
+
 -H 'NGSILD-Tenant: openiot'
 ```
 
@@ -423,8 +425,7 @@ curl -X GET \
             },
             "timesSent": 74,
             "lastNotification": "2021-02-08T17:06:06.043Z"
-        },
-        "@context": "http://context/ngsi-context.jsonld"
+        }
     }
 ]
 ```
@@ -574,7 +575,7 @@ curl -L -X POST 'http://localhost:1026/ngsi-ld/v1/subscriptions/' \
       "accept": "application/json"
     }
   },
-   "@context": "http://context/ngsi-context.jsonld"
+   "@context": "http://context/user-context.jsonld"
 }'
 ```
 
@@ -612,7 +613,7 @@ object FeedbackLD {
   final val CONTENT = "{\n  \"type\" : \"Property\",\n  \"value\" : \" \" \n}"
   final val HEADERS = Map(
     "NGSILD-Tenant" -> "openiot",
-    "Link" -> "<http://context/ngsi-context.jsonld>; rel=\"http://www.w3.org/ns/json-ld#context\"; type=\"application/ld+json\""
+    "Link" -> "<http://context/user-context.jsonld>; rel=\"http://www.w3.org/ns/json-ld#context\"; type=\"application/ld+json\""
   )
   final val LOW_THRESHOLD = 35
   final val HIGH_THRESHOLD = 50
@@ -670,7 +671,7 @@ The arguments of the **`OrionSinkObject`** are:
 -   **Content Type**: `ContentType.JSON`.
 -   **HTTP Method**: `HTTPMethod.PATCH`.
 -   **Headers**:
-    `Map("NGSILD-Tenant" -> "openiot", "Link" -> "<http://context/ngsi-context.jsonld>; rel=\"http://www.w3.org/ns/json-ld#context\"; type=\"application/ld+json\"" )`.
+    `Map("NGSILD-Tenant" -> "openiot", "Link" -> "<http://context/user-context.jsonld>; rel=\"http://www.w3.org/ns/json-ld#context\"; type=\"application/ld+json\"" )`.
     We add the headers we need in the HTTP Request.
 
 # Next Steps
