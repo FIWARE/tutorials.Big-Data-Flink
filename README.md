@@ -371,7 +371,8 @@ This is done by making a POST request to the `/ngsi-ld/v1/subscriptions` endpoin
 #### 1️⃣ Request:
 
 ```console
-curl -L -X POST 'http://localhost:1026/ngsi-ld/v1/subscriptions/' \
+curl -L -X POST \
+  'http://localhost:1026/ngsi-ld/v1/subscriptions/' \
 -H 'Content-Type: application/ld+json' \
 -H 'NGSILD-Tenant: openiot' \
 --data-raw '{
@@ -559,7 +560,8 @@ soil humidity sensor.
 #### 3️⃣ Request:
 
 ```console
-curl -L -X POST 'http://localhost:1026/ngsi-ld/v1/subscriptions/' \
+curl -L -X POST \
+  'http://localhost:1026/ngsi-ld/v1/subscriptions/' \
 -H 'Content-Type: application/ld+json' \
 -H 'NGSILD-Tenant: openiot' \
 --data-raw '{

@@ -392,7 +392,8 @@ curl -X POST -H "Expect:" -F "jarfile=@/cosmos-examples-1.2.jar" http://localhos
 #### 1️⃣ リクエスト :
 
 ```console
-curl -L -X POST 'http://localhost:1026/ngsi-ld/v1/subscriptions/' \
+curl -L -X POST \
+  'http://localhost:1026/ngsi-ld/v1/subscriptions/' \
 -H 'Content-Type: application/ld+json' \
 -H 'NGSILD-Tenant: openiot' \
 --data-raw '{
@@ -590,7 +591,8 @@ processedDataStream.print().setParallelism(1)
 #### 3️⃣ リクエスト:
 
 ```console
-curl -L -X POST 'http://localhost:1026/ngsi-ld/v1/subscriptions/' \
+curl -L -X POST \
+  'http://localhost:1026/ngsi-ld/v1/subscriptions/' \
 -H 'Content-Type: application/ld+json' \
 -H 'NGSILD-Tenant: openiot' \
 --data-raw '{
