@@ -685,4 +685,4 @@ the other [tutorials in this series](https://fiware-tutorials.rtfd.io)
 
 ## License
 
-[MIT](LICENSE) © 2021-2025 FIWARE Foundation e.V.
+[MIT](LICENSE) © 2021-2026 FIWARE Foundation e.V.
