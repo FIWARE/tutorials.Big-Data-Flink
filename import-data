@@ -14,10 +14,10 @@ echo -e "      \033[1m"${TUTORIAL_DATA_MODELS_CONTEXT}"\033[0m JSON-LD context"
 # Create four Farm Entities in various locations across Berlin
 #
 curl -s -o /dev/null -X POST 'http://'"${CONTEXT_BROKER}"'/ngsi-ld/v1/entityOperations/upsert' \
--H 'Content-Type: application/json' \
--H 'Link: <'"${TUTORIAL_DATA_MODELS_CONTEXT}"'>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"' \
--H 'Accept: application/ld+json' \
---data-raw '[
+    -H 'Content-Type: application/json' \
+    -H 'Link: <'"${TUTORIAL_DATA_MODELS_CONTEXT}"'>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"' \
+    -H 'Accept: application/ld+json' \
+    --data-raw '[
   {
     "id": "urn:ngsi-ld:Building:farm001",
     "type": "Building",
@@ -32,7 +32,19 @@ curl -s -o /dev/null -X POST 'http://'"${CONTEXT_BROKER}"'/ngsi-ld/v1/entityOper
         "value": { "type": "Point", "coordinates": [13.3505, 52.5144]}
     },
     "name": {"type": "Property","value": "Victory Farm"},
-    "owner": {"type": "Relationship", "object": "urn:ngsi-ld:Person:person001"}
+    "owner": {"type": "Relationship", "object": "urn:ngsi-ld:Person:person001"},
+    "fillingLevel": {
+      "type": "Property",
+      "value": 1,
+      "unitCode": "C62",
+      "providedBy": {"type": "Relationship", "object": "urn:ngsi-ld:FillingLevelSensor:001"}
+    },
+    "temperature": {
+      "type": "Property",
+      "value": 20,
+      "unitCode": "CEL",
+      "providedBy": {"type": "Relationship", "object": "urn:ngsi-ld:TemperatureSensor:001"}
+    }
   },
   {
     "id": "urn:ngsi-ld:Building:barn002",
@@ -48,7 +60,19 @@ curl -s -o /dev/null -X POST 'http://'"${CONTEXT_BROKER}"'/ngsi-ld/v1/entityOper
         "value": { "type": "Point", "coordinates": [13.3698, 52.5163]}
     },
     "name": {"type": "Property","value": "Big Red Barn"},
-    "owner": {"type": "Relationship", "object": "urn:ngsi-ld:Person:person001"}
+    "owner": {"type": "Relationship", "object": "urn:ngsi-ld:Person:person001"},
+    "fillingLevel": {
+      "type": "Property",
+      "value": 0.9,
+      "unitCode": "C62",
+      "providedBy": {"type": "Relationship", "object": "urn:ngsi-ld:FillingLevelSensor:002"}
+    },
+    "temperature": {
+      "type": "Property",
+      "value": 21,
+      "unitCode": "CEL",
+      "providedBy": {"type": "Relationship", "object": "urn:ngsi-ld:TemperatureSensor:002"}
+    }
   },
   {
     "id": "urn:ngsi-ld:Building:tower003",
@@ -80,18 +104,150 @@ curl -s -o /dev/null -X POST 'http://'"${CONTEXT_BROKER}"'/ngsi-ld/v1/entityOper
         "value": { "type": "Point", "coordinates": [13.3127, 52.4893]}
     },
     "name": {"type": "Property","value": "Animal Farm"},
-    "owner": {"type": "Relationship", "object": "urn:ngsi-ld:Person:person002"}
+    "owner": {"type": "Relationship", "object": "urn:ngsi-ld:Person:person002"},
+    "fillingLevel": {
+      "type": "Property",
+      "value": 0.8,
+      "unitCode": "C62",
+      "providedBy": {"type": "Relationship", "object": "urn:ngsi-ld:FillingLevelSensor:003"}
+    },
+    "temperature": {
+      "type": "Property",
+      "value": 27,
+      "unitCode": "CEL",
+      "providedBy": {"type": "Relationship", "object": "urn:ngsi-ld:TemperatureSensor:003"}
+    }
   },
   {
     "id": "urn:ngsi-ld:Person:person001",
     "type": "Person",
-    "name": {"type": "Property","value": "Old MacDonald"}
+    "name": {"type": "Property","value": "Old MacDonald"},
+    "owns": {"type": "Relationship", "object": "urn:ngsi-ld:Building:farm001"},
+    "jobTitle": {
+        "type": "Property",
+        "value": {
+          "inDefinedTermSet": "https://targetjobs.co.uk/careers-advice/job-descriptions",
+          "termCode": "277119-agricultural-manager-job-description",
+          "name": "Agricultural Manager",
+          "url": "https://targetjobs.co.uk/careers-advice/job-descriptions/277119-agricultural-manager-job-description"
+        }
+    }
   },
   {
     "id": "urn:ngsi-ld:Person:person002",
     "type": "Person",
-    "name": {"type": "Property","value": "Napoleon the Pig"}
+    "gender": {"type": "Property","value": "male"},
+    "givenName": {"type": "Property","value": "Napoleon"},
+    "name": {"type": "Property","value": "Napoleon the Pig"},
+    "jobTitle": {
+        "type": "Property",
+        "value": {
+          "inDefinedTermSet": "https://targetjobs.co.uk/careers-advice/job-descriptions",
+          "termCode": "277119-agricultural-manager-job-description",
+          "name": "Agricultural Manager",
+          "url": "https://targetjobs.co.uk/careers-advice/job-descriptions/277119-agricultural-manager-job-description"
+        }
+    },
+    "owns": {"type": "Relationship", "object": "urn:ngsi-ld:Building:farm002"},
+    "weight": {
+        "type": "Property","value": 270, "unitCode": "KGM"
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:Person:person003",
+    "type": "Person",
+    "gender": {"type": "Property","value": "male"},
+    "givenName": {"type": "Property","value": "Squealer"},
+    "name": {"type": "Property","value": "Squealer the Pig"},
+    "jobTitle": {
+        "type": "Property",
+        "value": {
+          "inDefinedTermSet": "https://targetjobs.co.uk/careers-advice/job-descriptions",
+          "termCode": "276387-broadcasting-presenter-job-description",
+          "name": "Broadcasting Presenter",
+          "url": "https://targetjobs.co.uk/careers-advice/job-descriptions/276387-broadcasting-presenter-job-description"
+        }
+    },
+    "weight": {
+        "type": "Property","value": 230, "unitCode": "KGM"
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:Person:person004",
+    "type": "Person",
+    "gender": {"type": "Property","value": "male"},
+    "givenName": {"type": "Property","value": "Snowball"},
+    "name": {"type": "Property","value": "Snowball the Pig"},
+    "jobTitle": {
+        "type": "Property",
+        "value": {
+          "inDefinedTermSet": "https://targetjobs.co.uk/careers-advice/job-descriptions",
+          "termCode": "277089-agricultural-consultant-description",
+          "name": "Agricultural Consultant",
+          "url": "https://targetjobs.co.uk/careers-advice/job-descriptions/277089-agricultural-consultant"
+        }
+    },
+    "weight": {
+        "type": "Property","value": 250, "unitCode": "KGM"
+    }
   }
 ]'
+
+
+curl -s -o /dev/null -X POST 'http://'"${CONTEXT_BROKER}"'/ngsi-ld/v1/entityOperations/upsert' \
+    -H 'Content-Type: application/json' \
+    -H 'Link: <'"${TUTORIAL_DATA_MODELS_CONTEXT}"'>; rel="http://www.w3.org/ns/json-ld#context"; type="application/ld+json"' \
+    -H 'NGSILD-Tenant: openiot' \
+    -H 'Accept: application/ld+json' \
+    --data-raw '[
+  {
+    "id": "urn:ngsi-ld:Device:tractor001",
+    "type": "Tractor"
+  },
+  {
+    "id": "urn:ngsi-ld:Device:tractor002",
+    "type": "Tractor"
+  },
+  {
+    "id": "urn:ngsi-ld:Device:tractor003",
+    "type": "Tractor"
+  },
+  {
+    "id": "urn:ngsi-ld:Device:tractor004",
+    "type": "Tractor"
+  },
+  {
+    "id": "urn:ngsi-ld:Device:water001",
+    "type": "Water"
+  },
+  {
+    "id": "urn:ngsi-ld:Device:water002",
+    "type": "Water"
+  },
+  {
+    "id": "urn:ngsi-ld:Device:water003",
+    "type": "Water"
+  },
+  {
+    "id": "urn:ngsi-ld:Device:water004",
+    "type": "Water"
+  },
+  {
+    "id": "urn:ngsi-ld:Device:filling001",
+    "type": "FillingLevelSensor"
+  },
+  {
+    "id": "urn:ngsi-ld:Device:filling002",
+    "type": "FillingLevelSensor"
+  },
+  {
+    "id": "urn:ngsi-ld:Device:filling003",
+    "type": "FillingLevelSensor"
+  },
+  {
+    "id": "urn:ngsi-ld:Device:filling004",
+    "type": "FillingLevelSensor"
+  }
+  ]'
 
 echo -e " \033[1;32mdone\033[0m"

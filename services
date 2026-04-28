@@ -172,7 +172,7 @@ addIoTDatabaseIndex () {
 	printf "Adding appropriate \033[1mMongoDB\033[0m indexes for \033[1;36mIoT-Agent\033[0m  ..."
 	docker exec db-mongo mongosh --eval '
 	conn = new Mongo();
-	db = conn.getDB("iotagentul");
+	db = conn.getDB("iotagentjson");
 	db.getCollectionNames().forEach(c=>db[c].drop());
 	db.createCollection("devices");
 	db.devices.createIndex({"_id.service": 1, "_id.id": 1, "_id.type": 1});
@@ -205,7 +205,7 @@ case "${command}" in
 		waitForCoreContext
 		echo -e "Starting containers:  \033[1;34mOrion\033[0m, \033[1;36mIoT-Agent\033[0m, two \033[1mFlink\033[0m instances (jobmanager taskmanager)  and a \033[1mTutorial\033[0m, a linked data \033[1mContext\033[0m and \033[1mMongoDB\033[0m database."
 		echo -e "- \033[1;34mOrion\033[0m is the context broker"
-		echo -e "- \033[1;36mIoT-Agent\033[0m is configured for the UltraLight Protocol"
+		echo -e "- \033[1;36mIoT-Agent\033[0m is configured for the JSON Protocol"
 		echo -e "- \033[1mTutorial\033[0m displays a web app to manipulate the context directly"
 		echo -e "- \033[1mIoT Devices\033[0m acts as a series of dummy IoT Sensors over HTTP"
 		echo -e "- \033[1mApache Flink\033[0m is a stream-processing framework"
@@ -227,7 +227,7 @@ case "${command}" in
 		waitForCoreContext
 		echo -e "Starting containers:  \033[1;34mScorpio\033[0m, and a \033[1mPostgres\033[0m database, \033[1;36mIoT-Agent\033[0m, two \033[1mFlink\033[0m instances (jobmanager taskmanager)  and a \033[1mTutorial\033[0m, a linked data \033[1mContext\033[0m and \033[1mMongoDB\033[0m database."
 		echo -e "- \033[1;Scorpio\033[0m is the context broker"
-		echo -e "- \033[1;36mIoT-Agent\033[0m is configured for the UltraLight Protocol"
+		echo -e "- \033[1;36mIoT-Agent\033[0m is configured for the JSON Protocol"
 		echo -e "- \033[1mTutorial\033[0m displays a web app to manipulate the context directly"
 		echo -e "- \033[1mIoT Devices\033[0m acts as a series of dummy IoT Sensors over HTTP"
 		echo -e "- \033[1mApache Flink\033[0m is a stream-processing framework"
@@ -249,7 +249,7 @@ case "${command}" in
 		waitForCoreContext
 		echo -e "Starting containers:  \033[1;34mStellio\033[0m, \033[1;36mIoT-Agent\033[0m, \033[1mTutorial\033[0m, \033[1mKafka\033[0m, \033[1mPostgreSQL/TimescaleDB\033[0m, and a linked data \033[1mContext\033[0m."
 		echo -e "- \033[1;Stellio\033[0m is the context broker"
-		echo -e "- \033[1;36mIoT-Agent\033[0m is configured for the UltraLight Protocol"
+		echo -e "- \033[1;36mIoT-Agent\033[0m is configured for the JSON Protocol"
 		echo -e "- \033[1mTutorial\033[0m displays a web app to manipulate the context directly"
 		echo -e "- \033[1mIoT Devices\033[0m acts as a series of dummy IoT Sensors over HTTP"
 		echo -e "- \033[1mApache Flink\033[0m is a stream-processing framework"
