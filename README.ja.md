@@ -91,7 +91,7 @@ FIWARE に基づくスマート・ソリューションは、マイクロサー�
 このアプリケーションは、[以前のチュートリアル](https://github.com/FIWARE/tutorials.IoT-Agent/)で作成されたコンポーネントと
 ダミー IoT デバイス上に構築されます。 3つの FIWARE コンポーネントを使用します。
 [Orion Context Broker](https://fiware-orion.readthedocs.io/en/latest/),
-[IoT Agent for Ultralight 2.0](https://fiware-iotagent-ul.readthedocs.io/en/latest/) および Orion を
+[IoT Agent for JSON](https://fiware-iotagent-json.readthedocs.io/en/latest/) および Orion を
 [Apache Flink cluster](https://ci.apache.org/projects/flink/flink-docs-stable/concepts/runtime.html) クラスタに接続する
 ための [Cosmos Orion Flink Connector](https://fiware-cosmos-flink.readthedocs.io/en/latest/) です。Flink クラスタ自体は、
 実行を調整する単一の **JobManager** _master_ と、タスクを実行する単一の **TaskManager** _worker_ で構成されます。
@@ -105,8 +105,8 @@ Orion Context Broker と IoT Agent はどちらも、オープンソースの [M
 -   独立したマイクロサービスとしての2つの **FIWARE Generic Enablers** :
     -   FIWARE [Orion Context Broker](https://fiware-orion.readthedocs.io/en/latest/)は、
         [NGSI-v2](https://fiware.github.io/specifications/OpenAPI/ngsiv2) を使用してリクエストを受信します
-    -   FIWARE [IoT Agent for Ultralight 2.0](https://fiware-iotagent-ul.readthedocs.io/en/latest/) は、ダミー IoT
-        デバイスから Ultralight 2.0 形式のノースバウンド測定値を受信し、Context Broker の
+    -   FIWARE [IoT Agent for JSON](https://fiware-iotagent-json.readthedocs.io/en/latest/) は、ダミー IoT
+        デバイスから JSON 形式のノースバウンド測定値を受信し、Context Broker の
         [NGSI-v2](https://fiware.github.io/specifications/OpenAPI/ngsiv2) リクエストに変換して、コンテキスト・
         エンティティの状態を変更します
 -   [Apache Flink cluster](https://ci.apache.org/projects/flink/flink-docs-stable/concepts/runtime.html) は、
@@ -120,7 +120,7 @@ Orion Context Broker と IoT Agent はどちらも、オープンソースの [M
     -   **IoT Agent** がデバイスの URL やキーなどのデバイス情報を保持するために使用します
 -   3つの**コンテキスト・プロバイダ** :
     -   HTTP 上で実行される
-        [Ultralight 2.0](https://fiware-iotagent-ul.readthedocs.io/en/latest/usermanual/index.html#user-programmers-manual)
+        [JSON](https://fiware-iotagent-json.readthedocs.io/en/latest/usermanual/index.html#user-programmers-manual)
         を使用する、[ダミー IoT デバイス](https://github.com/FIWARE/tutorials.IoT-Sensors/tree/NGSI-v2) のセットとして
         機能する Webサーバ
     -   **在庫管理フロントエンド** は、このチュートリアルでは使用しません。次のことを行います :
